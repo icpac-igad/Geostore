@@ -8,7 +8,7 @@
     "service": {
         "id": "gfw-geostore-api_1.0.0",
         "name": "GFW GeoStore API",
-        "uri": "http://geostore-api-vizz.herokuapp.com",
+        "uri": "http://gfw-geostore-api.herokuapp.com",
         "port": null
     },
     "apiGateway":{
