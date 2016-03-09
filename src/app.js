@@ -35,10 +35,13 @@ var onDbReady = function (err) {
         } catch(err) {
             logger.error('Codigo de estado ', this.status);
             logger.error('Codigo de error ', err.status);
-
+            logger.error('Data err', err);
             this.status = err.status || this.status || 500;
+            logger.error('Status', this.status);
             this.body = ErrorSerializer.serializeError(this.status, err.message );
+            logger.error('Body', this.body);
             if(process.env.NODE_ENV === 'prod' && this.status === 500 ){
+                logger.error('Entra aqui');
                 this.body = 'Unexpected error';
             }
         }
