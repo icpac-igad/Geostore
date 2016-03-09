@@ -25,6 +25,7 @@ class GeoStoreRouter {
         } finally {
             if(!geoJSON) {
                 this.throw(404, 'GeoStore not found');
+                return;
             }
             this.body = GeoJSONSerializer.serialize(geoJSON);
         }
