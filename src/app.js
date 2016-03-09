@@ -33,6 +33,9 @@ var onDbReady = function (err) {
         try {
             yield next;
         } catch(err) {
+            logger.error('Codigo de estado ', this.status);
+            logger.error('Codigo de error ', err.status);
+
             this.status = err.status || this.status || 500;
             this.body = ErrorSerializer.serializeError(this.status, err.message );
             if(process.env.NODE_ENV === 'prod' && this.status === 500 ){
