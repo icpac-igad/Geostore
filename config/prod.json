@@ -1,0 +1,20 @@
+{
+    "logger": {
+        "name": "gfw-geostore-api-DEV",
+        "level": "error",
+        "toFile": true,
+        "dirLogFile": "/var/logs/gfw-geostore-api.log"
+    },
+    "service": {
+        "id": "gfw-geostore-api_1.0.0",
+        "name": "GFW GeoStore API",
+        "uri": "change",
+        "port": null
+    },
+    "apiGateway":{
+        "uri": null
+    },
+    "mongodb":{
+        "uri": null
+    }
+}

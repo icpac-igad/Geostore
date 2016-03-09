@@ -1,0 +1,20 @@
+{
+    "logger": {
+        "name": "gfw-geostore-api-STAGING",
+        "level": "debug",
+        "toFile": false,
+        "dirLogFile": null
+    },
+    "service": {
+        "id": "gfw-geostore-api_1.0.0",
+        "name": "GFW GeoStore API",
+        "uri": "http://geostore-api-vizz.herokuapp.com",
+        "port": null
+    },
+    "apiGateway":{
+        "uri": null
+    },
+    "mongodb":{
+        "uri": null
+    }
+}
