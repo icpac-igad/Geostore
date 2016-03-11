@@ -1,7 +1,7 @@
 {
     "logger": {
         "name": "gfw-geostore-api-DEV",
-        "level": "debug",
+        "level": "error",
         "toFile": false,
         "dirLogFile": null
     },
@@ -16,5 +16,8 @@
     },
     "mongodb":{
         "uri": "mongodb://192.168.99.100:32768/gfw_geostore_db"
+    },
+    "migrate":{
+        "uri": "http://staging.api-staging.globalforestwatch.org/geostore/all"
     }
 }

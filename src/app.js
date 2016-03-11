@@ -63,5 +63,5 @@ var onDbReady = function (err) {
     logger.info('Server started in port:' + port);
 
 };
-
+logger.debug('Connecting');
 mongoose.connect(mongoUri, onDbReady);

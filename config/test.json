@@ -16,5 +16,8 @@
     },
     "mongodb":{
         "uri": null
+    },
+    "migrate": {
+        "uri": "http://staging.api-staging.globalforestwatch.org/geostore/all"
     }
 }

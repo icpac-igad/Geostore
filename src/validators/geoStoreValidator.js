@@ -6,7 +6,7 @@ class GeoStoreValidator {
 
     static * create(next) {
         logger.debug('Validate create geostore');
-        this.checkBody('body').isGEOJSON();
+        this.checkBody('body').isGEOJSON().toGEOJSON();
 
         if(this.errors) {
             logger.debug('errors ', this.errors);
