@@ -4,7 +4,7 @@ var request = require('co-request');
 var logger = require('logger');
 var co = require('co');
 var mongoose = require('mongoose');
-var GeoJSONConverter = require('converters/geoJSONConverter');
+var geoJSONConverter = require('converters/geoJSONConverter');
 var geojsonhint = require('geojsonhint');
 var uriMigrate = process.env.MIGRATE_URI || config.get('migrate.uri');
 var mongoUri = process.env.MONGOLAB_URI || config.get('mongodb.uri');
@@ -45,7 +45,8 @@ var checkIfExist = function*(id){
         return true;
     }
     return false;
-}
+};
+
 var saveData = function *(element) {
     logger.debug('Saving element');
     try{
@@ -64,7 +65,7 @@ var saveData = function *(element) {
         logger.error(e);
     }
     logger.debug('Saved');
-}
+};
 
 var transformAndSaveData = function *(data) {
     logger.debug('Transforming data');
@@ -85,7 +86,7 @@ var transformAndSaveData = function *(data) {
                 if(!result || result.length === 0) {
                     yield saveData({
                         id: geoData.id,
-                        geojson: GeoJSONConverter(geojson)
+                        geojson: geoJSONConverter(geojson)
                     });
                 }
             }
@@ -118,5 +119,5 @@ var onDbReady = function(){
         yield migrate();
         process.exit();
     });
-}
+};
 mongoose.connect(mongoUri, onDbReady);

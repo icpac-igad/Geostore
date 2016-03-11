@@ -2,7 +2,7 @@
 var logger = require('logger');
 var geojsonhint = require('geojsonhint');
 var koaValidate = require('koa-validate');
-var GeoJSONConverter = require('converters/geoJSONConverter');
+var geoJSONConverter = require('converters/geoJSONConverter');
 
 (function(){
 
@@ -15,7 +15,7 @@ var GeoJSONConverter = require('converters/geoJSONConverter');
     };
 
     koaValidate.Validator.prototype.toGEOJSON = function(tip){
-            this.params = GeoJSONConverter(this.params);
+            this.params = geoJSONConverter(this.params);
             return this;
     };
 
