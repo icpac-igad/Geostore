@@ -2,7 +2,7 @@
 
 let logger = require('logger');
 
-module.exports = function(data){
+module.exports.convert = function(data){
     if(data.coordinates){
         logger.debug('is a geometry');
         return {

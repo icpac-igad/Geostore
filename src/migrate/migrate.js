@@ -4,7 +4,7 @@ var request = require('co-request');
 var logger = require('logger');
 var co = require('co');
 var mongoose = require('mongoose');
-var geoJSONConverter = require('converters/geoJSONConverter');
+var GeoJSONConverter = require('converters/geoJSONConverter');
 var geojsonhint = require('geojsonhint');
 var uriMigrate = process.env.MIGRATE_URI || config.get('migrate.uri');
 var mongoUri = process.env.MONGOLAB_URI || config.get('mongodb.uri');
@@ -86,7 +86,7 @@ var transformAndSaveData = function *(data) {
                 if(!result || result.length === 0) {
                     yield saveData({
                         id: geoData.id,
-                        geojson: geoJSONConverter(geojson)
+                        geojson: GeoJSONConverter.convert(geojson)
                     });
                 }
             }
