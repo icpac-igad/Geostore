@@ -94,7 +94,7 @@ var transformAndSaveData = function *(data) {
             logger.error('JSON not valid', e);
         }
 
-        logger.debug('Percentage %', ((i / length) * 100));
+        logger.debug('Percentage %', parseInt((i / length) * 100, 10));
     }
     logger.debug('Finished converting data');
     return newData;
