@@ -10,7 +10,7 @@ npm install -g bunyan  // logger system
 ```
 ## Run
 Execute the next command: Environment available: dev, test, staging, prod
-
+ 
 ```bash
     NODE_ENV=<env> npm start
 ```
