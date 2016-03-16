@@ -12,4 +12,5 @@ var koaValidate = require('koa-validate');
         }
         return this;
     };
+
 }());

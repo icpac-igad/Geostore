@@ -16,5 +16,8 @@
     },
     "mongodb":{
         "uri": null
+    },
+    "migrate":{
+        "uri": null
     }
 }
