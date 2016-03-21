@@ -1,53 +1,43 @@
 # GFW GeoStore API
 This repository is the microservice that it implement the geostore funcionality and exposed the /geostore endpoint in the apigateway
 
-## Installation in local
+## First time user
+Perform the following steps:
+* [Install docker](https://docs.docker.com/engine/installation/)
+* Clone this repository: ```git clone git@github.com:Vizzuality/gfw-ogr-api.git```
+* Enter in the directory (cd gfw-ogr-api)
+* After, you open a terminal (if you have mac or windows, open a terminal with the 'Docker Quickstart Terminal') and execute the next command:
 
 ```bash
-npm install
+    docker-compose -f docker-compose-develop.yml build
 
-npm install -g bunyan  // logger system
-```
-Is necessary install mongodb and you set the url in file config by your environment.
-
-## Run
-Execute the next command: Environment available: dev, test, staging, prod
- 
-```bash
-    NODE_ENV=<env> npm start
 ```
 
-if you want see the logs formatted execute:
+## Run in develop mode (Watch mode)
+Remember: In windows and Mac, open the terminal with 'Docker Quickstart Terminal'
 
 ```bash
-    NODE_ENV=<env> npm start | bunyan
+docker-compose -f docker-compose-develop.yml build
+//this command up the machine. If you want up in background mode, you add the -d option
 ```
+
 
 ## Execute test
-```bash
-    npm test
+Remember: In windows and Mac, open the terminal with 'Docker Quickstart Terminal'
+```
+docker-compose -f docker-compose-test.yml run test
 ```
 
-if you want see the logs formatted execute:
+## Install in heroku
 
-```bash
-    npm test | bunyan
-```
+Config heroku app with: [https://elements.heroku.com/buildpacks/prashtx/heroku-buildpack-gdal](https://elements.heroku.com/buildpacks/prashtx/heroku-buildpack-gdal)
 
-## Run in develop mode
-We use grunt. Execute the next command:
-
-```bash
-    npm run develop
-```
-
-## Production and Staging installation environment
 Is necessary define the next environment variables:
-
 * API_GATEWAY_URI => Url the register of the API Gateway. Remember: If the authentication is active in API Gateway, add the username and password in the url
 * NODE_ENV => Environment (prod, staging, dev)
 
 
+# Config
 
 ## register.json
 This file contain the configuration about the endpoints that public the microservice. This json will send to the apigateway. it can contain variables:
