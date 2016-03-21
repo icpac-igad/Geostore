@@ -11,16 +11,16 @@
         "uri": "http://gfw-geostore-api.herokuapp.com",
         "port": null
     },
-    "apiGateway":{
+    "apiGateway": {
         "uri": null
     },
-    "mongodb":{
+    "mongodb": {
         "uri": null,
         "uri": null,
         "database": null,
         "host": null
     },
-    "migrate": {
+    "migrate":  {
         "uri": null
     }
 }
