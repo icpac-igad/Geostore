@@ -1,26 +1,26 @@
 {
     "logger": {
-        "name": "gfw-geostore-api-DEV",
-        "level": "error",
-        "toFile": true,
-        "dirLogFile": "/var/logs/gfw-geostore-api.log"
+        "name": "gfw-geostore-api",
+        "level": "info",
+        "toFile": false,
+        "dirLogFile": null
     },
     "service": {
         "id": "gfw-geostore-api_1.0.0",
         "name": "GFW GeoStore API",
-        "uri": "change",
+        "uri": "http://gfw-geostore-api.herokuapp.com",
         "port": null
     },
-    "apiGateway":{
-        "uri": null,
-        "uri": null,
-        "database": null,
-        "host": null
-    },
-    "mongodb":{
+    "apiGateway": {
         "uri": null
     },
-    "migrate": {
+    "mongodb": {
+        "uri": null,
+        "database": null,
+        "host": null,
+        "port": null
+    },
+    "migrate": {
         "uri": null
     }
 }

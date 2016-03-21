@@ -16,11 +16,11 @@
     },
     "mongodb": {
         "uri": null,
-        "uri": null,
         "database": null,
-        "host": null
+        "host": null,
+        "port": null
     },
-    "migrate":  {
+    "migrate": {
         "uri": null
     }
 }

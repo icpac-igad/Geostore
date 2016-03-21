@@ -12,7 +12,7 @@
         "port": 3100
     },
     "apiGateway":{
-        "uri": "http://localhost:8000/gateway/service"
+        "uri": null
     },
     "mongodb":{
         "uri": null,
