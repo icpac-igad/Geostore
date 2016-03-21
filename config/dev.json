@@ -8,13 +8,19 @@
     "service": {
         "id": "gfw-geostore-api_1.0.0",
         "name": "GFW GeoStore API",
-        "uri": "http://localhost:3100",
+        "uri": "http://192.168.99.100:3100",
         "port": 3100
     },
     "apiGateway":{
-        "uri": "http://localhost:8000/gateway/service"
+        "uri": "http://192.168.99.100:8000/gateway/service"
     },
     "mongodb":{
-        "uri": "mongodb://192.168.99.100:32768/gfw_geostore_db"
+        "uri": "mongodb://192.168.99.100:32780/gfw_geostore_db",
+        "database": "gfw_geostore_db",
+        "host": "192.168.99.100",
+        "port": 32780
+    },
+    "migrate":{
+        "uri": "http://staging.api-staging.globalforestwatch.org/geostore/all"
     }
 }

@@ -1,8 +1,13 @@
 language: node_js
 node_js:
 - 5.7.0
+sudo: required
+services:
+  - docker
+
 script:
-- npm test
+  - docker-compose -f docker-compose-test.yml build
+  - docker-compose -f docker-compose-test.yml run test
 deploy:
   provider: heroku
   app: gfw-geostore-api

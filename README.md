@@ -12,7 +12,7 @@ Is necessary install mongodb and you set the url in file config by your environm
 
 ## Run
 Execute the next command: Environment available: dev, test, staging, prod
-
+ 
 ```bash
     NODE_ENV=<env> npm start
 ```
@@ -54,3 +54,28 @@ This file contain the configuration about the endpoints that public the microser
 * #(service.id) => Id of the service setted in the config file by environment
 * #(service.name) => Name of the service setted in the config file by environment
 * #(service.uri) => Base uri of the service setted in the config file by environment
+
+Example:
+````
+{
+    "id": "#(service.id)",
+    "name": "#(service.name)",
+    "urls": [{
+        "url": "/geostore",
+        "method": "POST",
+        "endpoints": [{
+            "method": "POST",
+            "baseUrl": "#(service.uri)",
+            "path": "/api/v1/geostore"
+        }]
+    }, {
+        "url": "/geostore/:id",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "baseUrl": "#(service.uri)",
+            "path": "/api/v1/geostore/:id"
+        }]
+    }]
+}
+```
