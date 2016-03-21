@@ -5,34 +5,38 @@ var request = require('co-request');
 var url = require('url');
 var co = require('co');
 var slug = require('slug');
-var idService = null;
-var apiGatewayUri = process.env.API_GATEWAY_URI || config.get('apiGateway.uri');
+var apiGatewayUri = config.get('apiGateway.uri');
+
+var unregisterDone = false;
 
 var unregister = function* () {
-    logger.info('Unregistering service ', idService);
-    try {
-        let result = yield request({
-            uri: apiGatewayUri + '/' + idService,
-            method: 'DELETE'
-        });
-        if(result.statusCode !== 200) {
+    if(!unregisterDone){
+        logger.info('Unregistering service ', config.get('service.id'));
+        try {
+            let result = yield request({
+                uri: apiGatewayUri + '/' + config.get('service.id'),
+                method: 'DELETE'
+            });
+            if(result.statusCode !== 200) {
+                logger.error('Error unregistering service');
+                process.exit();
+            }
+            unregisterDone = true;
+            logger.info('Unregister service correct!');
+            process.exit();
+        } catch(e) {
             logger.error('Error unregistering service');
             process.exit();
         }
-        logger.info('Unregister service correct!');
-        process.exit();
-    } catch(e) {
-        logger.error('Error unregistering service');
-        process.exit();
     }
 };
 
 var exitHandler = function (signal) {
     logger.error('Signal', signal);
-    process.exit();
-    // co(function* () {
-    //     yield unregister();
-    // });
+    // process.exit();
+    co(function* () {
+        yield unregister();
+    });
 };
 
 var loadRegisterFile = function(){
@@ -43,7 +47,7 @@ var loadRegisterFile = function(){
 };
 
 var register = function () {
-    var pack = require('../package.json');
+    var pack = require('../../package.json');
     co(function* () {
         if(process.env.SELF_REGISTRY) {
             logger.info('Registering service in API Gateway...');
@@ -61,8 +65,6 @@ var register = function () {
                 if(result.statusCode !== 200) {
                     logger.error('Error registering service:', result);
                     process.exit();
-                } else {
-                    idService = result.body._id;
                 }
 
                 logger.info('Register service in API Gateway correct!');

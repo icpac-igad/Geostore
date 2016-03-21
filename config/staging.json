@@ -15,7 +15,10 @@
         "uri": null
     },
     "mongodb":{
-        "uri": null
+        "uri": null,
+        "uri": null,
+        "database": null,
+        "host": null
     },
     "migrate": {
         "uri": null
