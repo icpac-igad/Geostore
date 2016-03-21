@@ -10,7 +10,7 @@ var loader = require('loader');
 var validate = require('koa-validate');
 var mongoose = require('mongoose');
 var ErrorSerializer = require('serializers/errorSerializer');
-var mongoUri = process.env.MONGOLAB_URI || config.get('mongodb.uri');
+var mongoUri = process.env.MONGOLAB_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
 
 var onDbReady = function (err) {
     if(err) {
@@ -26,7 +26,7 @@ var onDbReady = function (err) {
         app.use(koaLogger());
     }
 
-    app.use(bodyParser());
+    app.use(bodyParser({jsonLimit: '50mb'}));
 
     //catch errors and send in jsonapi standard. Always return vnd.api+json
     app.use(function* (next) {

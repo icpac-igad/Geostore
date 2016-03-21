@@ -12,7 +12,10 @@
         "port": null
     },
     "apiGateway":{
-        "uri": null
+        "uri": null,
+        "uri": null,
+        "database": null,
+        "host": null
     },
     "mongodb":{
         "uri": null

@@ -4,12 +4,9 @@
   "description": "Global forest watch - GeoStore API",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_PATH=src NODE_ENV=test grunt test",
-    "test-e2e": "NODE_PATH=src NODE_ENV=test grunt e2eTest",
-    "test-unit": "NODE_PATH=src NODE_ENV=test grunt unitTest",
-    "develop": "NODE_PATH=src grunt | bunyan",
-    "startDev": "NODE_PATH=src NODE_ENV=dev node index | bunyan",
-    "start": "NODE_PATH=src node index"
+      "test-e2e": "NODE_PATH=app/src grunt --gruntfile app/Gruntfile.js e2eTest",
+      "test-unit": "NODE_PATH=app/src grunt --gruntfile app/Gruntfile.js unitTest",
+      "start": "NODE_PATH=app/src node app/index.js"
   },
   "repository": {
     "type": "git",
