@@ -8,6 +8,9 @@ and returns an ID that can be used later to retrieve the given object.
 It is used primarily by the GFW map to handle large GeoJSON objects that
 could not normally be stored in the URL.
 
+[View the documentation for this
+API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/Vizzuality/gfw-geostore-api/master/swagger.yml#/GeoStore)
+
 1. [Getting Started](#getting-started)
 2. [Deployment](#deployment)
 
