@@ -1,81 +1,67 @@
-# GFW GeoStore API
-This repository is the microservice that it implement the geostore funcionality and exposed the /geostore endpoint in the apigateway
+# Global Forest Watch Geostore API
 
-## Installation in local
+This repository is the microservice that implements the Geostore
+funcionality, which is exposed on the /geostore endpoint.
 
-```bash
+The Geostore is a simple GeoJSON storage service that receives GeoJSON
+and returns an ID that can be used later to retrieve the given object.
+It is used primarily by the GFW map to handle large GeoJSON objects that
+could not normally be stored in the URL.
+
+[View the documentation for this
+API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/Vizzuality/gfw-geostore-api/master/swagger.yml#/GeoStore)
+
+1. [Getting Started](#getting-started)
+2. [Deployment](#deployment)
+
+## Getting Started
+
+### OS X
+
+**First, make sure that you have the [API gateway running
+locally](https://github.com/Vizzuality/api-gateway/tree/master#getting-started).**
+
+We're using Docker which, luckily for you, means that getting the
+application running locally should be fairly painless. First, make sure
+that you have [Docker Compose](https://docs.docker.com/compose/install/)
+installed on your machine.
+
+If you've not used Docker before, you may need to set up some defaults:
+
+```
+docker-machine create --driver virtualbox default
+docker-machine start default
+eval $(docker-machine env default)
+```
+
+Now we're ready to actually get the application running:
+
+```
+git clone https://github.com/Vizzuality/gfw-geostore-api.git
+cd gfw-geostore-api
 npm install
-
-npm install -g bunyan  // logger system
-```
-Is necessary install mongodb and you set the url in file config by your environment.
-
-## Run
-Execute the next command: Environment available: dev, test, staging, prod
- 
-```bash
-    NODE_ENV=<env> npm start
+npm run develop
 ```
 
-if you want see the logs formatted execute:
+You can now access the microservice through the API gateway.
 
-```bash
-    NODE_ENV=<env> npm start | bunyan
+## Deployment
+
+The application is deployed to Heroku. Setup Heroku for the repository:
+
+```
+heroku git:remote -a gfw-geostore-api-staging -r staging
 ```
 
-## Execute test
-```bash
-    npm test
+And deploy as normal:
+
+```
+git push staging master
 ```
 
-if you want see the logs formatted execute:
+### Configuration
 
-```bash
-    npm test | bunyan
-```
+It is necessary to define these environment variables:
 
-## Run in develop mode
-We use grunt. Execute the next command:
-
-```bash
-    npm run develop
-```
-
-## Production and Staging installation environment
-Is necessary define the next environment variables:
-
-* API_GATEWAY_URI => Url the register of the API Gateway. Remember: If the authentication is active in API Gateway, add the username and password in the url
+* API_GATEWAY_URI => Gateway Serice API URL
 * NODE_ENV => Environment (prod, staging, dev)
-
-
-
-## register.json
-This file contain the configuration about the endpoints that public the microservice. This json will send to the apigateway. it can contain variables:
-* #(service.id) => Id of the service setted in the config file by environment
-* #(service.name) => Name of the service setted in the config file by environment
-* #(service.uri) => Base uri of the service setted in the config file by environment
-
-Example:
-````
-{
-    "id": "#(service.id)",
-    "name": "#(service.name)",
-    "urls": [{
-        "url": "/geostore",
-        "method": "POST",
-        "endpoints": [{
-            "method": "POST",
-            "baseUrl": "#(service.uri)",
-            "path": "/api/v1/geostore"
-        }]
-    }, {
-        "url": "/geostore/:id",
-        "method": "GET",
-        "endpoints": [{
-            "method": "GET",
-            "baseUrl": "#(service.uri)",
-            "path": "/api/v1/geostore/:id"
-        }]
-    }]
-}
-```
