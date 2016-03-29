@@ -4,23 +4,5 @@
         "level": "debug",
         "toFile": false,
         "dirLogFile": null
-    },
-    "service": {
-        "id": "gfw-geostore-api_1.0.0",
-        "name": "GFW GeoStore API",
-        "uri": "http://localhost:3100",
-        "port": 3100
-    },
-    "apiGateway":{
-        "uri": null
-    },
-    "mongodb":{
-        "uri": null,
-        "uri": null,
-        "database": null,
-        "host": null
-    },
-    "migrate":{
-        "uri": null
     }
 }
