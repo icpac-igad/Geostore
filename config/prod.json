@@ -8,5 +8,5 @@
     "service": {
         "uri": "http://gfw-geostore-api.herokuapp.com",
         "port": null
-    }
+    } 
 }
