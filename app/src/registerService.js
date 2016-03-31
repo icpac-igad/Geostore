@@ -6,6 +6,8 @@ var url = require('url');
 var co = require('co');
 var slug = require('slug');
 var apiGatewayUri = config.get('apiGateway.uri');
+var yaml = require('yaml-js');
+var fs = require('fs');
 
 var unregisterDone = false;
 
@@ -45,6 +47,9 @@ var loadRegisterFile = function(){
         .replace(/#\(service.name\)/g, config.get('service.name'))
         .replace(/#\(service.uri\)/g, config.get('service.uri')));
 };
+var loadPublicSwagger = function(){
+    return yaml.load(fs.readFileSync(__dirname + '/../public-swagger.yml').toString());
+};
 
 var register = function () {
     var pack = require('../../package.json');
@@ -52,6 +57,7 @@ var register = function () {
         if(process.env.SELF_REGISTRY) {
             logger.info('Registering service in API Gateway...');
             let serviceConfig = loadRegisterFile();
+            serviceConfig.swagger = loadPublicSwagger();
             logger.debug(serviceConfig);
             try {
 
