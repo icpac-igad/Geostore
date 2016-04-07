@@ -12,8 +12,8 @@ var mongoose = require('mongoose');
 var ErrorSerializer = require('serializers/errorSerializer');
 var mongoUri = process.env.MONGOLAB_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
 
-var onDbReady = function (err) {
-    if(err) {
+var onDbReady = function(err) {
+    if (err) {
         logger.error(err);
         throw new Error(err);
     }
@@ -22,20 +22,22 @@ var onDbReady = function (err) {
     var app = koa();
 
     //if environment is dev then load koa-logger
-    if(process.env.NODE_ENV === 'dev') {
+    if (process.env.NODE_ENV === 'dev') {
         app.use(koaLogger());
     }
 
-    app.use(bodyParser({jsonLimit: '50mb'}));
+    app.use(bodyParser({
+        jsonLimit: '50mb'
+    }));
 
     //catch errors and send in jsonapi standard. Always return vnd.api+json
-    app.use(function* (next) {
+    app.use(function*(next) {
         try {
             yield next;
-        } catch(err) {
+        } catch (err) {
             this.status = err.status || 500;
-            this.body = ErrorSerializer.serializeError(this.status, err.message );
-            if(process.env.NODE_ENV === 'prod' && this.status === 500 ){
+            this.body = ErrorSerializer.serializeError(this.status, err.message);
+            if (process.env.NODE_ENV === 'prod' && this.status === 500) {
                 this.body = 'Unexpected error';
             }
         }
@@ -56,7 +58,7 @@ var onDbReady = function (err) {
     // In production environment, the port must be declared in environment variable
     var port = process.env.PORT || config.get('service.port');
 
-    server.listen(port, function () {
+    server.listen(port, function() {
         require('registerService')();
     });
 

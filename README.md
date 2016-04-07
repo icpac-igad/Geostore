@@ -1,4 +1,7 @@
 # GFW GeoStore API
+
+Master: [![Build Status](https://travis-ci.org/gfw-api/gfw-geostore-api.svg?branch=master)](https://travis-ci.org/gfw-api/gfw-geostore-api) Develop: [![Build Status](https://travis-ci.org/gfw-api/gfw-geostore-api.svg?branch=develop)](https://travis-ci.org/gfw-api/gfw-geostore-api)
+
 This repository is the microservice that it implement the geostore funcionality and exposed the /geostore endpoint in the apigateway
 
 ## First time user
