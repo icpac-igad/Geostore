@@ -1,4 +1,6 @@
-# Global Forest Watch Geostore API
+# Global Forest Watch Mail API
+
+Master: [![Build Status](https://travis-ci.org/gfw-api/gfw-geostore-api.svg?branch=master)](https://travis-ci.org/gfw-api/gfw-geostore-api) Develop: [![Build Status](https://travis-ci.org/gfw-api/gfw-geostore-api.svg?branch=develop)](https://travis-ci.org/gfw-api/gfw-geostore-api)
 
 This repository is the microservice that implements the Geostore
 funcionality, which is exposed on the /geostore endpoint.
@@ -9,7 +11,7 @@ It is used primarily by the GFW map to handle large GeoJSON objects that
 could not normally be stored in the URL.
 
 [View the documentation for this
-API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/Vizzuality/gfw-geostore-api/master/swagger.yml#/GeoStore)
+API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/gfw-api/gfw-geostore-api/master/app/microservice/swagger.yml#/GeoStore)
 
 1. [Getting Started](#getting-started)
 2. [Deployment](#deployment)
@@ -37,7 +39,7 @@ eval $(docker-machine env default)
 Now we're ready to actually get the application running:
 
 ```
-git clone https://github.com/Vizzuality/gfw-geostore-api.git
+git clone https://github.com/Vizzuality/gfw-ogr-api.git
 cd gfw-geostore-api
 npm install
 npm run develop
@@ -63,5 +65,5 @@ git push staging master
 
 It is necessary to define these environment variables:
 
-* API_GATEWAY_URI => Gateway Serice API URL
+* API_GATEWAY_URI => Gateway Service API URL
 * NODE_ENV => Environment (prod, staging, dev)

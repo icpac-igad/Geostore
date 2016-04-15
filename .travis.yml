@@ -3,13 +3,12 @@ node_js:
 - 5.7.0
 sudo: required
 services:
-  - docker
-
+- docker
 script:
-  - docker-compose -f docker-compose-test.yml build
-  - docker-compose -f docker-compose-test.yml run test
+- docker-compose -f docker-compose-test.yml build
+- docker-compose -f docker-compose-test.yml run test
 deploy:
   provider: heroku
-  app: gfw-geostore-api
+  app: gfw-geostore-api-staging
   api_key:
-    secure: PT3U+kzvXHMyTru7SEnRRy7YuA4Btp7CpT/pKXop8Ldf4/TZ2QJTsMRbDB1UO9qAtwpn0TtyDoIDXeIBcrecLWKOi7S+lOpmD/fK0bJY4nBZtklQLJIX1mpxlMHwAHzXuCWg2BSVM4tD7DQiXDYxHze1aeFCHvolK1HNV4bLflB8AWDdSQBH9jIROWUveqpZP/izh6lVJ35P9zOwdLupbWgmza1hpjS1paxAeqlD/sT/vhosC90Zmrob2FoOZvXUdRBshXin6e6hzp+wfQLd65bH9ZvVGdnNu533bbP790n3nnUSh3Aca/dDKFweL291rAEFjoZuzPE9TrgakiQ1woqePy6fwMn/RTlmHVZTd+r1z0pc0WWvYgublTSCzGOAj4NCGFvEnaoOYBKpsePUf5O5aHN5/eQfBeH5U6HIjBgyUuxoxUAZ6kQVhyH+yWq2/J5UkY4AZ81qz+FJniztnITCKhLv82Hm/7RJMGDfn7bGci3vPnJyv/QBdiF+gUDlFOUvIXmJqek9rGkLtfohoxk/WWX2LVOr/VyNdYbLeDcciOGvyxw0trRhyLbA/mnL3TDYF0d1RCULhVjZ8w32s6oDA+TM6WKKo/8HSOHuYIk6jkfsU6xXSbhZHXBLex1kn3uObm5pqhR1mPB57MxqUnaFkr39W+UCVpO/M22b2Xc=
+    secure: VJZA3Nq34GBJKy0849FoXcOKjjzYZCrIzNVPJrlkjsigXvDKWMEi09+VJps7r5636rRxDn6QlXMogcZflqF2CvVqV9wNPuE3nsMoW980fCjnzgr8Ug6B9p7+YUypUqdeugMu7GNYJ7Vm6Y5cMe9nOKI9mVqiwwRfJc6bUhlovLR3lHVaKvCYVXnF6wUZhIft8Jl0aoL4unQp6GHGBLtjgWQ4twgKTJZXzUrg1L7h0t4c5yKR1iLvmbD9GB708o/Z/TpROTYyzfAHxhpbmijyGQ3E3+X02n5ws3ezYy62uby0y/2a3kAEYNet1Nmjpa2mvuuYTcjHdaD172iW3SKQhQQpiHWl46XBgwaiK0AdW+mzhHEOTa4n7Q1UBEKwY/JC0YdTg+bH66Bxg7zwlS/DtzNWVxLmWwqR/y/SEuGRDNtlapWobXtnaYUemUpaqNWDXTfbAe5dLekpfzlNaWciU8kjz+yteqysDFH9mUC9NDr/gRDD2M/HApLcwI0HjLTj0qN9XKxKwKK+3Jkx55+T0gH3CD+83dVhHEb+WuQig1lgzJicK+oHO6Vrl6z0pXx11zWLshhfAhwVvG3MgNU40+xQoCPDul1+u86tyY/ccLN5xxtFcH7QVibEWSNkfy/0cLhVdBUu3fOW9MCOZCm3EhX5TGBQh7/m9pofQ36pExc=

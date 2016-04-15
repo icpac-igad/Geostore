@@ -6,21 +6,7 @@
         "dirLogFile": null
     },
     "service": {
-        "id": "gfw-geostore-api_1.0.0",
-        "name": "GFW GeoStore API",
-        "uri": "http://gfw-geostore-api.herokuapp.com",
+        "uri": "http://gfw-geostore-api-staging.herokuapp.com",
         "port": null
-    },
-    "apiGateway":{
-        "uri": null
-    },
-    "mongodb":{
-        "uri": null,
-        "uri": null,
-        "database": null,
-        "host": null
-    },
-    "migrate": {
-        "uri": null
     }
 }
