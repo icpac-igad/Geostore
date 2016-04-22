@@ -6,7 +6,7 @@ var GeoJSON = new Schema({
     type: {type: String, required: true, trim: true},
     features: [{
         type: {type: String, required:true, trim: true},
-        properties: {type: Schema.Types.Mixed, required: true},
+        properties: {type: Schema.Types.Mixed, required: false},
         geometry:{
             type: {type: String, required:true, trim: true},
             coordinates: [Schema.Types.Mixed]
