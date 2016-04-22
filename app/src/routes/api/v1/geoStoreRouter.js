@@ -53,10 +53,15 @@ class GeoStoreRouter {
         logger.info('Saving GeoJSON');
         logger.debug('Converting geojson');
         let data = GeoJSONConverter.convert(this.request.body);
-        
-        var geoIns = yield new GeoJSON(data).save();
-        logger.debug('Save correct');
-        this.body = GeoJSONSerializer.serialize(geoIns);
+        try{
+            var geoIns = yield new GeoJSON(data).save();
+            logger.debug('Save correct');
+            this.body = GeoJSONSerializer.serialize(geoIns);
+        }catch(e){
+            logger.error(e);
+            throw e;
+        }
+
     }
 
 }
