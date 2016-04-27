@@ -18,35 +18,33 @@ var router = new Router({
 class GeoStoreRouter {
 
     static * getNewHash(hash){
-        if(hash.length > 24){
-            logger.debug('Is a ndb id (old id). Searching new id');
-            let idCon = yield IdConnection.findOne({oldId: hash}).exec();
-            if(!idCon){
-                throw new Error('Old Id not found');
-            }
-            return idCon.newId;
+        let idCon = yield IdConnection.findOne({oldId: hash}).exec();
+        if(!idCon){
+            return hash;
         }
-        logger.debug('Is a new id');
-        return hash;
+        return idCon.hash;
     }
 
     static * getGeoStoreById() {
-        this.assert(this.params.id, 400, 'Hash param not found');
+        this.assert(this.params.hash, 400, 'Hash param not found');
         logger.debug('Getting geostore by hash %s', this.params.hash);
         var geoStore = null;
 
         try {
             let hash = yield GeoStoreRouter.getNewHash(this.params.hash);
+            logger.debug('hash',hash);
             geoStore = yield GeoStore.findOne({hash: hash}, {'geojson._id': 0, 'geojson.features._id': 0});
             logger.debug('GeoStore found. Returning...');
-        } catch(e) {
-            logger.error(e);
-        } finally {
+
             if(!geoStore) {
                 this.throw(404, 'GeoStore not found');
                 return;
             }
             this.body = GeoJSONSerializer.serialize(geoStore);
+
+        } catch(e) {
+            logger.error(e);
+            throw e;
         }
     }
 
@@ -61,15 +59,20 @@ class GeoStoreRouter {
             logger.debug('Creating hash from geojson md5');
             geoStore.hash = md5(JSON.stringify(this.request.body.geojson));
         }
-
-        var geoIns = yield new GeoStore(geoStore).save();
-        logger.debug('Save correct');
-        this.body = GeoJSONSerializer.serialize(geoIns);
+        try{
+            logger.debug('hash', geoStore.hash);
+            var geoIns = yield new GeoStore(geoStore).save();
+            this.body = GeoJSONSerializer.serialize(geoIns);
+            logger.debug('Save correct');
+        } catch(err){
+            logger.error(err);
+            throw err;
+        }
     }
 
 }
 
-router.get('/:id', GeoStoreRouter.getGeoStoreById);
+router.get('/:hash', GeoStoreRouter.getGeoStoreById);
 router.post('/', GeoStoreValidator.create, GeoStoreRouter.createGeoStore);
 
 module.exports = router;

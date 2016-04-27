@@ -4,12 +4,12 @@ var Schema = mongoose.Schema;
 
 var GeoStore = new Schema({
     geojson:{
-        type: {type: String, required: true, trim: true},
+        type: {type: String,  trim: true},
         features: [{
-            type: {type: String, required:true, trim: true},
-            properties: {type: Schema.Types.Mixed, required: true},
+            type: {type: String,  trim: true},
+            properties: {type: Schema.Types.Mixed},
             geometry:{
-                type: {type: String, required:true, trim: true},
+                type: {type: String, trim: true},
                 coordinates: [Schema.Types.Mixed]
             }
         }],
@@ -20,9 +20,9 @@ var GeoStore = new Schema({
     },
     hash: {type: String, required: true, trim: true},
     providers:[{
-        provider:{type: String, required: true, trim: true},
-        table: {type: String, required: true, trim: true},
-        user:{type: String, required: true, trim: true}
+        provider:{type: String, trim: true},
+        table: {type: String, trim: true},
+        user:{type: String, trim: true}
     }]
 });
 
