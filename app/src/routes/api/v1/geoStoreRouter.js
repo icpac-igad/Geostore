@@ -5,8 +5,9 @@ var logger = require('logger');
 var GeoStoreValidator = require('validators/geoStoreValidator');
 var GeoJSONSerializer = require('serializers/geoJSONSerializer');
 var GeoJSONConverter = require('converters/geoJSONConverter');
-var GeoJSON = require('models/geoJSON');
+var GeoStore = require('models/geoStore');
 var IdConnection = require('models/idConnection');
+var md5 = require('md5');
 
 
 var router = new Router({
@@ -16,57 +17,62 @@ var router = new Router({
 
 class GeoStoreRouter {
 
-    static * getNewId(id){
-        if(id.length > 24){
-            logger.debug('Is a ndb id (old id). Searching new id');
-            let idCon = yield IdConnection.findOne({oldId: id}).exec();
-            if(!idCon){
-                throw new Error('Old Id not found');
-            }
-            return idCon.newId;
+    static * getNewHash(hash){
+        let idCon = yield IdConnection.findOne({oldId: hash}).exec();
+        if(!idCon){
+            return hash;
         }
-        logger.debug('Is a new id');
-        return id;
+        return idCon.hash;
     }
 
     static * getGeoStoreById() {
-        this.assert(this.params.id, 400, 'Id param not found');
-        logger.debug('Getting geostore by id %s', this.params.id);
-        var geoJSON = null;
+        this.assert(this.params.hash, 400, 'Hash param not found');
+        logger.debug('Getting geostore by hash %s', this.params.hash);
+        var geoStore = null;
 
         try {
-            let id = yield GeoStoreRouter.getNewId(this.params.id);
-            geoJSON = yield GeoJSON.findById(id, {'features._id': 0});
+            let hash = yield GeoStoreRouter.getNewHash(this.params.hash);
+            logger.debug('hash',hash);
+            geoStore = yield GeoStore.findOne({hash: hash}, {'geojson._id': 0, 'geojson.features._id': 0});
             logger.debug('GeoStore found. Returning...');
-        } catch(e) {
-            logger.error(e);
-        } finally {
-            if(!geoJSON) {
+
+            if(!geoStore) {
                 this.throw(404, 'GeoStore not found');
                 return;
             }
-            this.body = GeoJSONSerializer.serialize(geoJSON);
+            this.body = GeoJSONSerializer.serialize(geoStore);
+
+        } catch(e) {
+            logger.error(e);
+            throw e;
         }
     }
 
     static * createGeoStore() {
-        logger.info('Saving GeoJSON');
-        logger.debug('Converting geojson');
-        let data = GeoJSONConverter.convert(this.request.body);
-        try{
-            var geoIns = yield new GeoJSON(data).save();
-            logger.debug('Save correct');
-            this.body = GeoJSONSerializer.serialize(geoIns);
-        }catch(e){
-            logger.error(e);
-            throw e;
-        }
+        logger.info('Saving GeoStore');
 
+        let geoStore = {};
+        if(this.request.body.geojson){
+            logger.debug('Contain a geojson');
+            logger.debug('Converting geojson');
+            geoStore.geojson = GeoJSONConverter.convert(this.request.body.geojson);
+            logger.debug('Creating hash from geojson md5');
+            geoStore.hash = md5(JSON.stringify(this.request.body.geojson));
+        }
+        try{
+            logger.debug('hash', geoStore.hash);
+            var geoIns = yield new GeoStore(geoStore).save();
+            this.body = GeoJSONSerializer.serialize(geoIns);
+            logger.debug('Save correct');
+        } catch(err){
+            logger.error(err);
+            throw err;
+        }
     }
 
 }
 
-router.get('/:id', GeoStoreRouter.getGeoStoreById);
+router.get('/:hash', GeoStoreRouter.getGeoStoreById);
 router.post('/', GeoStoreValidator.create, GeoStoreRouter.createGeoStore);
 
 module.exports = router;

@@ -2,24 +2,24 @@
 
 var logger = require('logger');
 var JSONAPISerializer = require('jsonapi-serializer').Serializer;
-var geoJSONSerializer = new JSONAPISerializer('geoJSON', {
-    attributes: ['type', 'features', 'crs'],
-    features:{
-        attributes: ['type', 'geometry']
+var geoStoreSerializer = new JSONAPISerializer('geoStore', {
+    attributes: ['geojson', 'hash', 'providers'],
+    geojson:{
+        attributes:['type', 'features', 'crs']
     },
-    crs:{
-        attributes: ['type', 'properties']
+    providers:{
+        attributes: ['provider', 'table', 'user']
     },
     typeForAttribute: function (attribute, record) {
         return attribute;
     }
 });
 
-class GeoJSONSerializer {
+class GeoStoreSerializer {
 
   static serialize(data) {
-    return geoJSONSerializer.serialize(data);
+    return geoStoreSerializer.serialize(data);
   }
 }
 
-module.exports = GeoJSONSerializer;
+module.exports = GeoStoreSerializer;
