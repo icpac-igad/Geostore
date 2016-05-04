@@ -1,14 +1,15 @@
 language: node_js
 node_js:
-- 5.7.0
+  - 5.7.0
 sudo: required
 services:
-- docker
+  - docker
 script:
-- docker-compose -f docker-compose-test.yml build
-- docker-compose -f docker-compose-test.yml run test
-deploy:
-  provider: heroku
-  app: gfw-geostore-api-staging
-  api_key:
-    secure: VJZA3Nq34GBJKy0849FoXcOKjjzYZCrIzNVPJrlkjsigXvDKWMEi09+VJps7r5636rRxDn6QlXMogcZflqF2CvVqV9wNPuE3nsMoW980fCjnzgr8Ug6B9p7+YUypUqdeugMu7GNYJ7Vm6Y5cMe9nOKI9mVqiwwRfJc6bUhlovLR3lHVaKvCYVXnF6wUZhIft8Jl0aoL4unQp6GHGBLtjgWQ4twgKTJZXzUrg1L7h0t4c5yKR1iLvmbD9GB708o/Z/TpROTYyzfAHxhpbmijyGQ3E3+X02n5ws3ezYy62uby0y/2a3kAEYNet1Nmjpa2mvuuYTcjHdaD172iW3SKQhQQpiHWl46XBgwaiK0AdW+mzhHEOTa4n7Q1UBEKwY/JC0YdTg+bH66Bxg7zwlS/DtzNWVxLmWwqR/y/SEuGRDNtlapWobXtnaYUemUpaqNWDXTfbAe5dLekpfzlNaWciU8kjz+yteqysDFH9mUC9NDr/gRDD2M/HApLcwI0HjLTj0qN9XKxKwKK+3Jkx55+T0gH3CD+83dVhHEb+WuQig1lgzJicK+oHO6Vrl6z0pXx11zWLshhfAhwVvG3MgNU40+xQoCPDul1+u86tyY/ccLN5xxtFcH7QVibEWSNkfy/0cLhVdBUu3fOW9MCOZCm3EhX5TGBQh7/m9pofQ36pExc=
+  - docker-compose -f docker-compose-test.yml build
+  - docker-compose -f docker-compose-test.yml run test
+addons:
+  ssh_known_hosts: $DEPLOY_HOST
+before_install:
+  - bash _scripts/install.sh
+after_success:
+  - bash _scripts/deploy.sh
