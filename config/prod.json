@@ -6,7 +6,6 @@
         "dirLogFile": null
     },
     "service": {
-        "uri": "http://gfw-geostore-api.herokuapp.com",
-        "port": null
-    } 
+        "uri": "http://172.31.40.31:3100"
+    }
 }

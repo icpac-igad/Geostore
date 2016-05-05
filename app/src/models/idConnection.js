@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var IdConnection = new Schema({
-    newId: {type: String, required:true, trim: true},
+    hash: {type: String, required:true, trim: true},
     oldId: {type: String, required: true, trim: true}
 
 });

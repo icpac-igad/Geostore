@@ -1,4 +1,4 @@
-# Global Forest Watch Mail API
+# Global Forest Watch Geostore API
 
 Master: [![Build Status](https://travis-ci.org/gfw-api/gfw-geostore-api.svg?branch=master)](https://travis-ci.org/gfw-api/gfw-geostore-api) Develop: [![Build Status](https://travis-ci.org/gfw-api/gfw-geostore-api.svg?branch=develop)](https://travis-ci.org/gfw-api/gfw-geostore-api)
 
@@ -39,7 +39,7 @@ eval $(docker-machine env default)
 Now we're ready to actually get the application running:
 
 ```
-git clone https://github.com/Vizzuality/gfw-ogr-api.git
+git clone https://github.com/Vizzuality/gfw-geostore-api.git
 cd gfw-geostore-api
 npm install
 npm run develop
