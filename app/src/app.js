@@ -1,5 +1,6 @@
 'use strict';
 //load modules
+require('newrelice');
 var config = require('config');
 var logger = require('logger');
 var path = require('path');
@@ -12,9 +13,6 @@ var mongoose = require('mongoose');
 var ErrorSerializer = require('serializers/errorSerializer');
 var mongoUri = process.env.MONGOLAB_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
 
-require('pmx').init({
-    http: true
-});
 
 var onDbReady = function(err) {
     if (err) {
