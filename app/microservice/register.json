@@ -6,7 +6,6 @@
         "method": "POST",
         "endpoints": [{
             "method": "POST",
-            "baseUrl": "#(service.uri)",
             "path": "/api/v1/geostore"
         }]
     }, {
@@ -14,7 +13,6 @@
         "method": "GET",
         "endpoints": [{
             "method": "GET",
-            "baseUrl": "#(service.uri)",
             "path": "/api/v1/geostore/:id"
         }]
     }]
