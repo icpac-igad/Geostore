@@ -5,6 +5,6 @@ prod:
   env_file:
     - prod.env
   command: start
-  # log_driver: "gelf"
-  # log_opt:
-  #   gelf-address: "udp://172.31.40.76:12201"
+  log_driver: "gelf"
+  log_opt:
+    gelf-address: "udp://172.31.40.76:12201"
