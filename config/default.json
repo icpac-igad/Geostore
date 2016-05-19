@@ -11,9 +11,6 @@
         "uri": "http://192.168.99.100:3100",
         "port": 3100
     },
-    "apiGateway":{
-        "uri": "http://192.168.99.100:8000/gateway/service"
-    },
     "mongodb":{
         "database": "gfw_geostore_db",
         "host": "192.168.99.100",
