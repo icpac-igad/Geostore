@@ -8,6 +8,7 @@ var GeoJSONConverter = require('converters/geoJSONConverter');
 var GeoStore = require('models/geoStore');
 var IdConnection = require('models/idConnection');
 var md5 = require('md5');
+var turf = require('turf');
 
 
 var router = new Router({
@@ -58,6 +59,7 @@ class GeoStoreRouter {
             geoStore.geojson = GeoJSONConverter.convert(this.request.body.geojson);
             logger.debug('Creating hash from geojson md5');
             geoStore.hash = md5(JSON.stringify(this.request.body.geojson));
+            geoStore.areaHa = turf.area(geoStore.geojson) / 10000;
         }
         try{
             logger.debug('hash', geoStore.hash);

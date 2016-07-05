@@ -18,6 +18,7 @@ var GeoStore = new Schema({
             properties:{type: Schema.Types.Mixed, required: false }
         }
     },
+    areaHa: {type: Number, required: false},
     hash: {type: String, required: true, trim: true},
     providers:[{
         provider:{type: String, trim: true},
