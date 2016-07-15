@@ -3,12 +3,13 @@
 var logger = require('logger');
 var JSONAPISerializer = require('jsonapi-serializer').Serializer;
 var geoStoreSerializer = new JSONAPISerializer('geoStore', {
-    attributes: ['geojson', 'hash', 'providers', 'areaHa'],
+    attributes: ['geojson', 'hash', 'provider', 'areaHa'],
+    id: 'hash',
     geojson:{
         attributes:['type', 'features', 'crs']
     },
-    providers:{
-        attributes: ['provider', 'table', 'user']
+    provider:{
+        attributes: ['type', 'table', 'user', 'filter']
     },
     typeForAttribute: function (attribute, record) {
         return attribute;

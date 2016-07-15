@@ -4,12 +4,11 @@ var Router = require('koa-router');
 var logger = require('logger');
 var GeoStoreValidator = require('validators/geoStoreValidator');
 var GeoJSONSerializer = require('serializers/geoJSONSerializer');
-var GeoJSONConverter = require('converters/geoJSONConverter');
 var GeoStore = require('models/geoStore');
 var IdConnection = require('models/idConnection');
-var md5 = require('md5');
-var turf = require('turf');
-
+var GeoStoreService = require('services/geoStoreService');
+var ProviderNotFound = require('errors/providerNotFound');
+var GeoJSONNotFound = require('errors/geoJSONNotFound');
 
 var router = new Router({
     prefix: '/geostore'
@@ -51,25 +50,17 @@ class GeoStoreRouter {
 
     static * createGeoStore() {
         logger.info('Saving GeoStore');
-
-        let geoStore = {};
-        if(this.request.body.geojson){
-            logger.debug('Contain a geojson');
-            logger.debug('Converting geojson');
-            geoStore.geojson = GeoJSONConverter.convert(this.request.body.geojson);
-            logger.debug('Creating hash from geojson md5');
-            geoStore.hash = md5(JSON.stringify(this.request.body.geojson));
-            geoStore.areaHa = turf.area(geoStore.geojson) / 10000;
-        }
         try{
-            logger.debug('hash', geoStore.hash);
-            var geoIns = yield new GeoStore(geoStore).save();
-            this.body = GeoJSONSerializer.serialize(geoIns);
-            logger.debug('Save correct');
-        } catch(err){
-            logger.error(err);
+            let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, this.request.body.provider);
+            this.body = GeoJSONSerializer.serialize(geostore);
+        }catch(err){
+            if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound){
+                this.throw(400, err.message);
+                return ;
+            }
             throw err;
         }
+
     }
 
 }

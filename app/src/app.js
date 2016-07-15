@@ -39,8 +39,10 @@ var onDbReady = function(err) {
         try {
             yield next;
         } catch (err) {
+            logger.error(err);
             this.status = err.status || 500;
-            this.body = ErrorSerializer.serializeError(this.status, err.message);
+            this.body = ErrorSerializer.serializeError(this.status, err.message || err);
+            logger.debug(this.body);
             if (process.env.NODE_ENV === 'prod' && this.status === 500) {
                 this.body = 'Unexpected error';
             }
