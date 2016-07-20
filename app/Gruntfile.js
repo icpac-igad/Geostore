@@ -9,18 +9,6 @@ module.exports = function(grunt) {
 
 
         clean: {},
-
-        run: {
-            options: {
-                // Task-specific options go here.
-            },
-            migration: {
-                cmd: 'node',
-                args: [
-                    'app/src/migrate/migrate.js'
-                ]
-            }
-        },
         jshint: {
             js: {
                 src: [
