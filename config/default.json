@@ -17,6 +17,6 @@
         "port": 32780
     },
     "migrate":{
-        "uri": "http://staging.api-staging.globalforestwatch.org/geostore/all"
+        "uri": ""
     }
 }
