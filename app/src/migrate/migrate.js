@@ -38,36 +38,36 @@ var obtainData = function*(cursor) {
     return response.body;
 };
 
-var completeGeoJSON = function *(el, list) {
-    logger.debug('Complete geojson');
-    let found = null;
-    let numRequest = 0;
-    let firstTime = true;
-    while(!found){
-        for (let i = 0, length = list.length; i < length; i++) {
-            if (list[i] === el.next_id) {
-                found = list[i];
-                // if (found.next_id) {
-                //     found = yield completeGeoJSON(found, list);
-                // }
-                el.geojson += found.geojson;
-            }
-        }
-        if (!found) {
-            if(!firstTime){
-                logger.error('Not found parts');
-                throw new Error('Not found parts');
-            }
-            firstTime = false
-            logger.info('Obtaining next data');
-            let data = yield obtainData(nextCursor);
-            nextCursor = data.cursor;
-            list.concatmigrate(data.geostore);
-
-        }
-    }
-    return el;
-}
+// var completeGeoJSON = function *(el, list) {
+//     logger.debug('Complete geojson');
+//     let found = null;
+//     let numRequest = 0;
+//     let firstTime = true;
+//     while(!found){
+//         for (let i = 0, length = list.length; i < length; i++) {
+//             if (list[i] === el.next_id) {
+//                 found = list[i];
+//                 // if (found.next_id) {
+//                 //     found = yield completeGeoJSON(found, list);
+//                 // }
+//                 el.geojson += found.geojson;
+//             }
+//         }
+//         if (!found) {
+//             if(!firstTime){
+//                 logger.error('Not found parts');
+//                 throw new Error('Not found parts');
+//             }
+//             firstTime = false;
+//             logger.info('Obtaining next data');
+//             let data = yield obtainData(nextCursor);
+//             nextCursor = data.cursor;
+//             list.concatmigrate(data.geostore);
+//
+//         }
+//     }
+//     return el;
+// }
 var checkIfExist = function*(id) {
     var result = yield IdConnection.find({
         oldId: id
