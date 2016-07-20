@@ -74,7 +74,7 @@ describe('GeoJSON serializer test', function() {
         data.should.have.property('attributes');
         data.should.have.property('id');
         data.type.should.equal('geoStore');
-        data.id.should.equal(single.id);
+        data.id.should.equal(single.hash);
         data.attributes.geojson.should.have.property('type');
         data.attributes.geojson.type.should.be.equal(single.geojson.type);
         data.attributes.geojson.should.have.property('features');
@@ -103,7 +103,7 @@ describe('GeoJSON serializer test', function() {
         data.should.have.property('attributes');
         data.should.have.property('id');
         data.type.should.equal('geoStore');
-        data.id.should.equal(single.id);
+        data.id.should.equal(single.hash);
         data.attributes.geojson.should.have.property('type');
         data.attributes.geojson.type.should.be.equal(severalFeatures.geojson.type);
         data.attributes.geojson.should.have.property('features');

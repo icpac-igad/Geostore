@@ -1,6 +1,8 @@
 'use strict';
 //load modules
-require('newrelic');
+if(process.env.NODE_ENV === 'prod'){
+    require('newrelic');
+}
 var config = require('config');
 var logger = require('logger');
 var path = require('path');
@@ -11,7 +13,7 @@ var loader = require('loader');
 var validate = require('koa-validate');
 var mongoose = require('mongoose');
 var ErrorSerializer = require('serializers/errorSerializer');
-var mongoUri = process.env.MONGOLAB_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
+var mongoUri = process.env.MONGO_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
 
 
 var onDbReady = function(err) {
@@ -37,8 +39,10 @@ var onDbReady = function(err) {
         try {
             yield next;
         } catch (err) {
+            logger.error(err);
             this.status = err.status || 500;
-            this.body = ErrorSerializer.serializeError(this.status, err.message);
+            this.body = ErrorSerializer.serializeError(this.status, err.message || err);
+            logger.debug(this.body);
             if (process.env.NODE_ENV === 'prod' && this.status === 500) {
                 this.body = 'Unexpected error';
             }

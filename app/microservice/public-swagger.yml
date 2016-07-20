@@ -3,7 +3,7 @@ info:
   title: GFW GeoStore API
   description: Global Forest Watch - GeoStore API
   version: "1.0.0"
-host: api.gfw.com
+host: example.vizzuality.com
 
 schemes:
   - https
@@ -47,7 +47,13 @@ paths:
   /geostore:
     post:
       summary: Create geostore
-      description: Create Geostore
+      description: |
+        2 posibilities
+
+        - Send geojson in a body (geojson attribute)
+        - Send provider object with all params. With this mode, the geostore obtain the geojson in the provider. Support providers-> carto
+
+
       produces:
         - application/vnd.api+json
       tags:
@@ -59,14 +65,16 @@ paths:
           description: GeoStore to save
           required: true
           schema:
-            $ref: '#/definitions/Features'
+            $ref: '#/definitions/GeoStoreBodyRequest'
       responses:
         200:
           description: The object created
           schema:
             $ref: '#/definitions/GeoStoreAPI'
         400:
-          description: Validate error
+          description: Validate error. Errors-> ProviderNotFound or GeoJSONNotFound.
+            - ProviderNotFound-> If the provider is distinct to 'carto', the api return this error
+            - GeoJSONNotFound -> If the microservice try to obtain the geojson in the provider and the provider return empty response, the microservice return this error.
           schema:
             $ref: '#/definitions/Errors'
         500:
@@ -128,16 +136,38 @@ definitions:
         type: object
         description: A meta object containing non-standard meta-information about the error.
 
-
+  GeoStoreBodyRequest:
+    type: object
+    properties:
+      provider:
+        type: object
+        description: Data where obtain geojson
+        properties:
+          type:
+            type: string
+            description: type of provider (posibilities-> carto)
+          table:
+            type: string
+            description: table name
+          user:
+            type: string
+            description: owner of table
+          filter:
+            type: string
+            description: filter to obtain the geostore
+      geojson:
+        properties:
+          schema:
+            $ref: '#/definitions/Features'
   GeoStoreAPI:
     type: object
     properties:
       data:
         type: array
         items:
-          $ref: '#/definitions/GeoJSON'
+          $ref: '#/definitions/GeoStore'
 
-  GeoJSON:
+  GeoStore:
     type: object
     properties:
       type:
@@ -147,6 +177,35 @@ definitions:
         type: string
         description: Resource id
       attributes:
+        properties:
+          schema:
+            $ref: '#/definitions/GeoStoreBodyResponse'
+  GeoStoreBodyResponse:
+    type: object
+    properties:
+      hash:
+        type: string
+        description: Resource type
+      areaHa:
+        type: string
+        description: Area in
+      provider:
+        type: object
+        description: Data where obtain geojson
+        properties:
+          type:
+            type: string
+            description: type of provider (posibilities-> carto)
+          table:
+            type: string
+            description: table name
+          user:
+            type: string
+            description: owner of table
+          filter:
+            type: string
+            description: filter to obtain the geostore
+      geojson:
         properties:
           schema:
             $ref: '#/definitions/Features'

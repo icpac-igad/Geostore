@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
 
     grunt.file.setBase('..');
     require('load-grunt-tasks')(grunt);
