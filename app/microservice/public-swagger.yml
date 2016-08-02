@@ -248,9 +248,10 @@ paths:
           schema:
             $ref: '#/definitions/GeoStoreAPI'
         400:
-          description: Validate error. Errors-> ProviderNotFound or GeoJSONNotFound.
-            - ProviderNotFound-> If the provider is distinct to 'carto', the api return this error
-            - GeoJSONNotFound -> If the microservice try to obtain the geojson in the provider and the provider return empty response, the microservice return this error.
+          description: |
+            Validate error.
+            * ProviderNotFound-> If the provider is distinct to 'carto', the api return this error
+            * GeoJSONNotFound -> If the microservice try to obtain the geojson in the provider and the provider return empty response, the microservice return this error.
           schema:
             $ref: '#/definitions/Errors'
         500:
