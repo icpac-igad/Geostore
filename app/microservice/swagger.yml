@@ -206,6 +206,7 @@ paths:
         - name: geoStore
           in: body
           description: |
+            ##### Body examples
             * Geojson:
               ```json
               {
