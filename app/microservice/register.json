@@ -5,7 +5,6 @@
     "urls": [{
         "url": "/geostore",
         "method": "POST",
-        "authenticated": true,
         "endpoints": [{
             "method": "POST",
             "path": "/api/v1/geostore"
