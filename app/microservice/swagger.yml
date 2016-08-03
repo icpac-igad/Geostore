@@ -8,15 +8,69 @@ host: example.vizzuality.com
 schemes:
   - https
   - http
+
 # will be prefixed to all paths
 basePath: /api/v1
+
+consumes:
+  - application/json
 produces:
   - application/vnd.api+json
 
 paths:
   /geostore/{id}:
     get:
-      description: Returns geostore based on a single ID, if the geostore not exist return 404
+      summary: Get geostore by id
+      description: |
+        Returns geostore based on a single ID, if the geostore not exist return 404
+        ### Example URL request
+        ```
+        {{host}}/geostore/ca38fa80a4ffa9ac6217a7e0bf71e6df
+        ```
+        ### Example response
+        * Saving a geojson
+        ```json
+        {
+              "data": {
+                  "type": "geoStore",
+                  "id": "ca38fa80a4ffa9ac6217a7e0bf71e6df",
+                  "attributes": {
+                      "geojson": {
+                          "features": [{
+                              "type": "Feature",
+                              "geometry": {
+                                  "type": "Polygon",
+                                  "coordinates": [
+                                      [
+                                          [-5.273512601852417,
+                                              42.81137220349083
+                                          ],
+                                          [-5.273512601852417,
+                                              42.811803118457306
+                                          ],
+                                          [-5.272732079029083,
+                                              42.811803118457306
+                                          ],
+                                          [-5.272732079029083,
+                                              42.81137220349083
+                                          ],
+                                          [-5.273512601852417,
+                                              42.81137220349083
+                                          ]
+                                      ]
+                                  ]
+                              }
+                          }],
+                          "crs": {},
+                          "type": "FeatureCollection"
+                      },
+                      "hash": "ca38fa80a4ffa9ac6217a7e0bf71e6df",
+                      "provider": {},
+                      "areaHa": 0.3057556230214663
+                  }
+              }
+          }
+        ```
       operationId: getGeoStoreById
       produces:
         - application/vnd.api+json
@@ -49,12 +103,100 @@ paths:
     post:
       summary: Create geostore
       description: |
-        2 posibilities
+        ### 2 posibilities to create geostore
 
-        - Send geojson in a body (geojson attribute)
-        - Send provider object with all params. With this mode, the geostore obtain the geojson in the provider. Support providers-> carto
+        * Send geojson in a body (geojson attribute)
+        * Send provider object with all params. With this mode, the geostore obtain the geojson in the provider. Support providers-> carto
 
-
+        ### Example response
+        * Saving a geojson
+        ```json
+        {
+              "data": {
+                  "type": "geoStore",
+                  "id": "ca38fa80a4ffa9ac6217a7e0bf71e6df",
+                  "attributes": {
+                      "geojson": {
+                          "features": [{
+                              "type": "Feature",
+                              "geometry": {
+                                  "type": "Polygon",
+                                  "coordinates": [
+                                      [
+                                          [-5.273512601852417,
+                                              42.81137220349083
+                                          ],
+                                          [-5.273512601852417,
+                                              42.811803118457306
+                                          ],
+                                          [-5.272732079029083,
+                                              42.811803118457306
+                                          ],
+                                          [-5.272732079029083,
+                                              42.81137220349083
+                                          ],
+                                          [-5.273512601852417,
+                                              42.81137220349083
+                                          ]
+                                      ]
+                                  ]
+                              }
+                          }],
+                          "crs": {},
+                          "type": "FeatureCollection"
+                      },
+                      "hash": "ca38fa80a4ffa9ac6217a7e0bf71e6df",
+                      "provider": {},
+                      "areaHa": 0.3057556230214663
+                  }
+              }
+          }
+        ```
+        * Saving with provider
+        ```json
+        {
+          "data": {
+              "type": "geoStore",
+              "id": "f3ec85259a83c61ac1b7ff8a51d0a461",
+              "attributes": {
+                  "geojson": {
+                      "features": [{
+                          "type": "Feature",
+                          "geometry": {
+                              "type": "MultiPolygon",
+                              "coordinates": [
+                                  [
+                                      [
+                                          [-54.3664801812558, -10.9954102656944],
+                                          [-54.4224805595865, -10.995410177512],
+                                          [-54.4224803350077, -10.8554094476871],
+                                          [-54.4134802740762, -10.8554094618029],
+                                          [-54.4134802659914, -10.8504094360184],
+                                          [-54.3664799476939, -10.8504095083633],
+                                          [-54.3664799503888, -10.8514095138597],
+                                          [-54.3664801812558, -10.9954102656944]
+                                      ]
+                                  ]
+                              ]
+                          }
+                      }],
+                      "crs": {},
+                      "type": "FeatureCollection"
+                  },
+                  "hash": "f3ec85259a83c61ac1b7ff8a51d0a461",
+                  "provider": {
+                      "filter": "cartodb_id=729417",
+                      "user": "wri-01",
+                      "table": "gfw_mining",
+                      "type": "carto"
+                  },
+                  "areaHa": 9764.29591966568
+              }
+          }
+        }
+        ```
+      consumes:
+        - application/json
       produces:
         - application/vnd.api+json
       tags:
@@ -63,7 +205,43 @@ paths:
       parameters:
         - name: geoStore
           in: body
-          description: GeoStore to save
+          description: |
+            ##### Body examples
+            * Geojson:
+              ```json
+              {
+                  "geojson": {
+                      "type": "FeatureCollection",
+                      "features": [{
+                          "type": "Feature",
+                          "properties": {},
+                          "geometry": {
+                              "type": "Polygon",
+                              "coordinates": [
+                                  [
+                                      [-5.273512601852417, 42.81137220349083],
+                                      [-5.273512601852417, 42.811803118457306],
+                                      [-5.272732079029083, 42.811803118457306],
+                                      [-5.272732079029083, 42.81137220349083],
+                                      [-5.273512601852417, 42.81137220349083]
+                                  ]
+                              ]
+                          }
+                      }]
+                  }
+              }
+              ```
+            * Provider:
+              ```json
+                {
+                  "provider": {
+                      "filter": "cartodb_id=729417",
+                      "user": "wri-01",
+                      "table": "gfw_mining",
+                      "type": "carto"
+                  }
+                }
+              ```
           required: true
           schema:
             $ref: '#/definitions/GeoStoreBodyRequest'
@@ -73,9 +251,10 @@ paths:
           schema:
             $ref: '#/definitions/GeoStoreAPI'
         400:
-          description: Validate error. Errors-> ProviderNotFound or GeoJSONNotFound.
-            - ProviderNotFound-> If the provider is distinct to 'carto', the api return this error
-            - GeoJSONNotFound -> If the microservice try to obtain the geojson in the provider and the provider return empty response, the microservice return this error.
+          description: |
+            Validate error.
+            * ProviderNotFound-> If the provider is distinct to 'carto', the api return this error
+            * GeoJSONNotFound -> If the microservice try to obtain the geojson in the provider and the provider return empty response, the microservice return this error.
           schema:
             $ref: '#/definitions/Errors'
         500:
