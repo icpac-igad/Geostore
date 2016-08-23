@@ -5,6 +5,7 @@ var request = require('co-request');
 var logger = require('logger');
 var co = require('co');
 var md5 = require('md5');
+var turf = require('turf');
 var mongoose = require('mongoose');
 var GeoJSONConverter = require('converters/geoJSONConverter');
 var geojsonhint = require('geojsonhint');
@@ -85,6 +86,7 @@ var saveData = function*(element) {
         let exist = yield checkIfExist(element.id);
         if (!exist) {
             var model = yield new GeoStore({
+                areaHa: turf.area(element.geojson) / 10000,
                 geojson: element.geojson,
                 hash: md5(JSON.stringify(element.geojson))
             }).save();
