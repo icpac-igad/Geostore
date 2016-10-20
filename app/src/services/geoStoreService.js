@@ -51,6 +51,13 @@ class GeoStoreService {
         }
     }
 
+    static * calculateBBox(geoStore){
+        logger.debug('Calculating bbox');
+        geoStore.bbox = turf.bbox(geoStore.geojson);
+        yield geoStore.save();
+        return geoStore;
+    }
+
     static * saveGeostore(geojson, provider) {
 
         let geoStore = {
@@ -80,6 +87,10 @@ class GeoStoreService {
         let exist = yield GeoStore.findOne({
             hash: geoStore.hash
         });
+        if(!geoStore.bbox) {
+            geoStore.bbox = turf.bbox(geoStore.geojson);
+        }
+
         if (exist) {
             logger.debug('Updating');
             yield GeoStore.update({

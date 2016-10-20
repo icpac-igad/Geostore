@@ -40,6 +40,9 @@ class GeoStoreRouter {
                 this.throw(404, 'GeoStore not found');
                 return;
             }
+            if(!geoStore.bbox) {
+                geoStore = yield GeoStoreService.calculateBBox(geoStore);
+            }
             this.body = GeoJSONSerializer.serialize(geoStore);
 
         } catch(e) {
