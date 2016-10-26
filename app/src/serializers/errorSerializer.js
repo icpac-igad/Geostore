@@ -25,7 +25,8 @@ class ErrorSerializer {
             },
             code: message.replace(/ /g, '_').toLowerCase(),
             title: message,
-            detail: data[keys[0]]
+            detail: data[keys[0]],
+            status: 400
         };
     }
 

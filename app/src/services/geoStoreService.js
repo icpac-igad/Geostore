@@ -4,6 +4,7 @@ var GeoStore = require('models/geoStore');
 var GeoJSONConverter = require('converters/geoJSONConverter');
 var md5 = require('md5');
 var CartoDB = require('cartodb');
+var IdConnection = require('models/idConnection');
 var turf = require('turf');
 var ProviderNotFound = require('errors/providerNotFound');
 var GeoJSONNotFound = require('errors/geoJSONNotFound');
@@ -38,6 +39,22 @@ class GeoStoreService {
             return data.rows[0];
         }
         throw new GeoJSONNotFound('Geojson not found');
+    }
+
+    static * getNewHash(hash){
+        let idCon = yield IdConnection.findOne({oldId: hash}).exec();
+        if(!idCon){
+            return hash;
+        }
+        return idCon.hash;
+    }
+
+    static * getGeostoreById(id){
+        logger.debug(`Getting geostore by id ${id}`);
+        let hash = yield GeoStoreService.getNewHash(id);
+        logger.debug('hash',hash);
+        let geoStore = yield GeoStore.findOne({hash: hash}, {'geojson._id': 0, 'geojson.features._id': 0});
+        return geoStore;
     }
 
     static * obtainGeoJSON(provider) {
