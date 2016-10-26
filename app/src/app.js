@@ -65,6 +65,7 @@ var onDbReady = function(err) {
     var port = process.env.PORT || config.get('service.port');
 
     server.listen(port, function() {
+        logger.info('Initializing microservice endpoint');
         var p = require('vizz.microservice-client').register({
             id: config.get('service.id'),
             name: config.get('service.name'),
