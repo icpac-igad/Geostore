@@ -18,5 +18,8 @@
     },
     "migrate":{
         "uri": ""
+    },
+    "cartoDB":{
+        "user": null
     }
 }

@@ -17,13 +17,7 @@ var router = new Router({
 
 class GeoStoreRouter {
 
-    static * getNewHash(hash){
-        let idCon = yield IdConnection.findOne({oldId: hash}).exec();
-        if(!idCon){
-            return hash;
-        }
-        return idCon.hash;
-    }
+
 
     static * getGeoStoreById() {
         this.assert(this.params.hash, 400, 'Hash param not found');
@@ -31,9 +25,9 @@ class GeoStoreRouter {
         var geoStore = null;
 
         try {
-            let hash = yield GeoStoreRouter.getNewHash(this.params.hash);
-            logger.debug('hash',hash);
-            geoStore = yield GeoStore.findOne({hash: hash}, {'geojson._id': 0, 'geojson.features._id': 0});
+
+            geoStore = yield GeoStoreService.getGeostoreById(this.params.hash);
+            
             logger.debug('GeoStore found. Returning...');
 
             if(!geoStore) {
@@ -65,6 +59,7 @@ class GeoStoreRouter {
         }
 
     }
+
 
 }
 
