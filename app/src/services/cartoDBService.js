@@ -6,9 +6,9 @@ var CartoDB = require('cartodb');
 var Mustache = require('mustache');
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 
-const ISO = `SELECT slug FROM coverage_layers cl left join gadm2_countries_simple c on ST_INTERSECTS(cl.the_geom, c.the_geom) and c.iso = UPPER('{{iso}}')`;
+const ISO = `SELECT slug FROM coverage_layers cl, gadm2_countries_simple c where  ST_INTERSECTS(cl.the_geom, c.the_geom) and c.iso = UPPER('{{iso}}')`;
 
-const ID1 = `SELECT slug FROM coverage_layers cl left join gadm2_provinces_simple c on ST_INTERSECTS(cl.the_geom, c.the_geom) and c.iso = UPPER('{{iso}}')
+const ID1 = `SELECT slug FROM coverage_layers cl, gadm2_provinces_simple c where ST_INTERSECTS(cl.the_geom, c.the_geom) and c.iso = UPPER('{{iso}}')
           AND c.id_1 = {{id1}}`;
 
 const WDPA = `with p as (SELECT p.the_geom AS the_geom
@@ -22,9 +22,9 @@ const WDPA = `with p as (SELECT p.the_geom AS the_geom
           FROM wdpa_protected_areas
           WHERE wdpaid={{wdpaid}}
       ) p)
-        SELECT slug from coverage_layers cl left join p on ST_INTERSECTS(cl.the_geom, p.the_geom) `;
+        SELECT slug from coverage_layers cl, p where ST_INTERSECTS(cl.the_geom, p.the_geom) `;
 
-const USE = `SELECT slug FROM coverage_layers cl left join {{useTable}} c on c.cartodb_id = {{pid}} and ST_INTERSECTS(cl.the_geom, c.the_geom)`;
+const USE = `SELECT slug FROM coverage_layers cl, {{useTable}} c where c.cartodb_id = {{pid}} and ST_INTERSECTS(cl.the_geom, c.the_geom)`;
 
 
 const COVERAGES = `SELECT ST_AsGeoJSON(the_geom) as geojson, coverage_slug as slug, slug as layerSlug from coverage_layers`;
