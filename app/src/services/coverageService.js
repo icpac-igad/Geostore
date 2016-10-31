@@ -1,9 +1,34 @@
 'use strict';
 var logger = require('logger');
-var Coverage = require('models/coverage');
 var CartoDBService = require('services/cartoDBService');
 var CoverageDuplicated = require('errors/coverageDuplicated');
 var CoverageNotFound = require('errors/coverageNotFound');
+
+const ISO = `SELECT slug FROM coverage_layers cl, gadm2_countries_simple c where  ST_INTERSECTS(cl.the_geom, c.the_geom) and c.iso = UPPER('{{iso}}')`;
+
+const ID1 = `SELECT slug FROM coverage_layers cl, gadm2_provinces_simple c where ST_INTERSECTS(cl.the_geom, c.the_geom) and c.iso = UPPER('{{iso}}')
+          AND c.id_1 = {{id1}}`;
+
+const WDPA = `with p as (SELECT p.the_geom AS the_geom
+        FROM (
+          SELECT CASE
+          WHEN marine::numeric = 2 THEN NULL
+            WHEN ST_NPoints(the_geom)<=18000 THEN the_geom
+            WHEN ST_NPoints(the_geom) BETWEEN 18000 AND 50000 THEN ST_RemoveRepeatedPoints(the_geom, 0.001)
+            ELSE ST_RemoveRepeatedPoints(the_geom, 0.005)
+            END AS the_geom
+          FROM wdpa_protected_areas
+          WHERE wdpaid={{wdpaid}}
+      ) p)
+        SELECT slug from coverage_layers cl, p where ST_INTERSECTS(cl.the_geom, p.the_geom) `;
+
+const USE = `SELECT slug FROM coverage_layers cl, {{useTable}} c where c.cartodb_id = {{pid}} and ST_INTERSECTS(cl.the_geom, c.the_geom)`;
+
+
+const COVERAGES = `SELECT ST_AsGeoJSON(the_geom) as geojson, coverage_slug as slug, slug as layerSlug from coverage_layers`;
+
+const WORLD = `SELECT slug FROM coverage_layers where ST_INTERSECTS(the_geom, ST_SetSRID(ST_GeomFromGeoJSON('{{{geojson}}}'), 4326))`;
+
 
 var executeThunk = function(client, sql, params) {
     return function(callback) {
@@ -16,76 +41,85 @@ var executeThunk = function(client, sql, params) {
 };
 
 
-class GeoStoreService {
+class CoverageService {
 
-    static * createCoverage(body){
-        logger.info('Creating coverage');
-        let exist = yield Coverage.findOne({slug: body.slug}).exec();
-        if(exist) {
-            throw new CoverageDuplicated('Coverage duplicated');
-        }
-        logger.debug('Not exist duplicated');
-        const coverage = yield new Coverage(body).save();
-        return coverage;
-    }
+    * getNational(iso) {
+        logger.debug('Obtaining national of iso %s', iso);
+        let params = {
+            iso: iso
+        };
 
-    static * updateCoverage(slug,  body){
-        logger.info('Creating coverage');
-        let exist = yield Coverage.findOne({slug: body.slug}).exec();
-        if(!exist) {
-            throw new CoverageNotFound('Coverage not found');
-        }
-        if(body.layerSlug !== '') {
-            exist.layerSlug = body.layerSlug;
-        }
-        if(body.geojson !== '') {
-            exist.geojson = body.geojson;
-        }
-        yield exist.save();
-        return exist;
-    }
-
-    static * deleteCoverage(slug){
-        logger.info('Delete coverage');
-        let exist = yield Coverage.findOne({slug: slug}).exec();
-        if(!exist) {
-            throw new CoverageNotFound('Coverage not found');
-        }
-        yield exist.remove();
-        return exist;
-    }
-
-    static * getCoveragesByIntersect(geojson){
-        // logger.debug('Calculating intersect', geojson);
-        let results = yield CartoDBService.getLayersIntersect(geojson);
-        logger.debug(results);
-        if (results && results.rows) {
-            return results.rows.map( item => item.slug );
+        let data = yield executeThunk(this.client, ISO, params);
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map( item => item.slug );
         }
         return [];
     }
 
+    * getSubnational(iso, id1) {
+        logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
+        let params = {
+            iso: iso,
+            id1: id1
+        };
 
-    static * populateCoverages(data){
-        logger.info('Populating coverags');
-        if(!data) {
-            logger.error('Data is empty');
-            return;
+        let data = yield executeThunk(this.client, ID1, params);
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map( item => item.slug );
         }
-        let features = data.features;
-        for(let i =0, length = features.length; i < length; i++) {
-            logger.debug('Saving coverage', features[i].properties.slug);
-            let properties = features[i].properties;
-            delete features[i].properties;
-            
-            yield new Coverage({
-                slug: properties.coverage_slug.replace('\n', '').replace('\t', ''),
-                layerSlug: properties.slug,
-                geojson:features[i].geometry
-            }).save();
-            logger.debug('Saved correctly', properties.slug);
+        return [];
+    }
+
+    * getUse(useTable, id) {
+        logger.debug('Obtaining use with id %s', id);
+
+        let params = {
+            useTable: useTable,
+            pid: id
+        };
+
+        let data = yield executeThunk(this.client, USE, params);
+
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map( item => item.slug );
         }
+        return [];
+    }
+
+    * getWdpa(wdpaid) {
+        logger.debug('Obtaining wpda of id %s', wdpaid);
+
+        let params = {
+            wdpaid: wdpaid
+        };
+
+        let data = yield executeThunk(this.client, WDPA, params);
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map( item => item.slug );
+        }
+        return [];
+    }
+
+    * getCoverages() {
+        logger.info('Getting coverages');
+
+        let data = yield executeThunk(this.client, COVERAGES);
+        return data;
+    }
+
+    * getWorld(geojson) {
+        logger.info('Getting layers that intersect');
+
+        let params = {
+            geojson: JSON.stringify(geojson)
+        };
+
+        let data = yield executeThunk(this.client, WORLD, params);
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map( item => item.slug );
+        }
+        return [];
     }
 }
 
-module.exports = GeoStoreService;
+module.exports = CoverageService;

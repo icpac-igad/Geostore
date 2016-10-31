@@ -57,6 +57,11 @@ class GeoStoreService {
         return geoStore;
     }
 
+    static * getGeostoreByInfo(info){
+      let geoStore = yield GeoStore.findOne({info});
+      return geoStore;
+    }
+
     static * obtainGeoJSON(provider) {
         logger.debug('Obtaining geojson of provider', provider);
         switch (provider.type) {
@@ -75,23 +80,25 @@ class GeoStoreService {
         return geoStore;
     }
 
-    static * saveGeostore(geojson, provider) {
+    static * saveGeostore(geojson, data) {
 
         let geoStore = {
             geojson: geojson
         };
-        if (provider) {
 
-            let geoJsonObtained = yield GeoStoreService.obtainGeoJSON(provider);
-            geoStore.geojson = geoJsonObtained.geojson;
-            geoStore.areaHa = geoJsonObtained.area_ha;
-            geoStore.provider = {
-                type: provider.type,
-                table: provider.table,
-                user: provider.user,
-                filter: provider.filter
-            };
-
+        if (data && data.provider) {
+          let geoJsonObtained = yield GeoStoreService.obtainGeoJSON(data.provider);
+          geoStore.geojson = geoJsonObtained.geojson;
+          geoStore.areaHa = geoJsonObtained.area_ha;
+          geoStore.provider = {
+              type: data.provider.type,
+              table: data.provider.table,
+              user: data.provider.user,
+              filter: data.provider.filter
+          };
+        }
+        if (data && data.info) {
+          geoStore.info = data.info;
         }
 
         logger.debug('Converting geojson');

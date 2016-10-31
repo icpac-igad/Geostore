@@ -5,13 +5,18 @@ var config = require('config');
 var CartoDB = require('cartodb');
 var Mustache = require('mustache');
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
+const GeoStoreService = require('services/geoStoreService');
 
-const ISO = `SELECT slug FROM coverage_layers cl, gadm2_countries_simple c where  ST_INTERSECTS(cl.the_geom, c.the_geom) and c.iso = UPPER('{{iso}}')`;
+const ISO = `SELECT ST_AsGeoJSON(the_geom) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+        FROM gadm2_countries_simple
+        WHERE iso = UPPER('{{iso}}')`;
 
-const ID1 = `SELECT slug FROM coverage_layers cl, gadm2_provinces_simple c where ST_INTERSECTS(cl.the_geom, c.the_geom) and c.iso = UPPER('{{iso}}')
-          AND c.id_1 = {{id1}}`;
+const ID1 = `SELECT ST_AsGeoJSON(the_geom) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+        FROM gadm2_provinces_simple
+        WHERE iso = UPPER('{{iso}}')
+          AND id_1 = {{id1}}`;
 
-const WDPA = `with p as (SELECT p.the_geom AS the_geom
+const WDPA = `SELECT ST_AsGeoJSON(p.the_geom) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM (
           SELECT CASE
           WHEN marine::numeric = 2 THEN NULL
@@ -21,17 +26,13 @@ const WDPA = `with p as (SELECT p.the_geom AS the_geom
             END AS the_geom
           FROM wdpa_protected_areas
           WHERE wdpaid={{wdpaid}}
-      ) p)
-        SELECT slug from coverage_layers cl, p where ST_INTERSECTS(cl.the_geom, p.the_geom) `;
+        ) p`;
 
-const USE = `SELECT slug FROM coverage_layers cl, {{useTable}} c where c.cartodb_id = {{pid}} and ST_INTERSECTS(cl.the_geom, c.the_geom)`;
+const USE = `SELECT ST_AsGeoJSON(the_geom) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+        FROM {{use}}
+        WHERE cartodb_id = {{id}}`;
 
-
-const COVERAGES = `SELECT ST_AsGeoJSON(the_geom) as geojson, coverage_slug as slug, slug as layerSlug from coverage_layers`;
-
-const WORLD = `SELECT slug FROM coverage_layers where ST_INTERSECTS(the_geom, ST_SetSRID(ST_GeomFromGeoJSON('{{{geojson}}}'), 4326))`;
-
-var executeThunk = function(client, sql, params) {
+const executeThunk = function(client, sql, params) {
     return function(callback) {
         logger.debug(Mustache.render(sql, params));
         client.execute(sql, params).done(function(data) {
@@ -42,7 +43,7 @@ var executeThunk = function(client, sql, params) {
     };
 };
 
-var deserializer = function(obj) {
+const deserializer = function(obj) {
     return function(callback) {
         new JSONAPIDeserializer({keyForAttribute: 'camelCase'}).deserialize(obj, callback);
     };
@@ -60,81 +61,144 @@ class CartoDBService {
     * getNational(iso) {
         logger.debug('Obtaining national of iso %s', iso);
         let params = {
-            iso: iso
+          iso: iso
         };
 
+        logger.debug('Checking existing national geo');
+        const existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        logger.debug('Existed geo', existingGeo);
+        if (existingGeo) {
+          logger.debug('Return national geojson stored');
+          return {geojson: existingGeo.geojson, areaHa: existingGeo.areaHa};
+        }
+
+        logger.debug('Request national to carto');
         let data = yield executeThunk(this.client, ISO, params);
         if (data.rows && data.rows.length > 0) {
-            return data.rows.map( item => item.slug );
+          let result = data.rows[0];
+          logger.debug('Saving national geostore');
+          const geoData = {
+            info : {
+              iso: iso
+            }
+          };
+          const existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+          logger.debug('Return national geojson from carto');
+          return {geojson: JSON.parse(result.geojson), areaHa: result.area_ha};
         }
-        return [];
+        return null;
     }
 
     * getSubnational(iso, id1) {
-        logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
-        let params = {
-            iso: iso,
-            id1: id1
-        };
+      logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
+      let params = {
+        iso: iso,
+        id1: parseInt(id1, 10)
+      };
 
-        let data = yield executeThunk(this.client, ID1, params);
-        if (data.rows && data.rows.length > 0) {
-            return data.rows.map( item => item.slug );
-        }
-        return [];
+      logger.debug('Checking existing subnational geo');
+      const existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+      logger.debug('Existed geo', existingGeo);
+      if (existingGeo) {
+        logger.debug('Return subnational geojson stored');
+        return {geojson: existingGeo.geojson, areaHa: existingGeo.area_ha};
+      }
+
+      logger.debug('Request subnational to carto');
+      let data = yield executeThunk(this.client, ID1, params);
+      if (data.rows && data.rows.length > 0) {
+        logger.debug('Return subnational geojson from carto');
+        let result = data.rows[0];
+        logger.debug('Saving national geostore');
+        const geoData = {
+          info: params
+        };
+        const existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+        return {geojson: JSON.parse(result.geojson), areaHa: result.area_ha};
+      }
+      return null;
     }
 
-    * getUse(useTable, id) {
+    * getUse(use, id) {
         logger.debug('Obtaining use with id %s', id);
 
         let params = {
-            useTable: useTable,
-            pid: id
+          use: use,
+          id: id
         };
 
+        logger.debug('Checking existing subnational geo');
+        const existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        logger.debug('Existed geo', existingGeo);
+        if (existingGeo) {
+          logger.debug('Return subnational geojson stored');
+          return {geojson: existingGeo.geojson, areaHa: existingGeo.area_ha};
+        }
+
+        logger.debug('Request subnational to carto');
         let data = yield executeThunk(this.client, USE, params);
 
         if (data.rows && data.rows.length > 0) {
-            return data.rows.map( item => item.slug );
+            let result = data.rows[0];
+            logger.debug('Saving national geostore');
+            const geoData = {
+              info : params
+            };
+            const existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+            logger.debug('Return subnational geojson from carto');
+            return {geojson: JSON.parse(result.geojson), areaHa: result.area_ha};
         }
-        return [];
+        return null;
     }
 
     * getWdpa(wdpaid) {
         logger.debug('Obtaining wpda of id %s', wdpaid);
 
         let params = {
-            wdpaid: wdpaid
+          wdpaid: wdpaid
         };
 
+        logger.debug('Checking existing subnational geo');
+        const existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        logger.debug('Existed geo', existingGeo);
+        if (existingGeo) {
+          logger.debug('Return subnational geojson stored');
+          return {geojson: existingGeo.geojson, areaHa: existingGeo.area_ha};
+        }
+
+        logger.debug('Request subnational to carto');
         let data = yield executeThunk(this.client, WDPA, params);
         if (data.rows && data.rows.length > 0) {
-            return data.rows.map( item => item.slug );
+            let result = data.rows[0];
+            logger.debug('Saving national geostore');
+            const geoData = {
+              info : params
+            };
+            const existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+            logger.debug('Return subnational geojson from carto');
+            return {geojson: JSON.parse(result.geojson), areaHa: result.area_ha};
         }
-        return [];
+        return null;
     }
 
-    * getCoverages() {
-        logger.info('Getting coverages');
-
-        let data = yield executeThunk(this.client, COVERAGES);
-        return data;
-    }
-
-    * getWorld(geojson) {
-        logger.info('Getting layers that intersect');
-
-        let params = {
-            geojson: JSON.stringify(geojson)
-        };
-
-        let data = yield executeThunk(this.client, WORLD, params);
-        if (data.rows && data.rows.length > 0) {
-            return data.rows.map( item => item.slug );
+    * getGeostore(hashGeoStore) {
+        logger.debug('Obtaining geostore with hash %s', hashGeoStore);
+        let result = yield require('vizz.microservice-client').requestToMicroservice({
+            uri: '/geostore/' + hashGeoStore,
+            method: 'GET',
+            json: true
+        });
+        if (result.statusCode !== 200) {
+            console.error('Error obtaining geostore:');
+            console.error(result);
+            return null;
         }
-        return [];
+        let geostore = yield deserializer(result.body);
+        if (geostore) {
+            return geostore;
+        }
+        return null;
     }
-
 }
 
 module.exports = new CartoDBService();

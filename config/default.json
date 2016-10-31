@@ -8,12 +8,12 @@
     "service": {
         "id": "gfw-geostore-api_1.0.0",
         "name": "GFW GeoStore API",
-        "uri": "http://192.168.99.100:3100",
+        "uri": "http://mymachine:3100",
         "port": 3100
     },
     "mongodb":{
         "database": "gfw_geostore_db",
-        "host": "192.168.99.100",
+        "host": "mymachine",
         "port": 32780
     },
     "migrate":{
