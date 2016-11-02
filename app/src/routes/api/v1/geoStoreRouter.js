@@ -65,14 +65,14 @@ class GeoStoreRouter {
         logger.info('Obtaining national data geojson');
         const data = yield CartoService.getNational(this.params.iso);
 
-        this.body = data;
+        this.body = GeoJSONSerializer.serialize(data);
     }
 
     static * getSubnational() {
         logger.info('Obtaining subnational data geojson');
         const data = yield CartoService.getSubnational(this.params.iso, this.params.id1);
 
-        this.body = data;
+        this.body = GeoJSONSerializer.serialize(data);
     }
 
     static * use() {
@@ -99,14 +99,14 @@ class GeoStoreRouter {
         }
         const data = yield CartoService.getUse(useTable, this.params.id);
 
-        this.body = data;
+        this.body = GeoJSONSerializer.serialize(data);
     }
 
     static * wdpa() {
         logger.info('Obtaining wpda data with id %s', this.params.id);
 
         const data = yield CartoService.getWdpa(this.params.id);
-        this.body = data;
+        this.body = GeoJSONSerializer.serialize(data);
     }
 }
 
