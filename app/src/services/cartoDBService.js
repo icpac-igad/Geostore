@@ -65,11 +65,11 @@ class CartoDBService {
         };
 
         logger.debug('Checking existing national geo');
-        const existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
           logger.debug('Return national geojson stored');
-          return {geojson: existingGeo.geojson, areaHa: existingGeo.areaHa};
+          return existingGeo;
         }
 
         logger.debug('Request national to carto');
@@ -78,13 +78,11 @@ class CartoDBService {
           let result = data.rows[0];
           logger.debug('Saving national geostore');
           const geoData = {
-            info : {
-              iso: iso
-            }
+            info : params
           };
-          const existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+          existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
           logger.debug('Return national geojson from carto');
-          return {geojson: JSON.parse(result.geojson), areaHa: result.area_ha};
+          return existingGeo;
         }
         return null;
     }
@@ -97,11 +95,11 @@ class CartoDBService {
       };
 
       logger.debug('Checking existing subnational geo');
-      const existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+      let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
       logger.debug('Existed geo', existingGeo);
       if (existingGeo) {
         logger.debug('Return subnational geojson stored');
-        return {geojson: existingGeo.geojson, areaHa: existingGeo.area_ha};
+        return existingGeo;
       }
 
       logger.debug('Request subnational to carto');
@@ -113,8 +111,8 @@ class CartoDBService {
         const geoData = {
           info: params
         };
-        const existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
-        return {geojson: JSON.parse(result.geojson), areaHa: result.area_ha};
+        existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+        return existingGeo;
       }
       return null;
     }
@@ -124,29 +122,32 @@ class CartoDBService {
 
         let params = {
           use: use,
-          id: id
+          id: parseInt(id, 10)
+        };
+        let info = {
+          use: params
         };
 
-        logger.debug('Checking existing subnational geo');
-        const existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        logger.debug('Checking existing use geo', info);
+        let existingGeo = yield GeoStoreService.getGeostoreByInfo(info);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
-          logger.debug('Return subnational geojson stored');
-          return {geojson: existingGeo.geojson, areaHa: existingGeo.area_ha};
+          logger.debug('Return use geojson stored');
+          return existingGeo;
         }
 
-        logger.debug('Request subnational to carto');
+        logger.debug('Request use to carto');
         let data = yield executeThunk(this.client, USE, params);
 
         if (data.rows && data.rows.length > 0) {
             let result = data.rows[0];
-            logger.debug('Saving national geostore');
+            logger.debug('Saving use geostore');
             const geoData = {
-              info : params
+              info : info
             };
-            const existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
-            logger.debug('Return subnational geojson from carto');
-            return {geojson: JSON.parse(result.geojson), areaHa: result.area_ha};
+            existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+            logger.debug('Return use geojson from carto');
+            return existingGeo;
         }
         return null;
     }
@@ -155,18 +156,18 @@ class CartoDBService {
         logger.debug('Obtaining wpda of id %s', wdpaid);
 
         let params = {
-          wdpaid: wdpaid
+          wdpaid: parseInt(wdpaid, 10)
         };
 
-        logger.debug('Checking existing subnational geo');
-        const existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        logger.debug('Checking existing wdpa geo');
+        let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
-          logger.debug('Return subnational geojson stored');
+          logger.debug('Return wdpa geojson stored');
           return {geojson: existingGeo.geojson, areaHa: existingGeo.area_ha};
         }
 
-        logger.debug('Request subnational to carto');
+        logger.debug('Request wdpa to carto');
         let data = yield executeThunk(this.client, WDPA, params);
         if (data.rows && data.rows.length > 0) {
             let result = data.rows[0];
@@ -174,9 +175,9 @@ class CartoDBService {
             const geoData = {
               info : params
             };
-            const existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
-            logger.debug('Return subnational geojson from carto');
-            return {geojson: JSON.parse(result.geojson), areaHa: result.area_ha};
+            existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+            logger.debug('Return wdpa geojson from carto');
+            return existingGeo;
         }
         return null;
     }

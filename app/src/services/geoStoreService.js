@@ -58,7 +58,7 @@ class GeoStoreService {
     }
 
     static * getGeostoreByInfo(info){
-      let geoStore = yield GeoStore.findOne({info});
+      const geoStore = yield GeoStore.findOne({info});
       return geoStore;
     }
 
