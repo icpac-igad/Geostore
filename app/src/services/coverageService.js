@@ -11,7 +11,7 @@ const ISO = `with c as (select the_geom_webmercator, st_area(the_geom_webmercato
             SELECT slug FROM  cl inner join c on ST_INTERSECTS(c.the_geom_webmercator, cl.the_geom_webmercator)
             where (((st_area(ST_intersection(c.the_geom_webmercator, cl.the_geom_webmercator))/10000)::numeric/area_ha::numeric)*100)>1`;
 
-const ID1 = `with c as (select the_geom_webmercator, st_area(the_geom_webmercator)/10000 as area_ha from gadm2_provinces_simple where iso = UPPER('{{iso}}')) AND id_1 = {{id1}},
+const ID1 = `with c as (select the_geom_webmercator, st_area(the_geom_webmercator)/10000 as area_ha from gadm2_provinces_simple where iso = UPPER('{{iso}}') AND id_1 = {{id1}}),
             cl as (select (st_buffer(st_simplify(the_geom_webmercator,10000),1)) the_geom_webmercator, slug, coverage_slug from coverage_layers)
             SELECT slug FROM  cl inner join c on ST_INTERSECTS(c.the_geom_webmercator, cl.the_geom_webmercator)
             where (((st_area(ST_intersection(c.the_geom_webmercator, cl.the_geom_webmercator))/10000)::numeric/area_ha::numeric)*100)>1`;
