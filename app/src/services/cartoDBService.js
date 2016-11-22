@@ -164,7 +164,7 @@ class CartoDBService {
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
           logger.debug('Return wdpa geojson stored');
-          return {geojson: existingGeo.geojson, areaHa: existingGeo.area_ha};
+          return existingGeo;
         }
 
         logger.debug('Request wdpa to carto');
