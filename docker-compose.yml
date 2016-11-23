@@ -9,5 +9,5 @@ prod:
   dns: ${DNS_SERVER}
   log_driver: "syslog"
   log_opt:
-    gelf-address: ${SYSLOG_ADDRESS}
+    syslog-address: ${SYSLOG_ADDRESS}
     tag: "{{.ImageName}}${STAGING}"
