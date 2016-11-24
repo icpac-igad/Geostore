@@ -7,16 +7,16 @@ var Mustache = require('mustache');
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const GeoStoreService = require('services/geoStoreService');
 
-const ISO = `SELECT ST_AsGeoJSON(the_geom) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM gadm2_countries_simple
         WHERE iso = UPPER('{{iso}}')`;
 
-const ID1 = `SELECT ST_AsGeoJSON(the_geom) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const ID1 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM gadm2_provinces_simple
         WHERE iso = UPPER('{{iso}}')
           AND id_1 = {{id1}}`;
 
-const WDPA = `SELECT ST_AsGeoJSON(p.the_geom) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const WDPA = `SELECT ST_AsGeoJSON(st_makevalid(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM (
           SELECT CASE
           WHEN marine::numeric = 2 THEN NULL
@@ -28,7 +28,7 @@ const WDPA = `SELECT ST_AsGeoJSON(p.the_geom) AS geojson, (ST_Area(geography(the
           WHERE wdpaid={{wdpaid}}
         ) p`;
 
-const USE = `SELECT ST_AsGeoJSON(the_geom) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const USE = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM {{use}}
         WHERE cartodb_id = {{id}}`;
 
