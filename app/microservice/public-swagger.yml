@@ -1,20 +1,88 @@
 swagger: '2.0'
+###############################################################################
+#                              API Information                                 
+###############################################################################
 info:
-  title: GFW GeoStore API
-  description: Global Forest Watch - GeoStore API
+  title: GLobal Forest Watch API
+  description: |
+    The Global Forest Watch API is currently in beta. Based on feedback from trusted testers, this document specifies new API changes that are currently under development. Interested in being a trusted tester? Contact the [Data Lab](mailTo:support@wri.com) at World Resources Institute.
+    
+    All endpoints are accessible via http & https and are located at
+    `https://production-api.globalforestwatch.org`.
+    
+    Forest change measures tree cover loss, tree cover gain, or forest disturbance. The following forest change data are available through the API: 
+    * University of Maryland tree cover loss & gain 
+    * FORMA alerts
+    * IMAZON SAD alerts
+    * Terrai alerts
+    * Prodes
+    * Guira Loss
+    * Biomass loss
+    * GLAD tree cover loss alerts 
+    * NASA VIIRs active fires.
+    
+    Other services provided by the Api complements the ecosystem that surrounds the platform:
+    
+    * Metadata
+    * Urthecast 
+    * Geostore
+    * OGR 
+    * Story 
+    * User 
+    * subscription
+    
+  
+    ### GeoStore API
+    This Microservice will provide a comprehensive way of communicate geometries between the platforms and the microservices.
+    
+    We will be able to store a geojson and retrive a geohash for that geojson. The service will also provide information related the geometry stored, like the area in Ha or the bounding box.
+    
+    We will also be able to provide a geometry provider at CARTO:
+      ```{
+      "provider": {
+          "filter": "cartodb_id=729417",
+          "user": "wri-01",
+          "table": "gfw_mining",
+          "type": "carto"
+      }
+    }```
+    
+    
+  termsOfService: http://www.globalforestwatch.org/terms
+  contact:
+    name: API Support
+    url: http://www.globalforestwatch.org
+    email: support@wri.com
+  license:
+    name: MIT License (MIT)
+    url: https://opensource.org/licenses/MIT
   version: "1.0.0"
-host: example.vizzuality.com
+  
+host: staging-api.globalforestwatch.org
 
 schemes:
   - https
   - http
 
 consumes:
-  - application/json
+  - application/vnd.api+json
 
 produces:
   - application/vnd.api+json
-
+###############################################################################
+#                                  Security                                    
+###############################################################################
+#securityDefinitions:
+#  UserSecurity:
+#    type: apiKey
+#   in: header
+#    name: Authorization
+#    description: For write operations we need to provide a token like  ```Bearer {{TOKEN}}```
+#security:
+#        - UserSecurity: []
+###############################################################################
+#                                  Paths                                   
+###############################################################################
 paths:
   /geostore/{id}:
     get:
@@ -77,7 +145,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: ID of geostore to fetch
+          description: ID of geostore to fetch ```34cecd4c4809dbbec20ce40be3d1c877```
           required: true
           type: string
       responses:
@@ -97,15 +165,183 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Errors'
+  /geostore/wdpa/{id}:
+    get:
+      summary: Get geostore by wdpaid
+      description: |
+        Returns geostore for a protected are, if the geostore not exist return 404
+        ### Example URL request
+        ```
+        {{host}}/geostore/wdpa/235442
+        ```
+        ### Example response
+        * Saving a geojson
+        ```json
+        {
+              "data": {
+                  "type": "geoStore",
+                  "id": "ca38fa80a4ffa9ac6217a7e0bf71e6df",
+                  "attributes": {
+                      "geojson": {
+                          "features": [{
+                              "type": "Feature",
+                              "geometry": {
+                                  "type": "Polygon",
+                                  "coordinates": [
+                                      [
+                                          [-5.273512601852417,
+                                              42.81137220349083
+                                          ],
+                                          [-5.273512601852417,
+                                              42.811803118457306
+                                          ],
+                                          [-5.272732079029083,
+                                              42.811803118457306
+                                          ],
+                                          [-5.272732079029083,
+                                              42.81137220349083
+                                          ],
+                                          [-5.273512601852417,
+                                              42.81137220349083
+                                          ]
+                                      ]
+                                  ]
+                              }
+                          }],
+                          "crs": {},
+                          "type": "FeatureCollection"
+                      },
+                      "hash": "ca38fa80a4ffa9ac6217a7e0bf71e6df",
+                      "provider": {},
+                      "areaHa": 0.3057556230214663
+                  }
+              }
+          }
+        ```
+      operationId: getGeoStoreBywdpaid
+      produces:
+        - application/vnd.api+json
+      tags:
+        - GEOSTORE
+      parameters:
+        - name: id
+          in: path
+          description: ID of protected area geostore to fetch ```123412```
+          required: true
+          type: string
+      responses:
+        200:
+          description: Geostore obtained
+          schema:
+            $ref: '#/definitions/GeoStoreAPI'
+        404:
+          description: Geostore not found
+          schema:
+            $ref: '#/definitions/Errors'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Errors'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Errors'
+  
+  /geostore/use/{useType}/{id}:
+    get:
+      summary: Get geostore by Use id
+      description: |
+        Returns geostore for a protected are, if the geostore not exist return 404
+        ### Example URL request
+        ```
+        {{host}}/geostore/wdpa/235442
+        ```
+        ### Example response
+        * Saving a geojson
+        ```json
+        {
+              "data": {
+                  "type": "geoStore",
+                  "id": "ca38fa80a4ffa9ac6217a7e0bf71e6df",
+                  "attributes": {
+                      "geojson": {
+                          "features": [{
+                              "type": "Feature",
+                              "geometry": {
+                                  "type": "Polygon",
+                                  "coordinates": [
+                                      [
+                                          [-5.273512601852417,
+                                              42.81137220349083
+                                          ],
+                                          [-5.273512601852417,
+                                              42.811803118457306
+                                          ],
+                                          [-5.272732079029083,
+                                              42.811803118457306
+                                          ],
+                                          [-5.272732079029083,
+                                              42.81137220349083
+                                          ],
+                                          [-5.273512601852417,
+                                              42.81137220349083
+                                          ]
+                                      ]
+                                  ]
+                              }
+                          }],
+                          "crs": {},
+                          "type": "FeatureCollection"
+                      },
+                      "hash": "ca38fa80a4ffa9ac6217a7e0bf71e6df",
+                      "provider": {},
+                      "areaHa": 0.3057556230214663
+                  }
+              }
+          }
+        ```
+      operationId: getGeoStoreByUseid
+      produces:
+        - application/vnd.api+json
+      tags:
+        - GEOSTORE
+      parameters:
+        - name: useType
+          in: path
+          description: Type of concession one of ```mining, oilpalm, fiber, logging```
+          required: true
+          type: string
+        - name: id
+          in: path
+          description: ID of use area to fetch ```12```
+          required: true
+          type: string
+      responses:
+        200:
+          description: Geostore obtained
+          schema:
+            $ref: '#/definitions/GeoStoreAPI'
+        404:
+          description: Geostore not found
+          schema:
+            $ref: '#/definitions/Errors'
+        500:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Errors'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Errors'
+  
   /geostore:
     post:
       summary: Create geostore
       description: |
         ### 2 posibilities to create geostore
-
         * Send geojson in a body (geojson attribute)
         * Send provider object with all params. With this mode, the geostore obtain the geojson in the provider. Support providers-> carto
-
+        
         ### Example response
         * Saving a geojson
         ```json
@@ -333,10 +569,22 @@ definitions:
           filter:
             type: string
             description: filter to obtain the geostore
+        required:
+          - type
+          - table
+          - user
+          - filter    
+        example:
+          provider:
+            filter: cartodb_id=729417
+            user: wri-01
+            table: gfw_mining
+            type: carto    
       geojson:
         properties:
           schema:
             $ref: '#/definitions/Features'
+      
   GeoStoreAPI:
     type: object
     properties:
