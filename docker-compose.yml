@@ -7,7 +7,7 @@ prod:
   command: start
   restart: always
   dns: ${DNS_SERVER}
-  log_driver: "syslog"
-  log_opt:
-    syslog-address: ${SYSLOG_ADDRESS}
-    tag: gfw-geostore${STAGING}
+  # log_driver: "syslog"
+  # log_opt:
+  #   syslog-address: ${SYSLOG_ADDRESS}
+  #   tag: gfw-geostore${STAGING}
