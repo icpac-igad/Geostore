@@ -1,7 +1,7 @@
 {
     "logger": {
         "name": "gfw-geostore-api",
-        "level": "info",
+        "level": "warn",
         "toFile": false,
         "dirLogFile": null
     },
