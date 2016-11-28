@@ -8,7 +8,8 @@ develop:
   environment:
     NODE_ENV: dev
     CARTODB_USER: wri-01
-    API_GATEWAY_URL: http://mymachine:8000
+    CT_URL: http://mymachine:9000
+    LOCAL_URL: http://mymachine:4100
   command: develop
   links:
     - mongo
