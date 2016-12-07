@@ -16,5 +16,68 @@
             "method": "GET",
             "path": "/api/v1/geostore/:id"
         }]
+    }, {
+        "url": "/geostore/admin/:iso",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/geostore/admin/:iso"
+        }]
+    }, {
+        "url": "/geostore/admin/:iso/:id1",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/geostore/admin/:iso/:id1"
+        }]
+    }, {
+        "url": "/geostore/use/:name/:id",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/geostore/use/:name/:id"
+        }]
+    }, {
+        "url": "/geostore/wdpa/:id",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/geostore/wdpa/:id"
+        }]
+    }, {
+        "url": "/coverage/intersect/use/:name/:id",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/coverage/intersect/use/:name/:id"
+        }]
+    }, {
+        "url": "/coverage/intersect/admin/:iso",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/coverage/intersect/admin/:iso"
+        }]
+    }, {
+        "url": "/coverage/intersect/admin/:iso/:id1",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/coverage/intersect/admin/:iso/:id1"
+        }]
+    }, {
+        "url": "/coverage/intersect/wdpa/:id",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/coverage/intersect/wdpa/:id"
+        }]
+    }, {
+        "url": "/coverage/intersect",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/coverage/intersect"
+        }]
     }]
 }

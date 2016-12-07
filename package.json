@@ -1,6 +1,6 @@
 {
   "name": "gfw-geostore-api",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Global forest watch - GeoStore API",
   "main": "index.js",
   "scripts": {
@@ -48,7 +48,7 @@
     "mongoose": "4.4.6",
     "newrelic": "1.27.1",
     "turf": "^3.0.11",
-    "vizz.microservice-client": "1.2.4"
+    "ct-register-microservice-node": "^1.0.5"
   },
   "devDependencies": {
     "co-mocha": "1.1.2",

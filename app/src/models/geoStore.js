@@ -19,12 +19,22 @@ var GeoStore = new Schema({
         }
     },
     areaHa: {type: Number, required: false},
+    bbox: {type: Schema.Types.Mixed, required: false},
     hash: {type: String, required: true, trim: true},
-    provider:{
-        type:{type: String, trim: true},
+    provider: {
+        type: {type: String, trim: true},
         table: {type: String, trim: true},
-        user:{type: String, trim: true},
+        user: {type: String, trim: true},
         filter: {type: String, trim: true}
+    },
+    info: {
+        iso: {type: String, required: false},
+        id1: {type: Number, required: false},
+        wdpaid: {type: Number, required: false},
+        use: {
+            use:{type: String, required: false},
+            id:{type: Number, required: false},
+        }
     }
 });
 

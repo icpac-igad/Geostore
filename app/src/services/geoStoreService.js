@@ -4,6 +4,7 @@ var GeoStore = require('models/geoStore');
 var GeoJSONConverter = require('converters/geoJSONConverter');
 var md5 = require('md5');
 var CartoDB = require('cartodb');
+var IdConnection = require('models/idConnection');
 var turf = require('turf');
 var ProviderNotFound = require('errors/providerNotFound');
 var GeoJSONNotFound = require('errors/geoJSONNotFound');
@@ -40,6 +41,27 @@ class GeoStoreService {
         throw new GeoJSONNotFound('Geojson not found');
     }
 
+    static * getNewHash(hash){
+        let idCon = yield IdConnection.findOne({oldId: hash}).exec();
+        if(!idCon){
+            return hash;
+        }
+        return idCon.hash;
+    }
+
+    static * getGeostoreById(id){
+        logger.debug(`Getting geostore by id ${id}`);
+        let hash = yield GeoStoreService.getNewHash(id);
+        logger.debug('hash',hash);
+        let geoStore = yield GeoStore.findOne({hash: hash}, {'geojson._id': 0, 'geojson.features._id': 0});
+        return geoStore;
+    }
+
+    static * getGeostoreByInfo(info){
+      const geoStore = yield GeoStore.findOne({info});
+      return geoStore;
+    }
+
     static * obtainGeoJSON(provider) {
         logger.debug('Obtaining geojson of provider', provider);
         switch (provider.type) {
@@ -51,23 +73,32 @@ class GeoStoreService {
         }
     }
 
-    static * saveGeostore(geojson, provider) {
+    static * calculateBBox(geoStore){
+        logger.debug('Calculating bbox');
+        geoStore.bbox = turf.bbox(geoStore.geojson);
+        yield geoStore.save();
+        return geoStore;
+    }
+
+    static * saveGeostore(geojson, data) {
 
         let geoStore = {
             geojson: geojson
         };
-        if (provider) {
 
-            let geoJsonObtained = yield GeoStoreService.obtainGeoJSON(provider);
-            geoStore.geojson = geoJsonObtained.geojson;
-            geoStore.areaHa = geoJsonObtained.area_ha;
-            geoStore.provider = {
-                type: provider.type,
-                table: provider.table,
-                user: provider.user,
-                filter: provider.filter
-            };
-
+        if (data && data.provider) {
+          let geoJsonObtained = yield GeoStoreService.obtainGeoJSON(data.provider);
+          geoStore.geojson = geoJsonObtained.geojson;
+          geoStore.areaHa = geoJsonObtained.area_ha;
+          geoStore.provider = {
+              type: data.provider.type,
+              table: data.provider.table,
+              user: data.provider.user,
+              filter: data.provider.filter
+          };
+        }
+        if (data && data.info) {
+          geoStore.info = data.info;
         }
 
         logger.debug('Converting geojson');
@@ -80,6 +111,10 @@ class GeoStoreService {
         let exist = yield GeoStore.findOne({
             hash: geoStore.hash
         });
+        if(!geoStore.bbox) {
+            geoStore.bbox = turf.bbox(geoStore.geojson);
+        }
+
         if (exist) {
             logger.debug('Updating');
             yield GeoStore.update({
