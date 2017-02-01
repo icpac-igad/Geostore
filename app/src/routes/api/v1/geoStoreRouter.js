@@ -48,7 +48,8 @@ class GeoStoreRouter {
         try{
           const data = {
             provider: this.request.body.provider,
-            info: {}
+            info: {},
+            lock: this.request.body.lock ? this.request.body.lock : false
           };
           let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
           this.body = GeoJSONSerializer.serialize(geostore);
