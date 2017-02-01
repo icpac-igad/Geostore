@@ -118,6 +118,7 @@ class GeoStoreService {
 
         if (exist) {
             logger.debug('Updating');
+            geoStore.lock = exist.lock;
             yield GeoStore.update({
                 _id: exist._id
             }, geoStore);
