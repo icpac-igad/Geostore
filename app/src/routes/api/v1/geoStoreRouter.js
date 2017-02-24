@@ -65,14 +65,18 @@ class GeoStoreRouter {
     static * getNational() {
         logger.info('Obtaining national data geojson');
         const data = yield CartoService.getNational(this.params.iso);
-
+        if (!data) {
+          this.throw(404, 'Country not found');
+        }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
     static * getSubnational() {
         logger.info('Obtaining subnational data geojson');
         const data = yield CartoService.getSubnational(this.params.iso, this.params.id1);
-
+        if (!data) {
+          this.throw(404, 'Country/Region not found');
+        }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
@@ -99,7 +103,9 @@ class GeoStoreRouter {
             this.throw(404, 'Name not found');
         }
         const data = yield CartoService.getUse(useTable, this.params.id);
-
+        if (!data) {
+          this.throw(404, 'Use not found');
+        }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
@@ -107,6 +113,9 @@ class GeoStoreRouter {
         logger.info('Obtaining wpda data with id %s', this.params.id);
 
         const data = yield CartoService.getWdpa(this.params.id);
+        if (!data) {
+          this.throw(404, 'Wdpa not found');
+        }
         this.body = GeoJSONSerializer.serialize(data);
     }
 }
