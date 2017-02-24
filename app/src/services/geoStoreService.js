@@ -100,7 +100,7 @@ class GeoStoreService {
         if (data && data.info) {
           geoStore.info = data.info;
         }
-        geoStore.lock = data.lock;
+        geoStore.lock = data.lock || false;
 
         logger.debug('Converting geojson');
         geoStore.geojson = GeoJSONConverter.convert(geoStore.geojson);
