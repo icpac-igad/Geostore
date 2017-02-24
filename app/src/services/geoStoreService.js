@@ -123,7 +123,7 @@ class GeoStoreService {
                 _id: exist._id
             }, geoStore);
         } else {
-            logger.debug('Not exist. Saving', geoStore);
+            logger.debug('Not exist. Saving');
             yield new GeoStore(geoStore).save();
         }
         return yield GeoStore.findOne({
