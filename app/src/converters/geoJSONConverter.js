@@ -18,6 +18,7 @@ module.exports.convert = function(data){
             type: 'FeatureCollection',
             features:[{
                 type: 'Feature',
+                properties: {},
                 geometry: data
             }]
         };
