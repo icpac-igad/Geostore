@@ -100,6 +100,7 @@ class GeoStoreService {
         if (data && data.info) {
           geoStore.info = data.info;
         }
+        geoStore.lock = data.lock || false;
 
         logger.debug('Converting geojson');
         geoStore.geojson = GeoJSONConverter.convert(geoStore.geojson);
@@ -117,11 +118,12 @@ class GeoStoreService {
 
         if (exist) {
             logger.debug('Updating');
+            geoStore.lock = exist.lock;
             yield GeoStore.update({
                 _id: exist._id
             }, geoStore);
         } else {
-            logger.debug('Not exist');
+            logger.debug('Not exist. Saving');
             yield new GeoStore(geoStore).save();
         }
         return yield GeoStore.findOne({

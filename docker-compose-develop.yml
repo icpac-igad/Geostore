@@ -9,7 +9,7 @@ develop:
     NODE_ENV: dev
     CARTODB_USER: wri-01
     CT_URL: http://mymachine:9000
-    LOCAL_URL: http://mymachine:4100
+    LOCAL_URL: http://mymachine:3100
   command: develop
   links:
     - mongo
