@@ -25,15 +25,12 @@ class GeoStoreRouter {
         var geoStore = null;
 
         try {
-
             geoStore = yield GeoStoreService.getGeostoreById(this.params.hash);
-
-            logger.debug('GeoStore found. Returning...');
-
             if(!geoStore) {
                 this.throw(404, 'GeoStore not found');
                 return;
             }
+            logger.debug('GeoStore found. Returning...');
             if(!geoStore.bbox) {
                 geoStore = yield GeoStoreService.calculateBBox(geoStore);
             }

@@ -54,8 +54,11 @@ class GeoStoreService {
         let hash = yield GeoStoreService.getNewHash(id);
         logger.debug('hash',hash);
         let geoStore = yield GeoStore.findOne({hash: hash}, {'geojson._id': 0, 'geojson.features._id': 0});
-        logger.debug('geostore', JSON.stringify(geoStore.geojson));
-        return geoStore;
+        if (geoStore){
+          logger.debug('geostore', JSON.stringify(geoStore.geojson));
+          return geoStore;
+        }
+        return null;
     }
 
     static * getGeostoreByInfo(info){
