@@ -55,8 +55,8 @@ class GeoStoreRouter {
             info: {},
             lock: this.request.body.lock ? this.request.body.lock : false
           };
-          if (!this.request.body.geojson && !this.request.body.esrijson){
-            this.throw(400, 'geojson or esrijson required');
+          if (!this.request.body.geojson && !this.request.body.esrijson && !this.request.body.provider){
+            this.throw(400, 'geojson, esrijson or provider required');
             return;
           }
           if (this.request.body.esrijson){
