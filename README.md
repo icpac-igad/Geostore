@@ -17,34 +17,19 @@ API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/
 
 ## Getting Started
 
-### OS X
+## First time user
+Perform the following steps:
+* [Install docker && docker composse](https://docs.docker.com/engine/installation/)
+* [Install control tower](https://github.com/control-tower/control-tower)
+* Clone this repository: ```git clone git@github.com:gfw-api/gfw-geostore-api.git```
+* Enter in the directory ```cd gfw-geostore-api```
+* Open a terminal and run:
 
-**First, make sure that you have the [API gateway running
-locally](https://github.com/Vizzuality/api-gateway/tree/master#getting-started).**
-
-We're using Docker which, luckily for you, means that getting the
-application running locally should be fairly painless. First, make sure
-that you have [Docker Compose](https://docs.docker.com/compose/install/)
-installed on your machine.
-
-If you've not used Docker before, you may need to set up some defaults:
-
-```
-docker-machine create --driver virtualbox default
-docker-machine start default
-eval $(docker-machine env default)
-```
-
-Now we're ready to actually get the application running:
+```bash
+    sh ./geostore.sh develop
 
 ```
-git clone https://github.com/Vizzuality/gfw-geostore-api.git
-cd gfw-geostore-api
-npm install
-npm run develop
-```
 
-You can now access the microservice through the API gateway.
 
 ## Deployment
 

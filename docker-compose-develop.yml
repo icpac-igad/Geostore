@@ -10,6 +10,7 @@ develop:
     CARTODB_USER: wri-01
     CT_URL: http://mymachine:9000
     LOCAL_URL: http://mymachine:3100
+    API_VERSION: v1
   command: develop
   links:
     - mongo

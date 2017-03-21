@@ -54,7 +54,11 @@ class GeoStoreService {
         let hash = yield GeoStoreService.getNewHash(id);
         logger.debug('hash',hash);
         let geoStore = yield GeoStore.findOne({hash: hash}, {'geojson._id': 0, 'geojson.features._id': 0});
-        return geoStore;
+        if (geoStore){
+          logger.debug('geostore', JSON.stringify(geoStore.geojson));
+          return geoStore;
+        }
+        return null;
     }
 
     static * getGeostoreByInfo(info){
@@ -103,7 +107,9 @@ class GeoStoreService {
         geoStore.lock = data.lock || false;
 
         logger.debug('Converting geojson');
+        logger.debug('Converting', JSON.stringify(geoStore.geojson));
         geoStore.geojson = GeoJSONConverter.convert(geoStore.geojson);
+        logger.debug('Result', JSON.stringify(geoStore.geojson));
         logger.debug('Creating hash from geojson md5');
         geoStore.hash = md5(JSON.stringify(geoStore.geojson));
         if (geoStore.areaHa === undefined) {

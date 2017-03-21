@@ -10,6 +10,8 @@ var CartoService = require('services/cartoDBService');
 var GeoStoreService = require('services/geoStoreService');
 var ProviderNotFound = require('errors/providerNotFound');
 var GeoJSONNotFound = require('errors/geoJSONNotFound');
+var geojsonToArcGIS = require('arcgis-to-geojson-utils').geojsonToArcGIS;
+var arcgisToGeoJSON = require('arcgis-to-geojson-utils').arcgisToGeoJSON;
 
 var router = new Router({
     prefix: '/geostore'
@@ -23,18 +25,20 @@ class GeoStoreRouter {
         var geoStore = null;
 
         try {
-
             geoStore = yield GeoStoreService.getGeostoreById(this.params.hash);
-
-            logger.debug('GeoStore found. Returning...');
-
             if(!geoStore) {
                 this.throw(404, 'GeoStore not found');
                 return;
             }
+            logger.debug('GeoStore found. Returning...');
             if(!geoStore.bbox) {
                 geoStore = yield GeoStoreService.calculateBBox(geoStore);
             }
+            if (this.query.format && this.query.format === 'esri') {
+              logger.debug('esri', geojsonToArcGIS(geoStore.geojson)[0]);
+              geoStore.esrijson = geojsonToArcGIS(geoStore.geojson)[0].geometry;
+            }
+
             this.body = GeoJSONSerializer.serialize(geoStore);
 
         } catch(e) {
@@ -51,7 +55,16 @@ class GeoStoreRouter {
             info: {},
             lock: this.request.body.lock ? this.request.body.lock : false
           };
+          if (!this.request.body.geojson && !this.request.body.esrijson){
+            this.throw(400, 'geojson or esrijson required');
+            return;
+          }
+          if (this.request.body.esrijson){
+            this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
+          }
+          
           let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
+          logger.debug(JSON.stringify(geostore.geojson));
           this.body = GeoJSONSerializer.serialize(geostore);
         } catch(err){
             if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound){

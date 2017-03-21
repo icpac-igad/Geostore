@@ -6,14 +6,17 @@ var GeoStore = new Schema({
     geojson:{
         type: {type: String,  trim: true},
         features: [{
+            _id: false,
             type: {type: String,  trim: true},
             properties: {type: Schema.Types.Mixed},
             geometry:{
+                _id: false,
                 type: {type: String, trim: true},
                 coordinates: [Schema.Types.Mixed]
             }
         }],
         crs:{
+            _id: false,
             type: {type: String, required:false, trim: true},
             properties:{type: Schema.Types.Mixed, required: false }
         }
