@@ -7,8 +7,4 @@ services:
     env_file:
       - prod.env
     command: start
-    logging:
-      driver: "syslog"
-      options:
-        syslog-address: ${SYSLOG_ADDRESS}
-        tag: dataset${STAGING}
+   
