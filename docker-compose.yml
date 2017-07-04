@@ -1,5 +1,5 @@
 prod:
-  image: vizzuality/gfw-geostore-api:1.4.0${STAGING}-sdg
+  image: vizzuality/gfw-geostore-api:1.4.0${STAGING}
   ports:
     - "3100"
   env_file:
