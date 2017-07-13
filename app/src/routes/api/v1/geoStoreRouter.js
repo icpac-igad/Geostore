@@ -8,6 +8,7 @@ var GeoStore = require('models/geoStore');
 var IdConnection = require('models/idConnection');
 var CartoService = require('services/cartoDBService');
 var GeoStoreService = require('services/geoStoreService');
+var GeoJsonIOService = require('services/geojsonioService');
 var ProviderNotFound = require('errors/providerNotFound');
 var GeoJSONNotFound = require('errors/geoJSONNotFound');
 var geojsonToArcGIS = require('arcgis-to-geojson-utils').geojsonToArcGIS;
@@ -62,7 +63,7 @@ class GeoStoreRouter {
           if (this.request.body.esrijson){
             this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
           }
-          
+
           let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
           logger.debug(JSON.stringify(geostore.geojson));
           this.body = GeoJSONSerializer.serialize(geostore);
@@ -131,6 +132,30 @@ class GeoStoreRouter {
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
+
+    static * view() {
+        this.assert(this.params.hash, 400, 'Hash param not found');
+        logger.debug('Getting geostore by hash %s', this.params.hash);
+        var geoStore = null;
+        var geojsonIoPath = null;
+
+        try {
+            geoStore = yield GeoStoreService.getGeostoreById(this.params.hash);
+
+            if(!geoStore) {
+                this.throw(404, 'GeoStore not found');
+                return;
+            }
+            logger.debug('GeoStore found. Returning...');
+
+            geojsonIoPath = yield GeoJsonIOService.view(geoStore.geojson);
+            this.body = {'view_link': geojsonIoPath};
+
+        } catch(e) {
+            logger.error(e);
+            throw e;
+        }
+    }
 }
 
 router.get('/:hash', GeoStoreRouter.getGeoStoreById);
@@ -139,5 +164,6 @@ router.get('/admin/:iso', GeoStoreRouter.getNational);
 router.get('/admin/:iso/:id1', GeoStoreRouter.getSubnational);
 router.get('/use/:name/:id', GeoStoreRouter.use);
 router.get('/wdpa/:id', GeoStoreRouter.wdpa);
+router.get('/:hash/view', GeoStoreRouter.view);
 
 module.exports = router;
