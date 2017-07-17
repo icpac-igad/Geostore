@@ -17,6 +17,13 @@
             "path": "/api/v1/geostore/:id"
         }]
     }, {
+        "url": "/v1/geostore/:id/view",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/geostore/:id/view"
+        }]
+    }, {
         "url": "/v1/geostore/admin/:iso",
         "method": "GET",
         "endpoints": [{
