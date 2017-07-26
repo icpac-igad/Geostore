@@ -3,7 +3,7 @@
 node {
 
   // Actions
-  def forceCompleteDeploy = false;
+  def forceCompleteDeploy = true;
 
   // Variables
   def tokens = "${env.JOB_NAME}".tokenize('/')
