@@ -32,8 +32,6 @@ spec:
             value: app/src
           - name: LOCAL_URL
             value: http://{name}.default.svc.cluster.local:3100
-          - name: WORKERS
-            value: 2
           - name: MONGO_URI
             valueFrom:
                 secretKeyRef:
