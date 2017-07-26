@@ -2,19 +2,19 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    name: pepito
-  name: pepito
+    name: {name}
+  name: {name}
 spec:
   template:
     metadata:
       annotations:
         chaos.alpha.kubernetes.io/enabled: "true"
       labels:
-        name: pepito
+        name: {name}
     spec:
       containers:
-      - name: pepito
-        image: vizzuality/pepito
+      - name: {name}
+        image: vizzuality/{name}
         imagePullPolicy: Always
         resources:
           requests:
@@ -31,7 +31,7 @@ spec:
           - name: NODE_PATH
             value: app/src
           - name: LOCAL_URL
-            value: http://pepito.default.svc.cluster.local:3100
+            value: http://{name}.default.svc.cluster.local:3100
           - name: WORKERS
             value: 2
           - name: MONGO_URI
