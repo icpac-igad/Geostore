@@ -41,16 +41,26 @@ node {
 
         // Roll out to staging
         case "develop":
-          sh("echo Deploying to STAGING cluster")
-          sh("gcloud container clusters get-credentials ${KUBE_STAGING_CLUSTER} --zone ${GCLOUD_GCE_ZONE} --project ${GCLOUD_PROJECT}")
-          def service = sh([returnStdout: true, script: "kubectl get deploy ${appName} || echo NotFound"]).trim()
-          if ((service && service.indexOf("NotFound") > -1) || (forceCompleteDeploy)){
-            sh("sed -i -e 's/{name}/${appName}/g' k8s/services/*.yaml")
-            sh("sed -i -e 's/{name}/${appName}/g' k8s/staging/*.yaml")
-            sh("kubectl apply -f k8s/services/")
-            sh("kubectl apply -f k8s/staging/")
+          userInput = input(
+            id: 'Proceed1', message: 'Was this successful?', parameters: [
+            [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this deployment']
+          ])
+          if (userInput == true){
+            sh("echo Deploying to STAGING cluster")
+            sh("gcloud container clusters get-credentials ${KUBE_STAGING_CLUSTER} --zone ${GCLOUD_GCE_ZONE} --project ${GCLOUD_PROJECT}")
+            def service = sh([returnStdout: true, script: "kubectl get deploy ${appName} || echo NotFound"]).trim()
+            if ((service && service.indexOf("NotFound") > -1) || (forceCompleteDeploy)){
+              sh("sed -i -e 's/{name}/${appName}/g' k8s/services/*.yaml")
+              sh("sed -i -e 's/{name}/${appName}/g' k8s/staging/*.yaml")
+              sh("kubectl apply -f k8s/services/")
+              sh("kubectl apply -f k8s/staging/")
+            }
+            sh("kubectl set image deployment ${appName} ${appName}=${imageTag} --record")
+          } else {
+            echo "this was not successful"
+            currentBuild.result = 'FAILURE'
           }
-          sh("kubectl set image deployment ${appName} ${appName}=${imageTag} --record")
+          
           break
 
         // Roll out to production
