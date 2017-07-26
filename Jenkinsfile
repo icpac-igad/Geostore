@@ -41,10 +41,10 @@ node {
 
         // Roll out to staging
         case "develop":
-          // userInput = input(
-          //   id: 'Proceed1', message: 'Was this successful?', parameters: [
-          //   [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this deployment']
-          // ])
+          userInput = input(
+            id: 'Proceed1', message: 'Was this successful?', parameters: [
+            [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this deployment']
+          ])
           if (userInput == true){
             sh("echo Deploying to STAGING cluster")
             sh("gcloud container clusters get-credentials ${KUBE_STAGING_CLUSTER} --zone ${GCLOUD_GCE_ZONE} --project ${GCLOUD_PROJECT}")
