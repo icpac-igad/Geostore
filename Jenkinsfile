@@ -40,13 +40,27 @@ node {
       switch ("${env.BRANCH_NAME}") {
 
         // Roll out to staging
-        case "develop":
+        case "develop":          
+          sh("echo Deploying to STAGING cluster")
+          sh("gcloud container clusters get-credentials ${KUBE_STAGING_CLUSTER} --zone ${GCLOUD_GCE_ZONE} --project ${GCLOUD_PROJECT}")
+          def service = sh([returnStdout: true, script: "kubectl get deploy ${appName} || echo NotFound"]).trim()
+          if ((service && service.indexOf("NotFound") > -1) || (forceCompleteDeploy)){
+            sh("sed -i -e 's/{name}/${appName}/g' k8s/services/*.yaml")
+            sh("sed -i -e 's/{name}/${appName}/g' k8s/staging/*.yaml")
+            sh("kubectl apply -f k8s/services/")
+            sh("kubectl apply -f k8s/staging/")
+          }
+          sh("kubectl set image deployment ${appName} ${appName}=${imageTag} --record")
+          break
+
+        // Roll out to production
+        case "master":
           def userInput = true
           def didTimeout = false
           try {
-            timeout(time: 15, unit: 'SECONDS') {
+            timeout(time: 60, unit: 'SECONDS') {
               userInput = input(
-                id: 'Proceed1', message: 'Was this successful?', parameters: [
+                id: 'Proceed1', message: 'Confirm deployment', parameters: [
                 [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this deployment']
               ])
             }
@@ -62,35 +76,20 @@ node {
           }
 
           if (userInput == true && !didTimeout){
-            sh("echo Deploying to STAGING cluster")
-            sh("gcloud container clusters get-credentials ${KUBE_STAGING_CLUSTER} --zone ${GCLOUD_GCE_ZONE} --project ${GCLOUD_PROJECT}")
+            sh("echo Deploying to PROD cluster")
+            sh("gcloud container clusters get-credentials ${KUBE_PROD_CLUSTER} --zone ${GCLOUD_GCE_ZONE} --project ${GCLOUD_PROJECT}")
             def service = sh([returnStdout: true, script: "kubectl get deploy ${appName} || echo NotFound"]).trim()
             if ((service && service.indexOf("NotFound") > -1) || (forceCompleteDeploy)){
               sh("sed -i -e 's/{name}/${appName}/g' k8s/services/*.yaml")
-              sh("sed -i -e 's/{name}/${appName}/g' k8s/staging/*.yaml")
+              sh("sed -i -e 's/{name}/${appName}/g' k8s/production/*.yaml")
               sh("kubectl apply -f k8s/services/")
-              sh("kubectl apply -f k8s/staging/")
+              sh("kubectl apply -f k8s/production/")
             }
             sh("kubectl set image deployment ${appName} ${appName}=${imageTag} --record")
           } else {
             echo "this was not successful"
             currentBuild.result = 'FAILURE'
           }
-          
-          break
-
-        // Roll out to production
-        case "master":
-          sh("echo Deploying to PROD cluster")
-          sh("gcloud container clusters get-credentials ${KUBE_PROD_CLUSTER} --zone ${GCLOUD_GCE_ZONE} --project ${GCLOUD_PROJECT}")
-          def service = sh([returnStdout: true, script: "kubectl get deploy ${appName} || echo NotFound"]).trim()
-          if ((service && service.indexOf("NotFound") > -1) || (forceCompleteDeploy)){
-            sh("sed -i -e 's/{name}/${appName}/g' k8s/services/*.yaml")
-            sh("sed -i -e 's/{name}/${appName}/g' k8s/production/*.yaml")
-            sh("kubectl apply -f k8s/services/")
-            sh("kubectl apply -f k8s/production/")
-          }
-          sh("kubectl set image deployment ${appName} ${appName}=${imageTag} --record")
           break
 
         // Default behavior?
