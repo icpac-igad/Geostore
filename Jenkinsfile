@@ -41,11 +41,27 @@ node {
 
         // Roll out to staging
         case "develop":
-          userInput = input(
-            id: 'Proceed1', message: 'Was this successful?', parameters: [
-            [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this deployment']
-          ])
-          if (userInput == true){
+          def userInput = true
+          def didTimeout = false
+          try {
+            timeout(time: 15, unit: 'SECONDS') {
+              userInput = input(
+                id: 'Proceed1', message: 'Was this successful?', parameters: [
+                [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this deployment']
+              ])
+            }
+          }
+          catch(err) { // timeout reached or input false
+              def user = err.getCauses()[0].getUser()
+              if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
+                  didTimeout = true
+              } else {
+                  userInput = false
+                  echo "Aborted by: [${user}]"
+              }
+          }
+
+          if (userInput == true && !didTimeout){
             sh("echo Deploying to STAGING cluster")
             sh("gcloud container clusters get-credentials ${KUBE_STAGING_CLUSTER} --zone ${GCLOUD_GCE_ZONE} --project ${GCLOUD_PROJECT}")
             def service = sh([returnStdout: true, script: "kubectl get deploy ${appName} || echo NotFound"]).trim()
