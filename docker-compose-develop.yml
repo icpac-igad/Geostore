@@ -19,7 +19,7 @@ develop:
     - ./app:/opt/gfw-geostore-api/app
 mongo:
   image: mongo
-  container_name: gfw-geostore-mongo
+  container_name: gfw-geostore-mon
   command: --smallfiles
   ports:
     - "27017"
