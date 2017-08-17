@@ -83,7 +83,7 @@ node {
               def user = err.getCauses()[0].getUser()
               sh("echo user")
               if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
-                  sh("echo system")
+                  sh("echo Catch error")
                   didTimeout = true
               } else {
                   userInput = false
