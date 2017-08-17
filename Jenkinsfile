@@ -25,7 +25,7 @@ node {
   currentBuild.result = "SUCCESS"
 
   checkout scm
-  properties([pipelineTriggers([[$class: 'GitHubPushTrigger'], pollSCM('H/20 * * * *')])])
+  properties([pipelineTriggers([[$class: 'GitHubPushTrigger'], pollSCM('0 * * * *')])])
 
   try {
 
