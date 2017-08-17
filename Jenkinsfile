@@ -79,18 +79,13 @@ node {
             }
           }
           catch(err) { // timeout reached or input false
-              sh("echo Catch error")
-              def user = err.getCauses()[0].getUser()
-              sh("echo user")
+              sh("echo Aborted by user or timeout")
               if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
-                  sh("echo Catch error")
                   didTimeout = true
               } else {
                   userInput = false
-                  sh("echo Aborted by: [${user}]")
               }
           }
-          sh("echo  if ")
           if (userInput == true && !didTimeout){
             sh("echo Deploying to PROD cluster")
             sh("kubectl config use-context gke_${GCLOUD_PROJECT}_${GCLOUD_GCE_ZONE}_${KUBE_PROD_CLUSTER}")
@@ -103,7 +98,7 @@ node {
             }
             sh("kubectl set image deployment ${appName} ${appName}=${imageTag} --record")
           } else {
-            sh("echo this was not deployed")
+            sh("echo NOT DEPLOYED")
             currentBuild.result = 'SUCCESS'
           }
           break
