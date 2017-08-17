@@ -108,6 +108,7 @@ node {
         // Default behavior?
         default:
           echo "Default -> do nothing"
+          currentBuild.result = "SUCCESS"
       }
     }
 
