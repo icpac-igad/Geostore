@@ -11,4 +11,4 @@ services:
       driver: "syslog"
       options:
         syslog-address: ${SYSLOG_ADDRESS}
-        tag: dataset${STAGING}
+        tag: geostore-sdg${STAGING}   
