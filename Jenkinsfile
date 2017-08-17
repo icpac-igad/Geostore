@@ -88,7 +88,7 @@ node {
                   echo "Aborted by: [${user}]"
               }
           }
-          sh("echo if ")
+          sh("echo  if ")
           if (userInput == true && !didTimeout){
             sh("echo Deploying to PROD cluster")
             sh("kubectl config use-context gke_${GCLOUD_PROJECT}_${GCLOUD_GCE_ZONE}_${KUBE_PROD_CLUSTER}")
