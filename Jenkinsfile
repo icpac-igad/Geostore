@@ -101,7 +101,7 @@ node {
             }
             sh("kubectl set image deployment ${appName} ${appName}=${imageTag} --record")
           } else {
-            echo "this was not deployed"
+            sh("echo this was not deployed")
             currentBuild.result = 'SUCCESS'
           }
           break
