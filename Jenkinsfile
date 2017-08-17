@@ -85,7 +85,7 @@ node {
                   didTimeout = true
               } else {
                   userInput = false
-                  echo "Aborted by: [${user}]"
+                  sh("echo Aborted by: [${user}]")
               }
           }
           sh("echo  if ")
