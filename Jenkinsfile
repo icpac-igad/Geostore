@@ -71,7 +71,7 @@ node {
           def userInput = true
           def didTimeout = false
           try {
-            timeout(time: 10, unit: 'SECONDS') {
+            timeout(time: 60, unit: 'SECONDS') {
               userInput = input(
                 id: 'Proceed1', message: 'Confirm deployment', parameters: [
                 [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this deployment']
