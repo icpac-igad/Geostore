@@ -80,14 +80,14 @@ node {
           }
           catch(err) { // timeout reached or input false
               sh("echo Catch error")
-              
+              def user = err.getCauses()[0].getUser()
               sh("echo user")
               if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
                   sh("echo system")
                   didTimeout = true
               } else {
                   userInput = false
-                  sh("echo Aborted by user")
+                  sh("echo Aborted by: [${user}]")
               }
           }
           sh("echo  if ")
