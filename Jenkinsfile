@@ -79,7 +79,7 @@ node {
             }
           }
           catch(err) { // timeout reached or input false
-              sh("echo Aborted by user or timeout ")
+              sh("echo Aborted by user or timeout")
               if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
                   didTimeout = true
               } else {
