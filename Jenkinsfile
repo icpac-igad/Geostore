@@ -71,7 +71,7 @@ node {
           def userInput = true
           def didTimeout = false
           try {
-            timeout(time: 60, unit: 'SECONDS') {
+            timeout(time: 10, unit: 'SECONDS') {
               userInput = input(
                 id: 'Proceed1', message: 'Confirm deployment', parameters: [
                 [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this deployment']
@@ -79,6 +79,7 @@ node {
             }
           }
           catch(err) { // timeout reached or input false
+              sh("echo Catch error")
               def user = err.getCauses()[0].getUser()
               if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
                   didTimeout = true
