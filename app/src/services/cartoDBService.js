@@ -107,7 +107,7 @@ class CartoDBService {
             logger.debug('Adding Country names');
             countryList.forEach(countryListElement => {
                 let idx = data.rows.findIndex(el => {
-                    return el.iso === countryListElement.info.iso;
+                    return el.iso.toUpperCase() === countryListElement.info.iso.toUpperCase();
                 });
                 if (idx > -1) {
                     countryListElement.name = data.rows[idx].name;
