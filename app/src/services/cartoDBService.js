@@ -99,7 +99,7 @@ class CartoDBService {
         });
         let iso_values = '';
         iso_values_map.forEach(el => {
-            iso_values += `'${el}', `;
+            iso_values += `'${el.toUpperCase()}', `;
         });
         iso_values = `(${iso_values.substr(0, iso_values.length-2)})`;
         let data = yield executeThunk(this.client, ISO_NAME+iso_values);
@@ -109,8 +109,11 @@ class CartoDBService {
                 let idx = data.rows.findIndex(el => {
                     return el.iso === countryListElement.info.iso;
                 });
-                countryListElement.name = data.rows[idx].name;
-                data.rows.splice(idx, 1);
+                if (idx > -1) {
+                    countryListElement.name = data.rows[idx].name;
+                    data.rows.splice(idx, 1);
+                    logger.debug(data.rows);
+                }
             });
         }
         return countryList;
