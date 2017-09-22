@@ -11,6 +11,10 @@ const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(ge
         FROM gadm2_countries_simple
         WHERE iso = UPPER('{{iso}}')`;
 
+const ISO_NAME = `SELECT iso, name_0 as name
+        FROM gadm2_countries_simple
+        WHERE iso in `;
+
 const ID1 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM gadm2_provinces_simple
         WHERE iso = UPPER('{{iso}}')
@@ -85,6 +89,31 @@ class CartoDBService {
           return existingGeo;
         }
         return null;
+    }
+
+    * getNationalList(){
+        logger.debug('Request national list names from carto');
+        const countryList = yield GeoStoreService.getNationalList();
+        const iso_values_map = countryList.map(el => {
+            return el.info.iso;
+        });
+        let iso_values = '';
+        iso_values_map.forEach(el => {
+            iso_values += `'${el}', `;
+        });
+        iso_values = `(${iso_values.substr(0, iso_values.length-2)})`;
+        let data = yield executeThunk(this.client, ISO_NAME+iso_values);
+        if (data.rows && data.rows.length > 0) {
+            logger.debug('Adding Country names');
+            countryList.forEach(countryListElement => {
+                let idx = data.rows.findIndex(el => {
+                    return el.iso === countryListElement.info.iso;
+                });
+                countryListElement.name = data.rows[idx].name;
+                data.rows.splice(idx, 1);
+            });
+        }
+        return countryList;
     }
 
     * getSubnational(iso, id1) {
