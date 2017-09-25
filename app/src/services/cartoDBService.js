@@ -7,7 +7,7 @@ var Mustache = require('mustache');
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const GeoStoreService = require('services/geoStoreService');
 
-const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha, name_0 as name
         FROM gadm2_countries_simple
         WHERE iso = UPPER('{{iso}}')`;
 
@@ -65,9 +65,8 @@ class CartoDBService {
     * getNational(iso) {
         logger.debug('Obtaining national of iso %s', iso);
         let params = {
-          iso: iso
+            iso: iso.toUpperCase()
         };
-
         logger.debug('Checking existing national geo');
         let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
         logger.debug('Existed geo', existingGeo);
@@ -84,6 +83,7 @@ class CartoDBService {
           const geoData = {
             info : params
           };
+          geoData.info.name = result.name;
           existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
           logger.debug('Return national geojson from carto');
           return existingGeo;
@@ -122,7 +122,7 @@ class CartoDBService {
     * getSubnational(iso, id1) {
       logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
       let params = {
-        iso: iso,
+        iso: iso.toUpperCase(),
         id1: parseInt(id1, 10)
       };
 

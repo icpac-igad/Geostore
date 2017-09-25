@@ -33,6 +33,7 @@ var GeoStore = new Schema({
     },
     info: {
         iso: {type: String, required: false},
+        name: {type: String, required: false},
         id1: {type: Number, required: false},
         wdpaid: {type: Number, required: false},
         use: {
