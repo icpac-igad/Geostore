@@ -3,7 +3,7 @@
 var logger = require('logger');
 var JSONAPISerializer = require('jsonapi-serializer').Serializer;
 var geoStoreSerializer = new JSONAPISerializer('geoStore', {
-    attributes: ['geojson', 'hash', 'provider', 'areaHa', 'bbox', 'lock', 'esrijson'],
+    attributes: ['geojson', 'hash', 'provider', 'areaHa', 'bbox', 'lock', 'esrijson', 'info'],
     id: 'hash',
 
     geojson:{
