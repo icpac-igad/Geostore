@@ -71,6 +71,11 @@ class GeoStoreService {
         return yield GeoStore.find(query, select);
     }
 
+    static * getGeostoreByInfoProps(infoQuery){
+        const geoStore = yield GeoStore.findOne(infoQuery);
+        return geoStore;
+    }
+
     static * getGeostoreByInfo(info){
       const geoStore = yield GeoStore.findOne({info});
       return geoStore;
