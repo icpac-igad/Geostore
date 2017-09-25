@@ -64,11 +64,12 @@ class CartoDBService {
 
     * getNational(iso) {
         logger.debug('Obtaining national of iso %s', iso);
-        let params = {
-            iso: iso.toUpperCase()
+        let query = {
+            'info.iso': iso.toUpperCase(),
+            'info.id1': null
         };
         logger.debug('Checking existing national geo');
-        let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        let existingGeo = yield GeoStoreService.getGeostoreByInfoProps(query);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
           logger.debug('Return national geojson stored');
@@ -76,12 +77,14 @@ class CartoDBService {
         }
 
         logger.debug('Request national to carto');
-        let data = yield executeThunk(this.client, ISO, params);
+        let data = yield executeThunk(this.client, ISO, {iso: iso.toUpperCase()});
         if (data.rows && data.rows.length > 0) {
           let result = data.rows[0];
           logger.debug('Saving national geostore');
           const geoData = {
-            info : params
+            info : {
+                'iso': iso.toUpperCase()
+            }
           };
           geoData.info.name = result.name;
           existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
