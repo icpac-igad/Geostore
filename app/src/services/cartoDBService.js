@@ -7,9 +7,13 @@ var Mustache = require('mustache');
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const GeoStoreService = require('services/geoStoreService');
 
-const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha, name_0 as name
         FROM gadm2_countries_simple
         WHERE iso = UPPER('{{iso}}')`;
+
+const ISO_NAME = `SELECT iso, name_0 as name
+        FROM gadm2_countries_simple
+        WHERE iso in `;
 
 const ID1 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM gadm2_provinces_simple
@@ -60,12 +64,12 @@ class CartoDBService {
 
     * getNational(iso) {
         logger.debug('Obtaining national of iso %s', iso);
-        let params = {
-          iso: iso
+        let query = {
+            'info.iso': iso.toUpperCase(),
+            'info.id1': null
         };
-
         logger.debug('Checking existing national geo');
-        let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        let existingGeo = yield GeoStoreService.getGeostoreByInfoProps(query);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
           logger.debug('Return national geojson stored');
@@ -73,13 +77,16 @@ class CartoDBService {
         }
 
         logger.debug('Request national to carto');
-        let data = yield executeThunk(this.client, ISO, params);
+        let data = yield executeThunk(this.client, ISO, {iso: iso.toUpperCase()});
         if (data.rows && data.rows.length > 0) {
           let result = data.rows[0];
           logger.debug('Saving national geostore');
           const geoData = {
-            info : params
+            info : {
+                'iso': iso.toUpperCase()
+            }
           };
+          geoData.info.name = result.name;
           existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
           logger.debug('Return national geojson from carto');
           return existingGeo;
@@ -87,10 +94,38 @@ class CartoDBService {
         return null;
     }
 
+    * getNationalList(){
+        logger.debug('Request national list names from carto');
+        const countryList = yield GeoStoreService.getNationalList();
+        const iso_values_map = countryList.map(el => {
+            return el.info.iso;
+        });
+        let iso_values = '';
+        iso_values_map.forEach(el => {
+            iso_values += `'${el.toUpperCase()}', `;
+        });
+        iso_values = `(${iso_values.substr(0, iso_values.length-2)})`;
+        let data = yield executeThunk(this.client, ISO_NAME+iso_values);
+        if (data.rows && data.rows.length > 0) {
+            logger.debug('Adding Country names');
+            countryList.forEach(countryListElement => {
+                let idx = data.rows.findIndex(el => {
+                    return el.iso.toUpperCase() === countryListElement.info.iso.toUpperCase();
+                });
+                if (idx > -1) {
+                    countryListElement.name = data.rows[idx].name;
+                    data.rows.splice(idx, 1);
+                    logger.debug(data.rows);
+                }
+            });
+        }
+        return countryList;
+    }
+
     * getSubnational(iso, id1) {
       logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
       let params = {
-        iso: iso,
+        iso: iso.toUpperCase(),
         id1: parseInt(id1, 10)
       };
 

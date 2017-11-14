@@ -61,6 +61,21 @@ class GeoStoreService {
         return null;
     }
 
+    static * getNationalList(){
+        logger.debug('Obtaining national list from database');
+        const query = {
+            'info.iso': { $ne:  null },
+            'info.id1': null
+        };
+        const select = 'hash info.iso';
+        return yield GeoStore.find(query, select);
+    }
+
+    static * getGeostoreByInfoProps(infoQuery){
+        const geoStore = yield GeoStore.findOne(infoQuery);
+        return geoStore;
+    }
+
     static * getGeostoreByInfo(info){
       const geoStore = yield GeoStore.findOne({info});
       return geoStore;

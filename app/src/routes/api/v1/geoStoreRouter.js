@@ -4,6 +4,7 @@ var Router = require('koa-router');
 var logger = require('logger');
 var GeoStoreValidator = require('validators/geoStoreValidator');
 var GeoJSONSerializer = require('serializers/geoJSONSerializer');
+var CountryListSerializer = require('serializers/countryListSerializer');
 var GeoStore = require('models/geoStore');
 var IdConnection = require('models/idConnection');
 var CartoService = require('services/cartoDBService');
@@ -85,6 +86,15 @@ class GeoStoreRouter {
         this.body = GeoJSONSerializer.serialize(data);
     }
 
+    static * getNationalList() {
+        logger.info('Obtaining national list');
+        const data = yield CartoService.getNationalList();
+        if (!data) {
+          this.throw(404, 'Empty List');
+        }
+        this.body = CountryListSerializer.serialize(data);
+    }
+
     static * getSubnational() {
         logger.info('Obtaining subnational data geojson');
         const data = yield CartoService.getSubnational(this.params.iso, this.params.id1);
@@ -161,6 +171,7 @@ class GeoStoreRouter {
 router.get('/:hash', GeoStoreRouter.getGeoStoreById);
 router.post('/', GeoStoreValidator.create, GeoStoreRouter.createGeoStore);
 router.get('/admin/:iso', GeoStoreRouter.getNational);
+router.get('/admin/list', GeoStoreRouter.getNationalList);
 router.get('/admin/:iso/:id1', GeoStoreRouter.getSubnational);
 router.get('/use/:name/:id', GeoStoreRouter.use);
 router.get('/wdpa/:id', GeoStoreRouter.wdpa);
