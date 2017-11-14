@@ -88,35 +88,26 @@ var onDbReady = function (err) {
   logger.info('Server started in port:' + port);
 
 };
-var options = {
-
-  db: {
-    native_parser: true
-  },
-
-  // This block gets run for a non replica set connection string (eg. localhost with a single DB)
-  server: {
-    poolSize: 5,
-    reconnectTries: Number.MAX_VALUE,
-    ssl: false,
-    sslValidate: false,
-    socketOptions: {
-      keepAlive: 1000,
-      connectTimeoutMS: 30000
-    }
-  },
-
-  // This block gets run when the connection string indicates a replica set (comma seperated connections)
-  replset: {
-    auto_reconnect: false,
-    poolSize: 10,
-    connectWithNoPrimary: true,
-    ssl: true,
-    sslValidate: false,
-    socketOptions: {
-      keepAlive: 1000,
-      connectTimeoutMS: 30000
-    }
-  }
-};
-mongoose.connect(mongoUri, options, onDbReady);
+let dbOptions = {};
+// KUBE CLUSTER
+if (mongoUri.indexOf('replicaSet') > - 1) {
+    dbOptions = {
+        db: { native_parser: true },
+        replset: {
+            auto_reconnect: false,
+            poolSize: 10,
+            socketOptions: {
+                keepAlive: 1000,
+                connectTimeoutMS: 30000
+            }
+        },
+        server: {
+            poolSize: 5,
+            socketOptions: {
+                keepAlive: 1000,
+                connectTimeoutMS: 30000
+            }
+        }
+    };
+}
+mongoose.connect(mongoUri, dbOptions, onDbReady);

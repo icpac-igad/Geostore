@@ -43,5 +43,6 @@ var GeoStore = new Schema({
     }
 });
 
+GeoStore.index({hash: 1});
 
 module.exports = mongoose.model('GeoStore', GeoStore);
