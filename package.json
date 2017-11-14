@@ -48,7 +48,7 @@
     "koa-router": "5.4.0",
     "koa-validate": "0.2.11",
     "md5": "2.1.0",
-    "mongoose": "4.4.6",
+    "mongoose": "4.13.2",
     "newrelic": "1.27.1",
     "turf": "^3.0.11"
   },
