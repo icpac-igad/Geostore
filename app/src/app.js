@@ -17,7 +17,7 @@ var ErrorSerializer = require('serializers/errorSerializer');
 var mongoUri = process.env.MONGO_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
 const ctRegisterMicroservice = require('ct-register-microservice-node');
 
-var onDbReady = function(err) {
+var onDbReady = function (err) {
   if (err) {
     logger.error(err);
     throw new Error(err);
@@ -36,7 +36,7 @@ var onDbReady = function(err) {
   }));
 
   //catch errors and send in jsonapi standard. Always return vnd.api+json
-  app.use(function*(next) {
+  app.use(function* (next) {
     try {
       yield next;
     } catch (err) {
@@ -67,7 +67,7 @@ var onDbReady = function(err) {
   // In production environment, the port must be declared in environment variable
   var port = process.env.PORT || config.get('service.port');
 
-  server.listen(port, function() {
+  server.listen(port, function () {
     ctRegisterMicroservice.register({
       info: require('../microservice/register.json'),
       swagger: require('../microservice/public-swagger.json'),
@@ -88,5 +88,35 @@ var onDbReady = function(err) {
   logger.info('Server started in port:' + port);
 
 };
+var options = {
 
-mongoose.connect(mongoUri, onDbReady);
+  db: {
+    native_parser: true
+  },
+
+  // This block gets run for a non replica set connection string (eg. localhost with a single DB)
+  server: {
+    poolSize: 5,
+    reconnectTries: Number.MAX_VALUE,
+    ssl: false,
+    sslValidate: false,
+    socketOptions: {
+      keepAlive: 1000,
+      connectTimeoutMS: 30000
+    }
+  },
+
+  // This block gets run when the connection string indicates a replica set (comma seperated connections)
+  replset: {
+    auto_reconnect: false,
+    poolSize: 10,
+    connectWithNoPrimary: true,
+    ssl: true,
+    sslValidate: false,
+    socketOptions: {
+      keepAlive: 1000,
+      connectTimeoutMS: 30000
+    }
+  }
+};
+mongoose.connect(mongoUri, options, onDbReady);
