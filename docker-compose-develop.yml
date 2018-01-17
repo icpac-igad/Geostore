@@ -18,7 +18,7 @@ develop:
   volumes:
     - ./app:/opt/gfw-geostore-api/app
 mongo:
-  image: mongo
+  image: mongo:3.4
   container_name: gfw-geostore-mon
   command: --smallfiles
   ports:

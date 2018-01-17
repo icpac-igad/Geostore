@@ -20,6 +20,12 @@ const ID1 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(ge
         WHERE iso = UPPER('{{iso}}')
           AND id_1 = {{id1}}`;
 
+const ID2 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+        FROM gadm28_adm2_geostore
+        WHERE iso = UPPER('{{iso}}')
+          AND id_1 = {{id1}}
+          AND id_2 = {{id2}}`;
+
 const WDPA = `SELECT ST_AsGeoJSON(st_makevalid(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM (
           SELECT CASE
@@ -143,6 +149,37 @@ class CartoDBService {
         logger.debug('Return subnational geojson from carto');
         let result = data.rows[0];
         logger.debug('Saving national geostore');
+        const geoData = {
+          info: params
+        };
+        existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+        return existingGeo;
+      }
+      return null;
+    }
+
+    * getAdmin2(iso, id1, id2) {
+      logger.debug('Obtaining admin2 of iso %s, id1 and id2', iso, id1, id2);
+      let params = {
+        iso: iso.toUpperCase(),
+        id1: parseInt(id1, 10),
+        id2: parseInt(id2, 10)
+      };
+
+      logger.debug('Checking existing admin2 geostore');
+      let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+      logger.debug('Existed geo', existingGeo);
+      if (existingGeo) {
+        logger.debug('Return admin2 geojson stored');
+        return existingGeo;
+      }
+
+      logger.debug('Request admin2 shape from Carto');
+      let data = yield executeThunk(this.client, ID2, params);
+      if (data.rows && data.rows.length > 0) {
+        logger.debug('Return admin2 geojson from Carto');
+        let result = data.rows[0];
+        logger.debug('Saving admin2 geostore');
         const geoData = {
           info: params
         };

@@ -45,6 +45,13 @@
             "path": "/api/v1/geostore/admin/:iso/:id1"
         }]
     }, {
+        "url": "/v1/geostore/admin/:iso/:id1/:id2",
+        "method": "GET",
+        "endpoints": [{
+            "method": "GET",
+            "path": "/api/v1/geostore/admin/:iso/:id1/:id2"
+        }]
+    },{
         "url": "/v1/geostore/use/:name/:id",
         "method": "GET",
         "endpoints": [{
