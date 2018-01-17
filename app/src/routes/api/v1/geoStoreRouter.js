@@ -104,6 +104,15 @@ class GeoStoreRouter {
         this.body = GeoJSONSerializer.serialize(data);
     }
 
+    static * getAdmin2() {
+        logger.info('Obtaining Admin2 data geojson');
+        const data = yield CartoService.getAdmin2(this.params.iso, this.params.id1, this.params.id2);
+        if (!data) {
+          this.throw(404, 'Country/Admin1/Admin2 not found');
+        }
+        this.body = GeoJSONSerializer.serialize(data);
+    }
+
     static * use() {
         logger.info('Obtaining use data with name %s and id %s', this.params.name, this.params.id);
         let useTable = null;
@@ -173,6 +182,7 @@ router.post('/', GeoStoreValidator.create, GeoStoreRouter.createGeoStore);
 router.get('/admin/:iso', GeoStoreRouter.getNational);
 router.get('/admin/list', GeoStoreRouter.getNationalList);
 router.get('/admin/:iso/:id1', GeoStoreRouter.getSubnational);
+router.get('/admin/:iso/:id1/:id2', GeoStoreRouter.getAdmin2);
 router.get('/use/:name/:id', GeoStoreRouter.use);
 router.get('/wdpa/:id', GeoStoreRouter.wdpa);
 router.get('/:hash/view', GeoStoreRouter.view);

@@ -35,6 +35,7 @@ var GeoStore = new Schema({
         iso: {type: String, required: false},
         name: {type: String, required: false},
         id1: {type: Number, required: false},
+        id2: {type: Number, required: false},
         wdpaid: {type: Number, required: false},
         use: {
             use:{type: String, required: false},
@@ -43,6 +44,6 @@ var GeoStore = new Schema({
     }
 });
 
-GeoStore.index({hash: 1, "info.iso": 1, "info.name": 1, "info.id1": 1, "info.wdpaid": 1, "info.use.use": 1, "info.use.id": 1});
+GeoStore.index({hash: 1, 'info.iso': 1, 'info.name': 1, 'info.id1': 1, 'info.wdpaid': 1, 'info.use.use': 1, 'info.use.id': 1});
 
 module.exports = mongoose.model('GeoStore', GeoStore);
