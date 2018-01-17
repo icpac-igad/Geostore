@@ -162,7 +162,7 @@ class CartoDBService {
       logger.debug('Obtaining admin2 of iso %s, id1 and id2', iso, id1, id2);
       let params = {
         iso: iso.toUpperCase(),
-        id1: parseInt(id1, 10)
+        id1: parseInt(id1, 10),
         id2: parseInt(id2, 10)
       };
 
