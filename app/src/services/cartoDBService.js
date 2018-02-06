@@ -16,7 +16,7 @@ const ISO_NAME = `SELECT iso, name_0 as name
         WHERE iso in `;
 
 const ID1 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
-        FROM gadm2_provinces_simple
+        FROM gadm28_adm1
         WHERE iso = UPPER('{{iso}}')
           AND id_1 = {{id1}}`;
 
