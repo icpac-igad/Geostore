@@ -1,6 +1,8 @@
 {
     "id": "#(service.id)",
-    "name": "#(service.name)",
+    "name": "Geostore",
+    "cache": ["geostore"],
+    "uncache": ["geostore"],
     "tags": ["gfw"],
     "urls": [{
         "url": "/v1/geostore",
