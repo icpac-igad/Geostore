@@ -155,13 +155,6 @@ class GeoStoreService {
         });
     }
 
-    static * calculateBBox(geoStore){
-        logger.debug('Calculating bbox');
-        geoStore.bbox = turf.bbox(geoStore.geojson);
-        yield geoStore.save();
-        return geoStore;
-    }
-
     static * calculateArea(geojson, data) {
 
         let geoStore = {
@@ -181,7 +174,7 @@ class GeoStoreService {
         geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
         geoStore.bbox = turf.bbox(geoStore.geojson);
 
-        return yield geoStore
+        return yield geoStore;
 
     }
 
