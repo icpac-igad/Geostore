@@ -7,7 +7,7 @@ class AreaSerializer {
   static serialize(data) {
     return {
         data: {
-            'type': "geomArea",
+            'type': 'geomArea',
             'attributes': {
                 'bbox': data.bbox,
                 'areaHa': data.areaHa
