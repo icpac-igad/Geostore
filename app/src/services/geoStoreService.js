@@ -155,6 +155,36 @@ class GeoStoreService {
         });
     }
 
+    static * calculateBBox(geoStore){
+        logger.debug('Calculating bbox');
+        geoStore.bbox = turf.bbox(geoStore.geojson);
+        yield geoStore.save();
+        return geoStore;
+    }
+
+    static * calculateArea(geojson, data) {
+
+        let geoStore = {
+            geojson: geojson
+        };
+
+        if (data && data.provider) {
+          let geoJsonObtained = yield GeoStoreService.obtainGeoJSON(data.provider);
+          geoStore.geojson = geoJsonObtained.geojson;
+          geoStore.areaHa = geoJsonObtained.area_ha;
+        }
+
+        logger.debug('Converting geojson');
+        logger.debug('Converting', JSON.stringify(geoStore.geojson));
+        geoStore.geojson = GeoJSONConverter.convert(geoStore.geojson);
+        logger.debug('Result', JSON.stringify(geoStore.geojson));
+        geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
+        geoStore.bbox = turf.bbox(geoStore.geojson);
+
+        return yield geoStore
+
+    }
+
 }
 
 module.exports = GeoStoreService;
