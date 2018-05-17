@@ -8,6 +8,7 @@ var IdConnection = require('models/idConnection');
 var turf = require('turf');
 var ProviderNotFound = require('errors/providerNotFound');
 var GeoJSONNotFound = require('errors/geoJSONNotFound');
+var config = require('config');
 
 const CARTO_PROVIDER = 'carto';
 
@@ -25,6 +26,29 @@ var executeThunk = function(client, sql, params) {
 
 class GeoStoreService {
 
+    static * repairGeometry(geojson) {
+        logger.debug('Repair geoJSON geometry');
+        logger.debug('Generating query');
+        let sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),3)) as geojson`;
+        logger.debug('SQL to repair geojson: %s', sql);
+        try {
+            let client = new CartoDB.SQL({
+                user: config.get('cartoDB.user')
+            });
+            let data = yield executeThunk(client, sql, {});
+            if (data.rows && data.rows.length === 1) {
+                data.rows[0].geojson = JSON.parse(data.rows[0].geojson);
+                logger.debug(data.rows[0].geojson);
+                return data.rows[0];
+            }
+            throw new GeoJSONNotFound('No Geojson returned');
+        }
+        catch(e) {
+            logger.error(e);
+            throw e;
+        }
+    }
+    
     static * obtainGeoJSONOfCarto(table, user, filter) {
         logger.debug('Obtaining geojson with params: table %s, user %s, filter %s', table, user, filter);
         logger.debug('Generating query');
@@ -36,6 +60,7 @@ class GeoStoreService {
         let data = yield executeThunk(client, sql, {});
         if (data.rows && data.rows.length === 1) {
             data.rows[0].geojson = JSON.parse(data.rows[0].geojson);
+            logger.debug(data.rows[0].geojson);
             return data.rows[0];
         }
         throw new GeoJSONNotFound('Geojson not found');
@@ -120,10 +145,16 @@ class GeoStoreService {
           geoStore.info = data.info;
         }
         geoStore.lock = data.lock || false;
-
-        logger.debug('Converting geojson');
+        
+        logger.debug('Fix and convert geojson');
         logger.debug('Converting', JSON.stringify(geoStore.geojson));
-        geoStore.geojson = GeoJSONConverter.convert(geoStore.geojson);
+        
+        let geoJsonObtained = yield GeoStoreService.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
+        geoStore.geojson = geoJsonObtained.geojson;
+        
+        logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
+        logger.debug('Make Feature Collection');
+        geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson);
         logger.debug('Result', JSON.stringify(geoStore.geojson));
         logger.debug('Creating hash from geojson md5');
         geoStore.hash = md5(JSON.stringify(geoStore.geojson));
