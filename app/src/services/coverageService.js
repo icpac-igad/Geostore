@@ -133,7 +133,7 @@ class CoverageService {
     let params = {
       precision,
       geojson: JSON.stringify(geojson),
-      filter: slugs && `WHERE slug IN (${slugs.join(',')})`
+      filter: slugs && slugs.length && `WHERE slug IN (${slugs.map(slug => `'${slug.trim()}'`).join(',')})`
     };
     const query = (precision || slugs) ? REDUCED_WORLD : WORLD;
     let data = yield executeThunk(this.client, query, params);
