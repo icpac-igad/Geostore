@@ -137,16 +137,10 @@ class GeoStoreService {
             geoStore.bbox = turf.bbox(geoStore.geojson);
         }
 
-        if (exist) {
-            logger.debug('Updating');
-            geoStore.lock = exist.lock;
-            yield GeoStore.update({
-                _id: exist._id
-            }, geoStore);
-        } else {
-            logger.debug('Not exist. Saving');
-            yield new GeoStore(geoStore).save();
-        }
+
+        yield GeoStore.findOneAndUpdate({hash: geoStore.hash}, geoStore, {upsert: true, new: true, runValidators: true});
+
+        
         return yield GeoStore.findOne({
             hash: geoStore.hash
         }, {
