@@ -77,7 +77,6 @@ class CoverageRouter {
       this.throw(404, 'Use not found');
     }
     const options = {
-      precision: this.query.precision,
       slugs: this.query.slugs && this.query.slugs.split(',')
     };
     let result = yield CoverageService.getWorld(geoStore.geojson.features[0].geometry, options);
