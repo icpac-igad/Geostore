@@ -35,7 +35,7 @@ const USE = `SELECT slug FROM coverage_layers cl, {{useTable}} c where c.cartodb
 const COVERAGES = `SELECT ST_AsGeoJSON(the_geom) as geojson, coverage_slug as slug, slug as layerSlug from coverage_layers`;
 
 const WORLD = `SELECT slug FROM coverage_layers where ST_INTERSECTS(the_geom, ST_SetSRID(ST_GeomFromGeoJSON('{{{geojson}}}'), 4326))`;
-const REDUCED_WORLD = `with p as (SELECT slug, st_simplify(the_geom , {{{precision}}}) as the_geom FROM coverage_layers {{{filter}}}) SELECT slug FROM p  where ST_INTERSECTS(the_geom, ST_SetSRID(ST_GeomFromGeoJSON('{{{geojson}}}'), 4326))`;
+const REDUCED_WORLD = `with p as (SELECT slug, the_geom FROM coverage_layers {{{filter}}}) SELECT slug FROM p  where ST_INTERSECTS(the_geom, ST_SetSRID(ST_GeomFromGeoJSON('{{{geojson}}}'), 4326))`;
 
 
 var executeThunk = function(client, sql, params) {
@@ -127,15 +127,14 @@ class CoverageService {
   }
 
   *
-  getWorld(geojson, { precision, slugs }) {
+  getWorld(geojson, { slugs }) {
     logger.info('Getting layers that intersect');
 
     let params = {
-      precision,
       geojson: JSON.stringify(geojson),
       filter: slugs && slugs.length && `WHERE slug IN (${slugs.map(slug => `'${slug.trim()}'`).join(',')})`
     };
-    const query = (precision || slugs) ? REDUCED_WORLD : WORLD;
+    const query = slugs ? REDUCED_WORLD : WORLD;
     let data = yield executeThunk(this.client, query, params);
     if (data.rows && data.rows.length > 0) {
       return data.rows.map(item => item.slug);
