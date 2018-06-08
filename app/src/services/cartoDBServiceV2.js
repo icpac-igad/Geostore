@@ -11,7 +11,7 @@ const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(ge
         FROM gadm36_adm0
         WHERE gid_0 = UPPER('{{iso}}')`;
 
-const ISO_NAME = `SELECT iso, name_0 as name
+const ISO_NAME = `SELECT gid_0, name_0 as name
         FROM gadm36_adm0
         WHERE gid_0 in `;
 
