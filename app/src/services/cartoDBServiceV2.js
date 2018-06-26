@@ -5,26 +5,23 @@ var config = require('config');
 var CartoDB = require('cartodb');
 var Mustache = require('mustache');
 var JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
-const GeoStoreService = require('services/geoStoreService');
+const GeoStoreServiceV2 = require('services/geoStoreServiceV2');
 
 const ISO = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha, name_0 as name
-        FROM gadm2_countries_simple
-        WHERE iso = UPPER('{{iso}}')`;
+        FROM gadm36_adm0
+        WHERE gid_0 = UPPER('{{iso}}')`;
 
-const ISO_NAME = `SELECT iso, name_0 as name
-        FROM gadm2_countries_simple
-        WHERE iso in `;
+const ISO_NAME = `SELECT gid_0, name_0 as name
+        FROM gadm36_adm0
+        WHERE gid_0 in `;
 
 const ID1 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
-        FROM gadm28_adm1
-        WHERE iso = UPPER('{{iso}}')
-          AND id_1 = {{id1}}`;
+        FROM gadm36_adm1
+        WHERE gid_1 = '{{id1}}'`;
 
 const ID2 = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
-        FROM gadm28_adm2_geostore
-        WHERE iso = UPPER('{{iso}}')
-          AND id_1 = {{id1}}
-          AND id_2 = {{id2}}`;
+        FROM gadm36_adm2
+        WHERE gid_2 = '{{id2}}'`;
 
 const WDPA = `SELECT ST_AsGeoJSON(st_makevalid(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM (
@@ -60,7 +57,7 @@ const deserializer = function(obj) {
 };
 
 
-class CartoDBService {
+class CartoDBServiceV2 {
 
     constructor() {
         this.client = new CartoDB.SQL({
@@ -75,7 +72,7 @@ class CartoDBService {
             'info.id1': null
         };
         logger.debug('Checking existing national geo');
-        let existingGeo = yield GeoStoreService.getGeostoreByInfoProps(query);
+        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(query);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
           logger.debug('Return national geojson stored');
@@ -90,11 +87,11 @@ class CartoDBService {
           const geoData = {
             info : {
                 'iso': iso.toUpperCase(),
-                gadm: '2.8'
+                gadm: '3.6'
             }
           };
           geoData.info.name = result.name;
-          existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+          existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
           logger.debug('Return national geojson from carto');
           return existingGeo;
         }
@@ -103,7 +100,7 @@ class CartoDBService {
 
     * getNationalList(){
         logger.debug('Request national list names from carto');
-        const countryList = yield GeoStoreService.getNationalList();
+        const countryList = yield GeoStoreServiceV2.getNationalList();
         const iso_values_map = countryList.map(el => {
             return el.info.iso;
         });
@@ -132,12 +129,11 @@ class CartoDBService {
     * getSubnational(iso, id1) {
       logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
       let params = {
-        iso: iso.toUpperCase(),
-        id1: parseInt(id1, 10)
+        id1: `${iso.toUpperCase()}.${parseInt(id1, 10)}_1`
       };
 
       logger.debug('Checking existing subnational geo');
-      let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo(params);
       logger.debug('Existed geo', existingGeo);
       if (existingGeo) {
         logger.debug('Return subnational geojson stored');
@@ -151,10 +147,13 @@ class CartoDBService {
         let result = data.rows[0];
         logger.debug('Saving national geostore');
         const geoData = {
-          info: params,
-          gadm: '2.8'
+          info: {
+              iso: iso.toUpperCase(),
+              id1: parseInt(id1, 10),
+              gadm: '3.6'
+          }
         };
-        existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+        existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
         return existingGeo;
       }
       return null;
@@ -163,14 +162,11 @@ class CartoDBService {
     * getAdmin2(iso, id1, id2) {
       logger.debug('Obtaining admin2 of iso %s, id1 and id2', iso, id1, id2);
       let params = {
-        iso: iso.toUpperCase(),
-        id1: parseInt(id1, 10),
-        id2: parseInt(id2, 10),
-        gadm: '2.8'
+        id2: `${iso.toUpperCase()}.${parseInt(id1, 10)}.${parseInt(id2, 10)}_1`
       };
 
       logger.debug('Checking existing admin2 geostore');
-      let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo(params);
       logger.debug('Existed geo', existingGeo);
       if (existingGeo) {
         logger.debug('Return admin2 geojson stored');
@@ -184,9 +180,14 @@ class CartoDBService {
         let result = data.rows[0];
         logger.debug('Saving admin2 geostore');
         const geoData = {
-          info: params
+            info: {
+                iso: iso.toUpperCase(),
+                id1: parseInt(id1, 10),
+                id2: parseInt(id2, 10),
+                gadm: '3.6'
+            }
         };
-        existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+        existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
         return existingGeo;
       }
       return null;
@@ -204,7 +205,7 @@ class CartoDBService {
         };
 
         logger.debug('Checking existing use geo', info);
-        let existingGeo = yield GeoStoreService.getGeostoreByInfo(info);
+        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo(info);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
           logger.debug('Return use geojson stored');
@@ -220,7 +221,7 @@ class CartoDBService {
             const geoData = {
               info : info
             };
-            existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+            existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
             logger.debug('Return use geojson from carto');
             return existingGeo;
         }
@@ -235,7 +236,7 @@ class CartoDBService {
         };
 
         logger.debug('Checking existing wdpa geo');
-        let existingGeo = yield GeoStoreService.getGeostoreByInfo(params);
+        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo(params);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
           logger.debug('Return wdpa geojson stored');
@@ -250,7 +251,7 @@ class CartoDBService {
             const geoData = {
               info : params
             };
-            existingGeo = yield GeoStoreService.saveGeostore(JSON.parse(result.geojson), geoData);
+            existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
             logger.debug('Return wdpa geojson from carto');
             return existingGeo;
         }
@@ -277,4 +278,4 @@ class CartoDBService {
     }
 }
 
-module.exports = new CartoDBService();
+module.exports = new CartoDBServiceV2();
