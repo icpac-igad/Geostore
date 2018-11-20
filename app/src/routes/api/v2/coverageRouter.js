@@ -36,7 +36,7 @@ class CoverageRouterV2 {
         useTable = 'gfw_logging';
         break;
       default:
-        this.throw(400, 'Name param invalid');
+        useTable = this.params.name;
     }
     let result = yield CoverageServiceV2.getUse(useTable, this.params.id);
     this.body = CoverageSerializer.serialize({

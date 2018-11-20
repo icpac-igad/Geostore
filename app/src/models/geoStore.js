@@ -41,7 +41,10 @@ var GeoStore = new Schema({
         use: {
             use:{type: String, required: false},
             id:{type: Number, required: false},
-        }
+        },
+        simplify: {type: Boolean, required: false},
+        simplifyThresh: {type: Number, required: false}
+
     }
 });
 
