@@ -107,9 +107,13 @@ class GeoStoreRouterV2 {
 
     static * getNational() {
         logger.info('Obtaining national data geojson (GADM v3.6)');
-        const thresh = parseFloat(this.query.simplify) || null;
-        if(thresh && (thresh > 1 || thresh <= 0)) {
-            this.throw(404, 'Bad threshold for simplify');
+        let thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
+
+        if(thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)){
+                this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
+        }
+        else if (thresh && typeof thresh === Boolean && thresh !== true) {
+            this.throw(404, 'Bad syntax for simplify. Must be "true".');
         }
         const data = yield CartoServiceV2.getNational(this.params.iso, thresh);
         if (!data) {
@@ -129,9 +133,13 @@ class GeoStoreRouterV2 {
 
     static * getSubnational() {
         logger.info('Obtaining subnational data geojson (GADM v3.6)');
-        const thresh = parseFloat(this.query.simplify) || null;
-        if(thresh && (thresh > 1 || thresh <= 0)) {
-            this.throw(404, 'Bad threshold for simplify');
+        let thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
+
+        if(thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)){
+                this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
+        }
+        else if (thresh && typeof thresh === Boolean && thresh !== true) {
+            this.throw(404, 'Bad syntax for simplify. Must be "true".');
         }
         const data = yield CartoServiceV2.getSubnational(this.params.iso, this.params.id1, thresh);
         if (!data) {
@@ -140,13 +148,17 @@ class GeoStoreRouterV2 {
         this.body = GeoJSONSerializer.serialize(data);
     }
 
-    static * getAdmin2() {
+    static * getRegional() {
         logger.info('Obtaining Admin2 data geojson (GADM v3.6)');
-        const thresh = parseFloat(this.query.simplify) || null;
-        if(thresh && (thresh > 1 || thresh <= 0)) {
-            this.throw(404, 'Bad threshold for simplify');
+        let thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
+
+        if(thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)){
+                this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
         }
-        const data = yield CartoServiceV2.getAdmin2(this.params.iso, this.params.id1, this.params.id2, thresh);
+        else if (thresh && typeof thresh === Boolean && thresh !== true) {
+            this.throw(404, 'Bad syntax for simplify. Must be "true".');
+        }
+        const data = yield CartoServiceV2.getRegional(this.params.iso, this.params.id1, this.params.id2, thresh);
         if (!data) {
           this.throw(404, 'Country/Admin1/Admin2 not found');
         }
@@ -155,6 +167,11 @@ class GeoStoreRouterV2 {
 
     static * use() {
         logger.info('Obtaining use data with name %s and id %s', this.params.name, this.params.id);
+        let thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
+        if (thresh && typeof thresh === Boolean && thresh !== true) {
+            this.throw(404, 'Bad syntax for simplify. Must be "true".');
+        }
+
         let useTable = null;
         switch (this.params.name) {
             case 'mining':
@@ -169,9 +186,6 @@ class GeoStoreRouterV2 {
             case 'logging':
                 useTable = 'gfw_logging';
                 break;
-            case 'endemic_bird_areas':
-                useTable = 'endemic_bird_areas';
-                break;
             case 'tiger_conservation_landscapes':
                 useTable = 'tcl';
                 break;
@@ -181,7 +195,7 @@ class GeoStoreRouterV2 {
         if (!useTable) {
             this.throw(404, 'Name not found');
         }
-        const data = yield CartoServiceV2.getUse(useTable, this.params.id);
+        const data = yield CartoServiceV2.getUse(useTable, this.params.id, thresh);
         if (!data) {
           this.throw(404, 'Use not found');
         }
@@ -190,7 +204,6 @@ class GeoStoreRouterV2 {
 
     static * wdpa() {
         logger.info('Obtaining wpda data with id %s', this.params.id);
-
         const data = yield CartoServiceV2.getWdpa(this.params.id);
         if (!data) {
           this.throw(404, 'Wdpa not found');
@@ -229,7 +242,7 @@ router.post('/area', GeoStoreValidator.create, GeoStoreRouterV2.getArea);
 router.get('/admin/:iso', GeoStoreRouterV2.getNational);
 router.get('/admin/list', GeoStoreRouterV2.getNationalList);
 router.get('/admin/:iso/:id1', GeoStoreRouterV2.getSubnational);
-router.get('/admin/:iso/:id1/:id2', GeoStoreRouterV2.getAdmin2);
+router.get('/admin/:iso/:id1/:id2', GeoStoreRouterV2.getRegional);
 router.get('/use/:name/:id', GeoStoreRouterV2.use);
 router.get('/wdpa/:id', GeoStoreRouterV2.wdpa);
 router.get('/:hash/view', GeoStoreRouterV2.view);

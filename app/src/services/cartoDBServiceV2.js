@@ -39,6 +39,18 @@ const USE = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(ge
         FROM {{use}}
         WHERE cartodb_id = {{id}}`;
 
+const SIMPLIFIED_USE = 
+        `SELECT ST_Area(geography(the_geom))/10000 as area_ha, the_geom,
+        CASE
+            WHEN area_ha::numeric > 1e8 
+            THEN st_asgeojson(st_makevalid(st_simplify(the_geom, 0.1)))
+            WHEN area_ha::numeric > 1e6 
+            THEN st_asgeojson(st_makevalid(st_simplify(the_geom, 0.005)))
+            ELSE st_asgeojson(st_makevalid(the_geom))
+        END AS geojson
+        FROM {{use}}
+        WHERE cartodb_id = {{id}}`;
+
 const executeThunk = function(client, sql, params, thresh) {
     return function(callback) {
         sql = sql.replace('{geom}', thresh ? `ST_Simplify(the_geom, ${thresh})` : 'the_geom')
@@ -58,6 +70,17 @@ const deserializer = function(obj) {
     };
 };
 
+var parseSimplifyGeom = function(iso, id1, id2) {
+    const bigCountries = ['USA', 'RUS', 'CAN', 'CHN', 'BRA', 'IDN'];
+    let baseThresh = bigCountries.includes(iso) ? 0.1 : 0.005;
+    if(iso && !id1 && !id2){
+        return baseThresh;
+    }
+    else {
+        return id1 && !id2 ? baseThresh / 10 : baseThresh / 100;
+    }
+  };
+
 
 class CartoDBServiceV2 {
 
@@ -68,19 +91,25 @@ class CartoDBServiceV2 {
     }
 
     * getNational(iso, thresh) {
-        logger.debug('Obtaining national of iso %s', iso);
+        logger.debug('Request %s to carto', iso);
         let params = {
             'iso': iso.toUpperCase()
         };
+
+        const simplifyThresh = parseSimplifyGeom(iso);
+
+        if(thresh === true) {
+            thresh = simplifyThresh;
+        }
+
         logger.debug('Checking existing national geo');
-        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(params);
+        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps({iso, simplifyThresh: thresh});
         logger.debug('Existed geo', existingGeo);
-        if (existingGeo && !thresh) {
+        if (existingGeo) {
           logger.debug('Return national geojson stored');
           return existingGeo;
         }
 
-        logger.debug('Request national to carto');
         let data = yield executeThunk(this.client, ISO, params, thresh);
         if (data.rows && data.rows.length > 0) {
           let result = data.rows[0];
@@ -89,7 +118,8 @@ class CartoDBServiceV2 {
             info : {
                 iso: iso.toUpperCase(),
                 name: result.name,
-                gadm: '3.6'
+                gadm: '3.6',
+                simplifyThresh
             }
           };
           existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
@@ -132,10 +162,16 @@ class CartoDBServiceV2 {
       let params = {
         id1: `${iso.toUpperCase()}.${parseInt(id1, 10)}_1`
       };
+
+      const simplifyThresh = parseSimplifyGeom(iso, id1);
+      if(thresh === true) {
+          thresh = simplifyThresh;
+      }
+
       logger.debug('Checking existing subnational geo');
-      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo({iso, id1});
+      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo({iso, id1, simplifyThresh});
       logger.debug('Existed geo', existingGeo);
-      if (existingGeo && !thresh) {
+      if (existingGeo) {
         logger.debug('Return subnational geojson stored');
         return existingGeo;
       }
@@ -151,7 +187,8 @@ class CartoDBServiceV2 {
               iso: iso.toUpperCase(),
               name: result.name,
               id1: parseInt(id1, 10),
-              gadm: '3.6'
+              gadm: '3.6',
+              simplifyThresh
           }
         };
         existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
@@ -160,14 +197,19 @@ class CartoDBServiceV2 {
       return null;
     }
 
-    * getAdmin2(iso, id1, id2, thresh) {
+    * getRegional(iso, id1, id2, thresh) {
       logger.debug('Obtaining admin2 of iso %s, id1 and id2', iso, id1, id2);
       let params = {
         id2: `${iso.toUpperCase()}.${parseInt(id1, 10)}.${parseInt(id2, 10)}_1`
       };
 
+      const simplifyThresh = parseSimplifyGeom(iso, id1, id2);
+      if(thresh === true) {
+          thresh = simplifyThresh;
+      }
+
       logger.debug('Checking existing admin2 geostore');
-      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo({iso, id1, id2});
+      let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo({iso, id1, id2, simplifyThresh});
       logger.debug('Existed geo', existingGeo);
       if (existingGeo && !thresh) {
         logger.debug('Return admin2 geojson stored');
@@ -186,7 +228,8 @@ class CartoDBServiceV2 {
                 id1: parseInt(id1, 10),
                 id2: parseInt(id2, 10),
                 name: result.name,
-                gadm: '3.6'
+                gadm: '3.6',
+                simplifyThresh
             }
         };
         existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
@@ -195,15 +238,15 @@ class CartoDBServiceV2 {
       return null;
     }
 
-    * getUse(use, id) {
+    * getUse(use, id, thresh) {
         logger.debug('Obtaining use with id %s', id);
-
         let params = {
           use: use,
           id: parseInt(id, 10)
         };
         let info = {
-          use: params
+          use: params,
+          simplify: thresh ? true : false
         };
 
         logger.debug('Checking existing use geo', info);
@@ -214,8 +257,10 @@ class CartoDBServiceV2 {
           return existingGeo;
         }
 
+        const USE_SQL = thresh ? SIMPLIFIED_USE : USE;
+
         logger.debug('Request use to carto');
-        let data = yield executeThunk(this.client, USE, params);
+        let data = yield executeThunk(this.client, USE_SQL, params);
 
         if (data.rows && data.rows.length > 0) {
             let result = data.rows[0];
