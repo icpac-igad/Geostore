@@ -1,8 +1,10 @@
 # Global Forest Watch Geostore API
 
+[![Build Status](https://travis-ci.org/gfw-api/gfw-geostore-api.svg?branch=develop)](https://travis-ci.org/gfw-api/gfw-geostore-api)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/896da4f09a0ebb049753/test_coverage)](https://codeclimate.com/github/gfw-api/gfw-geostore-api/test_coverage)
 
 This repository is the microservice that implements the Geostore
-funcionality, which is exposed on the /geostore endpoint.
+functionality, which is exposed on the /geostore endpoint.
 
 The Geostore is a simple GeoJSON storage service that receives GeoJSON
 and returns an ID that can be used later to retrieve the given object.
