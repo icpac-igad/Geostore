@@ -6,8 +6,8 @@
         "dirLogFile": null
     },
     "mongodb":{
-        "database": "gfw_geostore_db",
+        "database": "gfw_geostore_db_test",
         "host": "mymachine",
-        "port": 32780
+        "port": 27017
     }
 }
