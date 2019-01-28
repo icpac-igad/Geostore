@@ -5,12 +5,12 @@ services:
     ports:
       - "35731:35729"
     container_name: gfw-geostore-api-develop
+    env_file:
+      - dev.env
     environment:
       NODE_ENV: dev
       NODE_PATH: app/src
       CARTODB_USER: wri-01
-      CT_URL: http://192.168.1.172:9000
-      LOCAL_URL: http://192.168.1.172:3100
       API_VERSION: v1
       CT_REGISTER_MODE: auto
       MONGO_PORT_27017_TCP_ADDR: mongo
