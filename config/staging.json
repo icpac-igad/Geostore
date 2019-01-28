@@ -8,5 +8,10 @@
     "service": {
         "uri": "http://gfw-geostore-api-staging.herokuapp.com",
         "port": null
+    },
+    "mongodb":{
+        "database": "gfw_geostore_db",
+        "host": "mymachine",
+        "port": 32780
     }
 }

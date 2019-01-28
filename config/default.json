@@ -13,8 +13,8 @@
     },
     "mongodb":{
         "database": "gfw_geostore_db",
-        "host": "mymachine",
-        "port": 32780
+        "host": "127.0.0.1",
+        "port": 27017
     },
     "migrate":{
         "uri": ""

@@ -7,5 +7,10 @@
     },
     "service": {
         "uri": "http://172.31.40.31:3100"
+    },
+    "mongodb":{
+        "database": "gfw_geostore_db",
+        "host": "mymachine",
+        "port": 32780
     }
 }

@@ -1,30 +1,27 @@
 'use strict';
-//load modules
-if (process.env.NODE_ENV === 'prod') {
-  require('newrelic');
-}
-var config = require('config');
-var logger = require('logger');
-var path = require('path');
-var koa = require('koa');
-var co = require('co');
-var bodyParser = require('koa-bodyparser');
-var koaLogger = require('koa-logger');
-var loader = require('loader');
-var validate = require('koa-validate');
-var mongoose = require('mongoose');
-var ErrorSerializer = require('serializers/errorSerializer');
-var mongoUri = process.env.MONGO_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
+
+const config = require('config');
+const logger = require('logger');
+const path = require('path');
+const koa = require('koa');
+const co = require('co');
+const bodyParser = require('koa-bodyparser');
+const koaLogger = require('koa-logger');
+const loader = require('loader');
+const validate = require('koa-validate');
+const mongoose = require('mongoose');
+const ErrorSerializer = require('serializers/errorSerializer');
+const mongoUri = process.env.MONGO_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
 const ctRegisterMicroservice = require('ct-register-microservice-node');
 
-var onDbReady = function (err) {
+const onDbReady = function (err) {
   if (err) {
     logger.error(err);
     throw new Error(err);
   }
 
   // instance of koa
-  var app = koa();
+  const app = koa();
 
   //if environment is dev then load koa-logger
   if (process.env.NODE_ENV === 'dev') {
@@ -59,13 +56,12 @@ var onDbReady = function (err) {
   loader.loadRoutes(app);
 
   //Instance of http module
-  var server = require('http').Server(app.callback());
-
+  const server = require('http').Server(app.callback());
 
 
   // get port of environment, if not exist obtain of the config.
   // In production environment, the port must be declared in environment variable
-  var port = process.env.PORT || config.get('service.port');
+  const port = process.env.PORT || config.get('service.port');
 
   server.listen(port, function () {
     ctRegisterMicroservice.register({
@@ -88,8 +84,8 @@ var onDbReady = function (err) {
   logger.info('Server started in port:' + port);
 
 };
+
 let dbOptions = {};
-// KUBE CLUSTER
 if (mongoUri.indexOf('replicaSet') > - 1) {
     dbOptions = {
         db: { native_parser: true },
