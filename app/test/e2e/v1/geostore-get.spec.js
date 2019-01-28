@@ -9,7 +9,7 @@ const should = chai.should();
 
 let requester;
 
-describe('Get datasets tests', () => {
+describe('Geostore v1 tests', () => {
 
     before(async () => {
         if (process.env.NODE_ENV !== 'test') {
