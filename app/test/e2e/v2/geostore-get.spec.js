@@ -9,7 +9,7 @@ const should = chai.should();
 
 let requester;
 
-describe('Geostore v1 tests - Get geostores', () => {
+describe('Geostore v2 tests - Get geostores', () => {
 
     before(async () => {
         if (process.env.NODE_ENV !== 'test') {
@@ -23,7 +23,7 @@ describe('Geostore v1 tests - Get geostores', () => {
 
     it('Get geostore that doesn\'t exist should return a 404', async () => {
         const randomGeostoreID = getUUID();
-        const response = await requester.get(`/api/v1/geostore/${randomGeostoreID}`).send();
+        const response = await requester.get(`/api/v2/geostore/${randomGeostoreID}`).send();
 
         response.status.should.equal(404);
         response.body.should.have.property('errors').and.be.an('array');
