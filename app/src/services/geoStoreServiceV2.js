@@ -26,7 +26,7 @@ var executeThunk = function(client, sql, params) {
 
 class GeoStoreServiceV2 {
 
-    static * getGeometryType(geojson) {
+    static getGeometryType(geojson) {
 
         logger.debug('Get geometry type');
         logger.debug('Geometry type: %s', geojson.type);
@@ -49,7 +49,7 @@ class GeoStoreServiceV2 {
 
         logger.debug('GeoJSON: %s', JSON.stringify(geojson));
 
-        let geometry_type = yield GeoStoreServiceV2.getGeometryType(geojson);
+        let geometry_type = GeoStoreServiceV2.getGeometryType(geojson);
         logger.debug('Geometry type: %s', JSON.stringify(geometry_type));
 
         logger.debug('Repair geoJSON geometry');

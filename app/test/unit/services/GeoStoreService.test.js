@@ -2,6 +2,7 @@
 var logger = require('logger');
 var should = require('should');
 var assert = require('assert');
+var expect = require('chai').expect;
 var GeoStoreService = require('services/geoStoreService');
 var UnknownGeometry = require('errors/unknownGeometry');
 
@@ -47,7 +48,12 @@ describe('GeoStore Service test', function() {
     });
 
     it('Test unknown geometry', function () {
-     assert.throw(function() { GeoStoreService.getGeometryType(invalidGeometry) }, UnknownGeometry)
+     try
+        {GeoStoreService.getGeometryType(invalidGeometry)}
+     catch(err) {
+        var expected = 'Unknown geometry type'
+        assert.equal(err.message, expected)
+        }
 
     });
 
