@@ -26,10 +26,36 @@ var executeThunk = function(client, sql, params) {
 
 class GeoStoreServiceV2 {
 
+    static * getGeometryType(geojson) {
+
+        logger.debug('Get geometry type');
+        logger.debug('Geometry type: %s', geojson.type);
+
+        if (geojson.type === "Point"){
+            return 1
+        }
+        else if (geojson.type === "Line") {
+            return 2
+            }
+        else if (geojson.type === "Polygon"){
+            return 3
+        }
+        else {
+            throw new UnknownGeometry('Unknown geometry type');
+        }
+
+    }
+
     static * repairGeometry(geojson) {
+
+        logger.debug('GeoJSON: %s', JSON.stringify(geojson));
+
+        let geometry_type = yield GeoStoreService.getGeometryType(geojson);
+        logger.debug('Geometry type: %s', JSON.stringify(geometry_type));
+
         logger.debug('Repair geoJSON geometry');
         logger.debug('Generating query');
-        let sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),3)) as geojson`;
+        let sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometry_type})) as geojson`;
         logger.debug('SQL to repair geojson: %s', sql);
         try {
             let client = new CartoDB.SQL({
