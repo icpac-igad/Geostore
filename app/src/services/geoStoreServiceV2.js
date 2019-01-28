@@ -50,7 +50,7 @@ class GeoStoreServiceV2 {
 
         logger.debug('GeoJSON: %s', JSON.stringify(geojson));
 
-        let geometry_type = yield GeoStoreService.getGeometryType(geojson);
+        let geometry_type = yield GeoStoreServiceV2.getGeometryType(geojson);
         logger.debug('Geometry type: %s', JSON.stringify(geometry_type));
 
         logger.debug('Repair geoJSON geometry');
