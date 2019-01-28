@@ -1,11 +1,11 @@
-FROM mhart/alpine-node:7.6
-MAINTAINER raul.requero@vizzuality.com
+FROM mhart/alpine-node:11.6
+MAINTAINER tiago.garcia@vizzuality.com
 
 ENV NAME gfw-geostore-api
 ENV USER microservice
 
 RUN apk update && apk upgrade && \
-    apk add --no-cache --update bash git openssh python
+    apk add --no-cache --update bash git openssh python alpine-sdk
 
 RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
 
