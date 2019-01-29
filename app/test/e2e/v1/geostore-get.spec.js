@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars,no-undef */
 const nock = require('nock');
 const chai = require('chai');
+const config = require('config');
 
 const { getTestServer } = require('../test-server');
 const { getUUID } = require('../utils');
@@ -14,6 +15,9 @@ describe('Geostore v1 tests - Get geostores', () => {
     before(async () => {
         if (process.env.NODE_ENV !== 'test') {
             throw Error(`Running the test suite with NODE_ENV ${process.env.NODE_ENV} may result in permanent data loss. Please use NODE_ENV=test.`);
+        }
+        if (config.get('cartoDB.user') === null) {
+            throw Error(`Carto user not set - please specify a CARTODB_USER env var with it.`);
         }
 
         requester = await getTestServer();

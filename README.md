@@ -94,5 +94,6 @@ Follow the instruction above for setting up the runtime environment for Docker e
 - CT_TOKEN => 
 - API_VERSION => API version identifier that prefixes the URL. Should be `v1`
 - MONGO_PORT_27017_TCP_ADDR => IP/Address of the MongoDB server
+- CARTODB_USER => [Carto](http://carto.com) username.
 
 You can optionally set other variables, see [this file](config/custom-environment-variables.json) for an extended list.
