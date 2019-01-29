@@ -8,6 +8,8 @@ const { getTestServer } = require('../test-server');
 const should = chai.should();
 
 let requester;
+nock.disableNetConnect();
+nock.enableNetConnect(process.env.HOST_IP);
 
 describe('Geostore v1 tests - Create geostores', () => {
 
@@ -25,6 +27,16 @@ describe('Geostore v1 tests - Create geostores', () => {
     });
 
     it('Create a geostore with points should be successful', async () => {
+        nock(`https://${config.get('cartoDB.user')}.cartodb.com:443`)
+            .get('/api/v2/sql')
+            .query({ q: "SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('{\"type\":\"Point\",\"coordinates\":[-1.6596221923828125,50.91255835156951]}')),1)) as geojson" })
+            .reply(200, {
+                "rows": [{ "geojson": "{\"type\":\"Point\",\"coordinates\":[-1.65962219238281,50.9125583515695]}" }],
+                "time": 0.001,
+                "fields": { "geojson": { "type": "string" } },
+                "total_rows": 1
+            });
+
         const response = await requester
             .post(`/api/v1/geostore`)
             .send({

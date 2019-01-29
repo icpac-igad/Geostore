@@ -9,6 +9,8 @@ const { getUUID } = require('../utils');
 const should = chai.should();
 
 let requester;
+nock.disableNetConnect();
+nock.enableNetConnect(process.env.HOST_IP);
 
 describe('Geostore v2 tests - Get geostores', () => {
 
