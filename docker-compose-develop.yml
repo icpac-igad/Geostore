@@ -8,6 +8,7 @@ services:
     env_file:
       - dev.env
     environment:
+      PORT: 3100
       NODE_ENV: dev
       NODE_PATH: app/src
       CARTODB_USER: wri-01
