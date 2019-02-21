@@ -32,13 +32,13 @@ class GeoStoreService {
         logger.debug('Get geometry type');
         logger.debug('Geometry type: %s', geojson.type);
 
-        if (geojson.type === "Point"){
+        if (geojson.type === "Point" || geojson.type === "MultiPoint") {
             return 1;
         }
-        else if (geojson.type === "Line") {
+        else if (geojson.type === "LineString" || geojson.type === "MultiLineString") {
             return 2;
             }
-        else if (geojson.type === "Polygon"){
+        else if (geojson.type === "Polygon" || geojson.type === "MultiPolygon") {
             return 3;
         }
         throw new UnknownGeometry('Unknown geometry type');
