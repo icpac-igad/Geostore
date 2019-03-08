@@ -1,14 +1,13 @@
-'use strict';
-var logger = require('logger');
-var ErrorSerializer = require('serializers/errorSerializer');
+const logger = require('logger');
+const ErrorSerializer = require('serializers/errorSerializer');
 
 class GeoStoreValidator {
 
-    static * create(next) {
+    static* create(next) {
         logger.debug('Validate create geostore');
         this.checkBody('geojson').optional().isGEOJSON();
 
-        if(this.errors) {
+        if (this.errors) {
             logger.debug('errors ', this.errors);
             this.body = ErrorSerializer.serializeValidationBodyErrors(this.errors);
             this.status = 400;

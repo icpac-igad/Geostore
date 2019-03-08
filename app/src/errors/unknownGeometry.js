@@ -1,5 +1,3 @@
-'use strict';
-
 class UnknownGeometry extends Error{
 
     constructor(message){

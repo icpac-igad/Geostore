@@ -26,6 +26,22 @@ describe('Geostore v1 tests - Create geostores', () => {
         nock.cleanAll();
     });
 
+    it('Create a geostore an invalid geometry type should fail', async () => {
+        const response = await requester
+            .post(`/api/v1/geostore`)
+            .send({
+                "geojson": {
+                    "type": "InvalidGeometryType"
+                }
+            });
+
+        response.status.should.equal(400);
+
+        response.body.should.have.property('errors').and.be.an('array');
+        response.body.errors[0].status.should.equal(400);
+        response.body.errors[0].detail.should.equal('The type InvalidGeometryType is unknown');
+    });
+
     it('Create a geostore with points should be successful', async () => {
         nock(`https://${config.get('cartoDB.user')}.cartodb.com:443`)
             .get('/api/v2/sql')
