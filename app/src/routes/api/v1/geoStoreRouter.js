@@ -1,147 +1,143 @@
-'use strict';
+const Router = require('koa-router');
+const logger = require('logger');
+const GeoStoreValidator = require('validators/geoStoreValidator');
+const GeoJSONSerializer = require('serializers/geoJSONSerializer');
+const AreaSerializer = require('serializers/areaSerializer');
+const CountryListSerializer = require('serializers/countryListSerializer');
+const CartoService = require('services/cartoDBService');
+const GeoStoreService = require('services/geoStoreService');
+const GeoJsonIOService = require('services/geoJsonIOService');
+const ProviderNotFound = require('errors/providerNotFound');
+const GeoJSONNotFound = require('errors/geoJSONNotFound');
+const geojsonToArcGIS = require('arcgis-to-geojson-utils').geojsonToArcGIS;
+const arcgisToGeoJSON = require('arcgis-to-geojson-utils').arcgisToGeoJSON;
 
-var Router = require('koa-router');
-var logger = require('logger');
-var GeoStoreValidator = require('validators/geoStoreValidator');
-var GeoJSONSerializer = require('serializers/geoJSONSerializer');
-var AreaSerializer = require('serializers/areaSerializer');
-var CountryListSerializer = require('serializers/countryListSerializer');
-var GeoStore = require('models/geoStore');
-var IdConnection = require('models/idConnection');
-var CartoService = require('services/cartoDBService');
-var GeoStoreService = require('services/geoStoreService');
-var GeoJsonIOService = require('services/geojsonioService');
-var ProviderNotFound = require('errors/providerNotFound');
-var GeoJSONNotFound = require('errors/geoJSONNotFound');
-var geojsonToArcGIS = require('arcgis-to-geojson-utils').geojsonToArcGIS;
-var arcgisToGeoJSON = require('arcgis-to-geojson-utils').arcgisToGeoJSON;
-
-var router = new Router({
+const router = new Router({
     prefix: '/geostore'
 });
 
 class GeoStoreRouter {
 
-    static * getGeoStoreById() {
+    static* getGeoStoreById() {
         this.assert(this.params.hash, 400, 'Hash param not found');
         logger.debug('Getting geostore by hash %s', this.params.hash);
-        var geoStore = null;
+        let geoStore = null;
 
         try {
             geoStore = yield GeoStoreService.getGeostoreById(this.params.hash);
-            if(!geoStore) {
+            if (!geoStore) {
                 this.throw(404, 'GeoStore not found');
                 return;
             }
             logger.debug('GeoStore found. Returning...');
-            if(!geoStore.bbox) {
+            if (!geoStore.bbox) {
                 geoStore = yield GeoStoreService.calculateBBox(geoStore);
             }
             if (this.query.format && this.query.format === 'esri') {
-              logger.debug('esri', geojsonToArcGIS(geoStore.geojson)[0]);
-              geoStore.esrijson = geojsonToArcGIS(geoStore.geojson)[0].geometry;
+                logger.debug('esri', geojsonToArcGIS(geoStore.geojson)[0]);
+                geoStore.esrijson = geojsonToArcGIS(geoStore.geojson)[0].geometry;
             }
 
             this.body = GeoJSONSerializer.serialize(geoStore);
 
-        } catch(e) {
+        } catch (e) {
             logger.error(e);
             throw e;
         }
     }
 
-    static * createGeoStore() {
+    static* createGeoStore() {
         logger.info('Saving GeoStore');
-        try{
-          const data = {
-            provider: this.request.body.provider,
-            info: {},
-            lock: this.request.body.lock ? this.request.body.lock : false
-          };
-          if (!this.request.body.geojson && !this.request.body.esrijson && !this.request.body.provider){
-            this.throw(400, 'geojson, esrijson or provider required');
-            return;
-          }
-          if (this.request.body.esrijson){
-            this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
-          }
+        try {
+            const data = {
+                provider: this.request.body.provider,
+                info: {},
+                lock: this.request.body.lock ? this.request.body.lock : false
+            };
+            if (!this.request.body.geojson && !this.request.body.esrijson && !this.request.body.provider) {
+                this.throw(400, 'geojson, esrijson or provider required');
+                return;
+            }
+            if (this.request.body.esrijson) {
+                this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
+            }
 
-          let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
-          logger.debug(JSON.stringify(geostore.geojson));
-          this.body = GeoJSONSerializer.serialize(geostore);
-        } catch(err){
-            if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound){
+            let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
+            logger.debug(JSON.stringify(geostore.geojson));
+            this.body = GeoJSONSerializer.serialize(geostore);
+        } catch (err) {
+            if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound) {
                 this.throw(400, err.message);
-                return ;
+                return;
             }
             throw err;
         }
     }
 
-    static * getArea() {
+    static* getArea() {
         logger.info('Retreiving Polygon Area');
-        try{
-          const data = {
-            provider: this.request.body.provider,
-            info: {},
-            lock: this.request.body.lock ? this.request.body.lock : false
-          };
-          if (!this.request.body.geojson && !this.request.body.esrijson && !this.request.body.provider){
-            this.throw(400, 'geojson, esrijson or provider required');
-            return;
-          }
-          if (this.request.body.esrijson){
-            this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
-          }
-          let geostore = yield GeoStoreService.calculateArea(this.request.body.geojson, data);
-          logger.debug(JSON.stringify(geostore.geojson));
-          this.body = AreaSerializer.serialize(geostore);
-        } catch(err){
-            if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound){
+        try {
+            const data = {
+                provider: this.request.body.provider,
+                info: {},
+                lock: this.request.body.lock ? this.request.body.lock : false
+            };
+            if (!this.request.body.geojson && !this.request.body.esrijson && !this.request.body.provider) {
+                this.throw(400, 'geojson, esrijson or provider required');
+                return;
+            }
+            if (this.request.body.esrijson) {
+                this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
+            }
+            let geostore = yield GeoStoreService.calculateArea(this.request.body.geojson, data);
+            logger.debug(JSON.stringify(geostore.geojson));
+            this.body = AreaSerializer.serialize(geostore);
+        } catch (err) {
+            if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound) {
                 this.throw(400, err.message);
-                return ;
+                return;
             }
             throw err;
         }
     }
 
-    static * getNational() {
+    static* getNational() {
         logger.info('Obtaining national data geojson');
         const data = yield CartoService.getNational(this.params.iso);
         if (!data) {
-          this.throw(404, 'Country not found');
+            this.throw(404, 'Country not found');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
-    static * getNationalList() {
+    static* getNationalList() {
         logger.info('Obtaining national list');
         const data = yield CartoService.getNationalList();
         if (!data) {
-          this.throw(404, 'Empty List');
+            this.throw(404, 'Empty List');
         }
         this.body = CountryListSerializer.serialize(data);
     }
 
-    static * getSubnational() {
+    static* getSubnational() {
         logger.info('Obtaining subnational data geojson');
         const data = yield CartoService.getSubnational(this.params.iso, this.params.id1);
         if (!data) {
-          this.throw(404, 'Country/Region not found');
+            this.throw(404, 'Country/Region not found');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
-    static * getAdmin2() {
+    static* getAdmin2() {
         logger.info('Obtaining Admin2 data geojson');
         const data = yield CartoService.getAdmin2(this.params.iso, this.params.id1, this.params.id2);
         if (!data) {
-          this.throw(404, 'Country/Admin1/Admin2 not found');
+            this.throw(404, 'Country/Admin1/Admin2 not found');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
-    static * use() {
+    static* use() {
         logger.info('Obtaining use data with name %s and id %s', this.params.name, this.params.id);
         let useTable = null;
         switch (this.params.name) {
@@ -171,40 +167,40 @@ class GeoStoreRouter {
         }
         const data = yield CartoService.getUse(useTable, this.params.id);
         if (!data) {
-          this.throw(404, 'Use not found');
+            this.throw(404, 'Use not found');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
-    static * wdpa() {
+    static* wdpa() {
         logger.info('Obtaining wpda data with id %s', this.params.id);
 
         const data = yield CartoService.getWdpa(this.params.id);
         if (!data) {
-          this.throw(404, 'Wdpa not found');
+            this.throw(404, 'Wdpa not found');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
 
-    static * view() {
+    static* view() {
         this.assert(this.params.hash, 400, 'Hash param not found');
         logger.debug('Getting geostore by hash %s', this.params.hash);
-        var geoStore = null;
-        var geojsonIoPath = null;
+        let geoStore = null;
+        let geojsonIoPath = null;
 
         try {
             geoStore = yield GeoStoreService.getGeostoreById(this.params.hash);
 
-            if(!geoStore) {
+            if (!geoStore) {
                 this.throw(404, 'GeoStore not found');
                 return;
             }
             logger.debug('GeoStore found. Returning...');
 
             geojsonIoPath = yield GeoJsonIOService.view(geoStore.geojson);
-            this.body = {'view_link': geojsonIoPath};
+            this.body = { 'view_link': geojsonIoPath };
 
-        } catch(e) {
+        } catch (e) {
             logger.error(e);
             throw e;
         }

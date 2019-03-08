@@ -1,10 +1,6 @@
-'use strict';
-
 const config = require('config');
 const logger = require('logger');
-const path = require('path');
 const koa = require('koa');
-const co = require('co');
 const bodyParser = require('koa-bodyparser');
 const koaLogger = require('koa-logger');
 const loader = require('loader');
@@ -14,6 +10,9 @@ const ErrorSerializer = require('serializers/errorSerializer');
 const mongoUri = process.env.MONGO_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
 const ctRegisterMicroservice = require('ct-register-microservice-node');
 const sleep = require('sleep');
+
+// const nock = require('nock');
+// nock.recorder.rec();
 
 let retries = 10;
 

@@ -7,6 +7,7 @@ services:
     container_name: gfw-geostore-api-test
     environment:
       NODE_ENV: test
+      CARTODB_USER: test
       NODE_PATH: app/src
       CT_URL: http://mymachine:9000
       API_VERSION: v1
