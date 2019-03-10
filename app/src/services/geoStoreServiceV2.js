@@ -37,7 +37,7 @@ class GeoStoreServiceV2 {
         } else if (geojson.type === "Polygon" || geojson.type === "MultiPolygon") {
             return 3;
         }
-        throw new UnknownGeometry('Unknown geometry type');
+        throw new UnknownGeometry(`Unknown geometry type: ${geojson.type}`);
     }
 
     static* repairGeometry(geojson) {
