@@ -39,7 +39,7 @@ const USE = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(ge
         FROM {{use}}
         WHERE cartodb_id = {{id}}`;
 
-const SIMPLIFIED_USE = 
+const SIMPLIFIED_USE =
         `SELECT ST_Area(geography(the_geom))/10000 as area_ha, the_geom,
         CASE
             WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e8 
@@ -103,7 +103,11 @@ class CartoDBServiceV2 {
         }
 
         logger.debug('Checking existing national geo');
-        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps({iso, simplifyThresh: thresh});
+        const query = {
+            'info.iso': iso.toUpperCase(),
+            'info.simplifyThresh': thresh
+        };
+        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(query);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
           logger.debug('Return national geojson stored');
@@ -175,7 +179,7 @@ class CartoDBServiceV2 {
         logger.debug('Return subnational geojson stored');
         return existingGeo;
       }
-   
+
       let data = yield executeThunk(this.client, ID1, params, thresh);
       logger.debug('Request subnational to carto');
       if (data.rows && data.rows.length > 0) {
