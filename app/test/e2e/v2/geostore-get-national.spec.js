@@ -3,10 +3,11 @@ const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
+const fs = require('fs');
+const path = require('path');
 
 const { getTestServer } = require('../test-server');
 
-const should = chai.should();
 
 let requester;
 nock.disableNetConnect();
@@ -113,6 +114,19 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
         response.body.data.attributes.info.should.have.property('iso').and.equal("MCO");
         response.body.data.attributes.info.should.have.property('simplifyThresh').and.equal(0.005);
         response.body.data.attributes.info.should.have.property('name');
+    });
+
+    it('Get complex country that exists should return a 200', async () => {
+        nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
+            .get('/api/v2/sql')
+            .query(
+                { q: "SELECT ST_AsGeoJSON(st_makevalid(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('USA')" }
+            )
+            .reply(200, JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'USA-geom.json'))));
+
+        const response = await requester.get(`/api/v2/geostore/admin/USA?simplify=0.005`).send();
+
+        response.status.should.equal(200);
     });
 
     afterEach(() => {
