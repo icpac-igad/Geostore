@@ -42,15 +42,20 @@ class GeoStoreServiceV2 {
 
     static* repairGeometry(geojson) {
 
-        logger.debug('GeoJSON: %s', JSON.stringify(geojson));
-
+        if (process.env.NODE_ENV !== 'test' || geojson.length < 2000) {
+            logger.debug('GeoJSON: %s', JSON.stringify(geojson));
+        }
         let geometry_type = GeoStoreServiceV2.getGeometryType(geojson);
         logger.debug('Geometry type: %s', JSON.stringify(geometry_type));
 
         logger.debug('Repair geoJSON geometry');
         logger.debug('Generating query');
         let sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometry_type})) as geojson`;
-        logger.debug('SQL to repair geojson: %s', sql);
+
+        if (process.env.NODE_ENV !== 'test' || sql.length < 2000) {
+            logger.debug('SQL to repair geojson: %s', sql);
+        }
+
         try {
             let client = new CartoDB.SQL({
                 user: config.get('cartoDB.user')
@@ -58,7 +63,9 @@ class GeoStoreServiceV2 {
             let data = yield executeThunk(client, sql, {});
             if (data.rows && data.rows.length === 1) {
                 data.rows[0].geojson = JSON.parse(data.rows[0].geojson);
-                logger.debug(data.rows[0].geojson);
+                if (process.env.NODE_ENV !== 'test' || data.rows[0].geojson.length < 2000) {
+                    logger.debug(data.rows[0].geojson);
+                }
                 return data.rows[0];
             }
             throw new GeoJSONNotFound('No Geojson returned');
@@ -166,15 +173,21 @@ class GeoStoreServiceV2 {
         geoStore.lock = data.lock || false;
 
         logger.debug('Fix and convert geojson');
-        logger.debug('Converting', JSON.stringify(geoStore.geojson));
+        if (process.env.NODE_ENV !== 'test' || geoStore.geojson.length < 2000) {
+            logger.debug('Converting', JSON.stringify(geoStore.geojson));
+        }
 
         let geoJsonObtained = yield GeoStoreServiceV2.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
         geoStore.geojson = geoJsonObtained.geojson;
 
-        logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
+        if (process.env.NODE_ENV !== 'test' || geoStore.geojson.length < 2000) {
+            logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
+        }
         logger.debug('Make Feature Collection');
         geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson);
-        logger.debug('Result', JSON.stringify(geoStore.geojson));
+        if (process.env.NODE_ENV !== 'test' || geoStore.geojson.length < 2000) {
+            logger.debug('Result', JSON.stringify(geoStore.geojson));
+        }
         logger.debug('Creating hash from geojson md5');
         geoStore.hash = md5(JSON.stringify(geoStore.geojson));
         if (geoStore.areaHa === undefined) {

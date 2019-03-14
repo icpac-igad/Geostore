@@ -50,7 +50,10 @@ class GeoStoreService {
             logger.debug('Repair geoJSON geometry');
             logger.debug('Generating query');
             let sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometry_type})) as geojson`;
-            logger.debug('SQL to repair geojson: %s', sql);
+
+            if (process.env.NODE_ENV !== 'test' || sql.length < 2000) {
+                logger.debug('SQL to repair geojson: %s', sql);
+            }
 
             let client = new CartoDB.SQL({
                 user: config.get('cartoDB.user')
