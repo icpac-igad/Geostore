@@ -141,7 +141,7 @@ class GeoStoreRouterV2 {
         }
         const data = yield CartoServiceV2.getSubnational(this.params.iso, this.params.id1, thresh);
         if (!data) {
-
+            this.throw(404, 'Location does not exist.');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
@@ -157,7 +157,7 @@ class GeoStoreRouterV2 {
         }
         const data = yield CartoServiceV2.getRegional(this.params.iso, this.params.id1, this.params.id2, thresh);
         if (!data) {
-            this.throw(404, 'Country/Admin1/Admin2 not found');
+            this.throw(404, 'Location does not exist.');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }

@@ -167,7 +167,7 @@ class CartoDBServiceV2 {
         }
 
         logger.debug('Checking existing subnational geo');
-        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo({ iso, id1, thresh });
+        let existingGeo = yield GeoStoreServiceV2.git({ iso, id1, thresh });
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
             logger.debug('Return subnational geojson stored');
