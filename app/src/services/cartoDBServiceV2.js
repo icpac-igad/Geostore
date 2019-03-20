@@ -219,7 +219,7 @@ class CartoDBServiceV2 {
         logger.debug('Checking existing admin2 geostore');
         let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(query);
         logger.debug('Existed geo', existingGeo);
-        if (existingGeo && !thresh) {
+        if (existingGeo) {
             logger.debug('Return admin2 geojson stored');
             return existingGeo;
         }
