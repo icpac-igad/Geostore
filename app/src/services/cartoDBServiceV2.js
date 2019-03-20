@@ -165,9 +165,14 @@ class CartoDBServiceV2 {
         if (!thresh) {
             thresh = parseSimplifyGeom(iso, id1);
         }
+        const query = {
+          'info.iso': iso.toUpperCase(),
+          'info.id1': id1,
+          'info.simplifyThresh': thresh
+        };
 
         logger.debug('Checking existing subnational geo');
-        let existingGeo = yield GeoStoreServiceV2.git({ iso, id1, thresh });
+        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(query);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo) {
             logger.debug('Return subnational geojson stored');
@@ -204,9 +209,15 @@ class CartoDBServiceV2 {
         if (!thresh) {
             thresh = parseSimplifyGeom(iso, id1, id2);
         }
+        const query = {
+          'info.iso': iso.toUpperCase(),
+          'info.id1': id1,
+          'info.id2': id2,
+          'info.simplifyThresh': thresh
+        };
 
         logger.debug('Checking existing admin2 geostore');
-        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfo({ iso, id1, id2, thresh });
+        let existingGeo = yield GeoStoreServiceV2.getGeostoreByInfoProps(query);
         logger.debug('Existed geo', existingGeo);
         if (existingGeo && !thresh) {
             logger.debug('Return admin2 geojson stored');

@@ -122,7 +122,7 @@ describe('Geostore v2 tests - Get geostore - Regional (admin-1) level', () => {
         response.body.data.should.have.property('id').and.a('string');
         response.body.data.should.have.property('attributes').and.be.an('object');
 
-        response.body.data.attributes.should.have.property('areaHa').and.equal(20421.899685269724);
+        response.body.data.attributes.should.have.property('areaHa').and.equal(20449.846900523287);
         response.body.data.attributes.should.have.property('bbox').and.be.an("array");
         response.body.data.attributes.should.have.property('geojson').and.be.an("object");
         response.body.data.attributes.should.have.property('hash').and.be.a("string");
