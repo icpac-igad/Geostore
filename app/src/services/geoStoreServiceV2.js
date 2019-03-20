@@ -177,8 +177,17 @@ class GeoStoreServiceV2 {
             logger.debug('Converting', JSON.stringify(geoStore.geojson));
         }
 
-        let geoJsonObtained = yield GeoStoreServiceV2.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
-        geoStore.geojson = geoJsonObtained.geojson;
+        if (geoStore.geojson.type && geoStore.geojson.type === 'GeometryCollection') {
+            geoStore.geojson = geoStore.geojson.geometries[0];
+            //maybe we should check type
+            // let geometry_type = GeoStoreServiceV2.getGeometryType(geoStore.geojson);
+            // logger.debug('Geometry type: %s', JSON.stringify(geometry_type));
+        }
+        else if (geoStore.geojson.type && geoStore.geojson.type === 'FeatureCollection') {
+
+            let geoJsonObtained = yield GeoStoreServiceV2.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
+            geoStore.geojson = geoJsonObtained.geojson;
+        }
 
         if (process.env.NODE_ENV !== 'test' || geoStore.geojson.length < 2000) {
             logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));

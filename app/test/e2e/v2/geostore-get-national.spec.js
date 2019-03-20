@@ -6,7 +6,9 @@ const GeoStore = require('models/geoStore');
 const fs = require('fs');
 const path = require('path');
 
-const { getTestServer } = require('../test-server');
+const {
+    getTestServer
+} = require('../test-server');
 
 
 let requester;
@@ -33,16 +35,22 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
     it('Get country that doesn\'t exist should return a 404', async () => {
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
-            .query(
-                { q: "SELECT ST_AsGeoJSON(ST_Simplify(the_geom, 0.005)) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('AAA')" }
-            )
+            .query({
+                q: "SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('AAA')"
+            })
             .reply(200, {
                 "rows": [],
                 "time": 0.349,
                 "fields": {
-                    "geojson": { "type": "string" },
-                    "area_ha": { "type": "number" },
-                    "name": { "type": "string" }
+                    "geojson": {
+                        "type": "string"
+                    },
+                    "area_ha": {
+                        "type": "number"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
                 },
                 "total_rows": 0
             });
@@ -59,30 +67,29 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
     it('Get country that exists should return a 200', async () => {
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
-            .query(
-                { q: "SELECT ST_AsGeoJSON(ST_Simplify(the_geom, 0.005)) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('MCO')" }
-            )
-            .reply(200,
-                {
-                    "rows": [{
-                        "geojson": "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[7.4134,43.7346],[7.4396,43.7492],[7.4179,43.7226],[7.4095,43.7299],[7.4134,43.7346]]]]}",
-                        "area_ha": 235.490994944,
-                        "name": "Monaco"
-                    }],
-                    "time": 0.002,
-                    "fields": {
-                        "geojson": { "type": "string" },
-                        "area_ha": { "type": "number" },
-                        "name": { "type": "string" }
+            .query({
+                q: "SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('MCO')"
+            })
+            .reply(200, {
+                "rows": [{
+                    "geojson": "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[7.4134,43.7346],[7.4396,43.7492],[7.4179,43.7226],[7.4095,43.7299],[7.4134,43.7346]]]]}",
+                    "area_ha": 235.490994944,
+                    "name": "Monaco"
+                }],
+                "time": 0.002,
+                "fields": {
+                    "geojson": {
+                        "type": "string"
                     },
-                    "total_rows": 1
-                });
-
-        nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
-            .get('/api/v2/sql')
-            .query({ q: "SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('{\"type\":\"MultiPolygon\",\"coordinates\":[[[[7.4134,43.7346],[7.4396,43.7492],[7.4179,43.7226],[7.4095,43.7299],[7.4134,43.7346]]]]}')),3)) as geojson" })
-            .reply(200,
-                {"rows":[{"geojson":"{\"type\":\"MultiPolygon\",\"coordinates\":[[[[7.4134,43.7346],[7.4396,43.7492],[7.4179,43.7226],[7.4095,43.7299],[7.4134,43.7346]]]]}"}],"time":0.001,"fields":{"geojson":{"type":"string"}},"total_rows":1});
+                    "area_ha": {
+                        "type": "number"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "total_rows": 1
+            });
 
 
         const response = await requester.get(`/api/v2/geostore/admin/MCO?simplify=0.005`).send();
@@ -128,10 +135,14 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
 
     it('Get complex country that exists should return a 200', async () => {
 
-        nock(`https://${process.env.CARTODB_USER}.cartodb.com`, {"encodedQueryParams":true})
+        nock(`https://${process.env.CARTODB_USER}.cartodb.com`, {
+                "encodedQueryParams": true
+            })
             .get('/api/v2/sql')
-            .query({"q":"SELECT%20ST_AsGeoJSON%28ST_Simplify%28the_geom%2C%200.005%29%29%20AS%20geojson%2C%20area_ha%2C%20name_0%20as%20name%0A%20%20%20%20%20%20%20%20FROM%20gadm36_countries%0A%20%20%20%20%20%20%20%20WHERE%20gid_0%20%3D%20UPPER%28%27USA%27%29"})
-            .reply(200, JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'USA-request-one-reply.json'))), [ 'Server',
+            .query({
+                "q": "SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('USA')"
+            })
+            .reply(200, JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'USA-request-one-reply.json'))), ['Server',
                 'openresty',
                 'Date',
                 'Thu, 14 Mar 2019 07:16:04 GMT',
@@ -170,54 +181,8 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
                 'X-Cache',
                 'HIT',
                 'Accept-Ranges',
-                'bytes' ]);
-
-        nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
-            .post('/api/v2/sql', fs.readFileSync(path.join(__dirname, 'resources', 'USA-request-two-query.txt')))
-            .reply(200, JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'USA-request-two-reply.json'))), [ 'Server',
-                'openresty',
-                'Date',
-                'Thu, 14 Mar 2019 07:16:30 GMT',
-                'Content-Type',
-                'application/json; charset=utf-8',
-                'Transfer-Encoding',
-                'chunked',
-                'Connection',
-                'close',
-                'Vary',
-                'Accept-Encoding',
-                'Vary',
-                'Accept-Encoding',
-                'Access-Control-Allow-Origin',
-                '*',
-                'Access-Control-Allow-Headers',
-                'X-Requested-With, X-Prototype-Version, X-CSRF-Token, Authorization',
-                'Carto-Rate-Limit-Limit',
-                '81',
-                'Carto-Rate-Limit-Remaining',
-                '80',
-                'Carto-Rate-Limit-Reset',
-                '0',
-                'vary',
-                'Authorization',
-                'X-SQLAPI-Log',
-                '{"request":{"sql":{"type":"query","sql":"SELECT ST AsGeoJson ST CollectionExtract st MakeValid ST GeomFromGeoJSON    type   MultiPolygon   coordinates      179 7439 51 9186   179 738 51 9109   179 6684 51 8943   179 6464 51 874   179 6116 51 8709   179 5803 51 8886   179 5185 51 896   179 5128 51 9125   179 481 51 9209   179 4718 51 9407   179 4854 51 9444   179 4905 51 9559   179 4778 51 9639   179 4767 51 9807   179 5246 51 9825   179 5724 52 013   179 6172 52 0183   179 6194 52 027   179 652 52 0248   179 6746 52 0087   179 702 52 0048   179 70"}}}',
-                'Content-Disposition',
-                'inline; filename=cartodb-query.json; modification-date="Thu, 14 Mar 2019 07:16:18 GMT";',
-                'Cache-Control',
-                'no-cache,max-age=31536000,must-revalidate,public',
-                'Last-Modified',
-                'Thu, 14 Mar 2019 07:16:18 GMT',
-                'X-SQLAPI-Profiler',
-                '{"authorization":1,"getConnectionParams":1,"getUserTimeoutLimits":1,"queryExplain":11792,"eventedQuery":3,"beforeSink":11663,"total":23461}' ]);
-
-
-        // nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
-        //     .get('/api/v2/sql')
-        //     .query(
-        //         { q: "SELECT ST_AsGeoJSON(ST_Simplify(the_geom, 0.005)) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('USA')" }
-        //     )
-        //     .reply(200, JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'USA-geom.json'))));
+                'bytes'
+            ]);
 
         const response = await requester.get(`/api/v2/geostore/admin/USA?simplify=0.005`).send();
 

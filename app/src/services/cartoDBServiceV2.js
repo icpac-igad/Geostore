@@ -5,7 +5,7 @@ const Mustache = require('mustache');
 const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const GeoStoreServiceV2 = require('services/geoStoreServiceV2');
 
-const ISO = `SELECT ST_AsGeoJSON({geom}) AS geojson, area_ha, name_0 as name
+const ISO = `SELECT ST_AsGeoJSON(ST_MAKEVALID({geom})) AS geojson, area_ha, name_0 as name
         FROM gadm36_countries
         WHERE gid_0 = UPPER('{{iso}}')`;
 
@@ -13,15 +13,15 @@ const ISO_NAME = `SELECT gid_0, name_0 as name
         FROM gadm36_adm0
         WHERE gid_0 in `;
 
-const ID1 = `SELECT ST_AsGeoJSON(st_makevalid({geom})) AS geojson, area_ha, name_1 as name
+const ID1 = `SELECT ST_AsGeoJSON(ST_MAKEVALID({geom})) AS geojson, area_ha, name_1 as name
         FROM gadm36_adm1
         WHERE gid_1 = '{{id1}}'`;
 
-const ID2 = `SELECT ST_AsGeoJSON(st_makevalid({geom})) AS geojson, area_ha, name_2 as name
+const ID2 = `SELECT ST_AsGeoJSON(ST_MAKEVALID({geom})) AS geojson, area_ha, name_2 as name
         FROM gadm36_adm2
         WHERE gid_2 = '{{id2}}'`;
 
-const WDPA = `SELECT ST_AsGeoJSON(st_makevalid(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const WDPA = `SELECT ST_AsGeoJSON(ST_MAKEVALID(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM (
           SELECT CASE
           WHEN marine::numeric = 2 THEN NULL
@@ -33,18 +33,18 @@ const WDPA = `SELECT ST_AsGeoJSON(st_makevalid(p.the_geom)) AS geojson, (ST_Area
           WHERE wdpaid={{wdpaid}}
         ) p`;
 
-const USE = `SELECT ST_AsGeoJSON(st_makevalid(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const USE = `SELECT ST_AsGeoJSON(ST_MAKEVALID(the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM {{use}}
         WHERE cartodb_id = {{id}}`;
 
 const SIMPLIFIED_USE =
     `SELECT ST_Area(geography(the_geom))/10000 as area_ha, the_geom,
         CASE
-            WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e8 
-            THEN st_asgeojson(st_makevalid(st_simplify(the_geom, 0.1)))
-            WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e6 
-            THEN st_asgeojson(st_makevalid(st_simplify(the_geom, 0.005)))
-            ELSE st_asgeojson(st_makevalid(the_geom))
+            WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e8
+            THEN st_asgeojson(ST_MAKEVALID(st_simplify(the_geom, 0.1)))
+            WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e6
+            THEN st_asgeojson(ST_MAKEVALID(st_simplify(the_geom, 0.005)))
+            ELSE st_asgeojson(ST_MAKEVALID(the_geom))
         END AS geojson
         FROM {{use}}
         WHERE cartodb_id = {{id}}`;
