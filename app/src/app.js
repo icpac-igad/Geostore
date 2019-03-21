@@ -51,8 +51,13 @@ async function init() {
                 try {
                     yield next;
                 } catch (err) {
-                    logger.error(err);
                     this.status = err.status || 500;
+                    if (this.status >= 500) {
+                        logger.error(err);
+                    } else {
+                        logger.info(err);
+                    }
+
                     this.body = ErrorSerializer.serializeError(this.status, err.message || err);
                     logger.debug(this.body);
                     if (process.env.NODE_ENV === 'prod' && this.status === 500) {

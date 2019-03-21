@@ -21,29 +21,22 @@ class GeoStoreRouterV2 {
     static* getGeoStoreById() {
         this.assert(this.params.hash, 400, 'Hash param not found');
         logger.debug('Getting geostore by hash %s', this.params.hash);
-        let geoStore = null;
 
-        try {
-            geoStore = yield GeoStoreServiceV2.getGeostoreById(this.params.hash);
-            if (!geoStore) {
-                this.throw(404, 'GeoStore not found');
-                return;
-            }
-            logger.debug('GeoStore found. Returning...');
-            if (!geoStore.bbox) {
-                geoStore = yield GeoStoreServiceV2.calculateBBox(geoStore);
-            }
-            if (this.query.format && this.query.format === 'esri') {
-                logger.debug('esri', geojsonToArcGIS(geoStore.geojson)[0]);
-                geoStore.esrijson = geojsonToArcGIS(geoStore.geojson)[0].geometry;
-            }
-
-            this.body = GeoJSONSerializer.serialize(geoStore);
-
-        } catch (e) {
-            logger.error(e);
-            throw e;
+        let geoStore = yield GeoStoreServiceV2.getGeostoreById(this.params.hash);
+        if (!geoStore) {
+            this.throw(404, 'GeoStore not found');
+            return;
         }
+        logger.debug('GeoStore found. Returning...');
+        if (!geoStore.bbox) {
+            geoStore = yield GeoStoreServiceV2.calculateBBox(geoStore);
+        }
+        if (this.query.format && this.query.format === 'esri') {
+            logger.debug('esri', geojsonToArcGIS(geoStore.geojson)[0]);
+            geoStore.esrijson = geojsonToArcGIS(geoStore.geojson)[0].geometry;
+        }
+
+        this.body = GeoJSONSerializer.serialize(geoStore);
     }
 
     static* createGeoStore() {
@@ -211,25 +204,17 @@ class GeoStoreRouterV2 {
     static* view() {
         this.assert(this.params.hash, 400, 'Hash param not found');
         logger.debug('Getting geostore by hash %s', this.params.hash);
-        let geoStore = null;
-        let geojsonIoPath = null;
 
-        try {
-            geoStore = yield GeoStoreServiceV2.getGeostoreById(this.params.hash);
+        let geoStore = yield GeoStoreServiceV2.getGeostoreById(this.params.hash);
 
-            if (!geoStore) {
-                this.throw(404, 'GeoStore not found');
-                return;
-            }
-            logger.debug('GeoStore found. Returning...');
-
-            geojsonIoPath = yield GeoJsonIOService.view(geoStore.geojson);
-            this.body = { 'view_link': geojsonIoPath };
-
-        } catch (e) {
-            logger.error(e);
-            throw e;
+        if (!geoStore) {
+            this.throw(404, 'GeoStore not found');
+            return;
         }
+        logger.debug('GeoStore found. Returning...');
+
+        let geojsonIoPath = yield GeoJsonIOService.view(geoStore.geojson);
+        this.body = { 'view_link': geojsonIoPath };
     }
 }
 
