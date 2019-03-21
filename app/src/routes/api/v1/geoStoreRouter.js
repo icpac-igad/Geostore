@@ -63,7 +63,10 @@ class GeoStoreRouter {
             }
 
             let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
-            logger.debug(JSON.stringify(geostore.geojson));
+            if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
+                logger.debug(JSON.stringify(geostore.geojson));
+            }
+
             this.body = GeoJSONSerializer.serialize(geostore);
         } catch (err) {
             if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound) {
@@ -90,7 +93,9 @@ class GeoStoreRouter {
                 this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
             }
             let geostore = yield GeoStoreService.calculateArea(this.request.body.geojson, data);
-            logger.debug(JSON.stringify(geostore.geojson));
+            if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
+                logger.debug(JSON.stringify(geostore.geojson));
+            }
             this.body = AreaSerializer.serialize(geostore);
         } catch (err) {
             if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound) {

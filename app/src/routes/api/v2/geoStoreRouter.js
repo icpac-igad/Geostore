@@ -63,7 +63,9 @@ class GeoStoreRouterV2 {
             }
 
             let geostore = yield GeoStoreServiceV2.saveGeostore(this.request.body.geojson, data);
-            logger.debug(JSON.stringify(geostore.geojson));
+            if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
+                logger.debug(JSON.stringify(geostore.geojson));
+            }
             this.body = GeoJSONSerializer.serialize(geostore);
         } catch (err) {
             if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound) {
@@ -90,7 +92,9 @@ class GeoStoreRouterV2 {
                 this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
             }
             let geostore = yield GeoStoreServiceV2.calculateArea(this.request.body.geojson, data);
-            logger.debug(JSON.stringify(geostore.geojson));
+            if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
+                logger.debug(JSON.stringify(geostore.geojson));
+            }
             this.body = AreaSerializer.serialize(geostore);
         } catch (err) {
             if (err instanceof ProviderNotFound || err instanceof GeoJSONNotFound) {
@@ -137,7 +141,7 @@ class GeoStoreRouterV2 {
         }
         const data = yield CartoServiceV2.getSubnational(this.params.iso, this.params.id1, thresh);
         if (!data) {
-
+            this.throw(404, 'Location does not exist.');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
@@ -153,7 +157,7 @@ class GeoStoreRouterV2 {
         }
         const data = yield CartoServiceV2.getRegional(this.params.iso, this.params.id1, this.params.id2, thresh);
         if (!data) {
-            this.throw(404, 'Country/Admin1/Admin2 not found');
+            this.throw(404, 'Location does not exist.');
         }
         this.body = GeoJSONSerializer.serialize(data);
     }
