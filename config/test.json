@@ -4,5 +4,10 @@
         "level": "debug",
         "toFile": false,
         "dirLogFile": null
+    },
+    "mongodb":{
+        "database": "gfw_geostore_db_test",
+        "host": "mymachine",
+        "port": 27017
     }
 }

@@ -1,18 +1,24 @@
-test:
-  extends:
-    file: base.yml
-    service: base
-  ports:
-    - "3100"
-  container_name: gfw-geostore-api-test
-  environment:
-    NODE_ENV: test
-  command: test
-  links:
-    - mongo
-mongo:
-  image: mongo
-  command: --smallfiles
-  ports:
-    - "27017"
-  restart: always
+version: "3"
+services:
+  test:
+    build: .
+    ports:
+      - "3100"
+    container_name: gfw-geostore-api-test
+    environment:
+      NODE_ENV: test
+      CARTODB_USER: test
+      NODE_PATH: app/src
+      CT_URL: http://mymachine:9000
+      API_VERSION: v1
+      STAMPERY_TOKEN: token
+      MONGO_PORT_27017_TCP_ADDR: mongo
+    command: test
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    command: --smallfiles
+    ports:
+      - "27017"
+    restart: always
