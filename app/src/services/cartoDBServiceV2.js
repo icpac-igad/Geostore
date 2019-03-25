@@ -40,9 +40,9 @@ const USE = `SELECT ST_AsGeoJSON(ST_MAKEVALID(the_geom)) AS geojson, (ST_Area(ge
 const SIMPLIFIED_USE =
     `SELECT ST_Area(geography(the_geom))/10000 as area_ha, the_geom,
         CASE
-            WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e8
+            WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e8 
             THEN st_asgeojson(ST_MAKEVALID(st_simplify(the_geom, 0.1)))
-            WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e6
+            WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e6 
             THEN st_asgeojson(ST_MAKEVALID(st_simplify(the_geom, 0.005)))
             ELSE st_asgeojson(ST_MAKEVALID(the_geom))
         END AS geojson
