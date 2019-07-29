@@ -23,6 +23,7 @@ const executeThunk = function (client, sql, params) {
     };
 };
 
+
 class GeoStoreService {
 
     static getGeometryType(geojson) {
@@ -43,7 +44,7 @@ class GeoStoreService {
         try {
 
             logger.debug('GeoJSON: %s', JSON.stringify(geojson));
-
+            
             let geometry_type = GeoStoreService.getGeometryType(geojson);
             logger.debug('Geometry type: %s', JSON.stringify(geometry_type));
 
@@ -163,6 +164,19 @@ class GeoStoreService {
                 filter: data.provider.filter
             };
         }
+        let props = null;
+        const geom_type = geoStore.geojson.type || null;
+        if (geom_type && geom_type === "FeatureCollection") {
+            logger.info('Preserving FeatureCollection properties.')
+            props = geoStore.geojson.features[0].properties || null;
+        } else if(geom_type && geom_type === "Feature"){
+            logger.info('Preserving Feature properties.')
+            props = geoStore.geojson.properties || null;
+        } else{
+            logger.info('Preserving Geometry properties.')
+            props = geoStore.geojson.properties || null;
+        }
+        logger.debug('Props', JSON.stringify(props));
         if (data && data.info) {
             geoStore.info = data.info;
         }
@@ -173,10 +187,10 @@ class GeoStoreService {
 
         let geoJsonObtained = yield GeoStoreService.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
         geoStore.geojson = geoJsonObtained.geojson;
-
+        
         logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
         logger.debug('Make Feature Collection');
-        geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson);
+        geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson, props);
         logger.debug('Result', JSON.stringify(geoStore.geojson));
         logger.debug('Creating hash from geojson md5');
         geoStore.hash = md5(JSON.stringify(geoStore.geojson));
