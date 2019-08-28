@@ -8,7 +8,7 @@ const path = require('path');
 
 const {
     getTestServer
-} = require('../test-server');
+} = require('../src/test-server');
 
 
 let requester;

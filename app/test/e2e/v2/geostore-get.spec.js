@@ -3,12 +3,14 @@ const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
 
-const { getTestServer } = require('../test-server');
-const { getUUID } = require('../utils');
+const { createRequest } = require('../src/test-server');
+const { getUUID, createGeostore, ensureCorrectError } = require('../src/utils');
+const { DEFAULT_GEOJSON } = require('../src/test.constants');
 
 const should = chai.should();
 
-let requester;
+const prefix = '/api/v2/geostore/';
+let geostore;
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
@@ -22,19 +24,67 @@ describe('Geostore v2 tests - Get geostores', () => {
             throw Error(`Carto user not set - please specify a CARTODB_USER env var with it.`);
         }
 
-        requester = await getTestServer();
+        geostore = await createRequest(prefix, 'get');
 
         nock.cleanAll();
     });
 
     it('Get geostore that doesn\'t exist should return a 404', async () => {
         const randomGeostoreID = getUUID();
-        const response = await requester.get(`/api/v2/geostore/${randomGeostoreID}`).send();
+        const response = await geostore.get(randomGeostoreID);
+        ensureCorrectError(response, 'GeoStore not found', 404);
+    });
 
-        response.status.should.equal(404);
-        response.body.should.have.property('errors').and.be.an('array');
-        response.body.errors[0].should.have.property('status').and.equal(404);
-        response.body.errors[0].should.have.property('detail').and.equal('GeoStore not found');
+    it('Getting geostore should return the result (happy case)', async () => {
+        const createdGeostore = await createGeostore();
+        const response = await geostore.get(createdGeostore.hash);
+
+        response.status.should.equal(200);
+        response.body.should.instanceOf(Object).and.have.property('data');
+
+        const { data } = response.body;
+        data.id.should.equal(createdGeostore.hash);
+        data.type.should.equal('geoStore');
+        data.should.have.property('attributes').and.should.instanceOf(Object);
+        data.attributes.should.instanceOf(Object);
+
+        const { geojson, bbox, hash } = data.attributes;
+
+        const expectedGeojson = {
+            ...DEFAULT_GEOJSON,
+            crs: {},
+        };
+        delete expectedGeojson.features[0].properties;
+
+        geojson.should.deep.equal(expectedGeojson);
+        bbox.should.instanceOf(Array);
+        hash.should.equal(createdGeostore.hash);
+    });
+
+    it('Getting geostore with format esri should return the result with esrijson (happy case)', async () => {
+        const createdGeostore = await createGeostore();
+        const response = await geostore.get(createdGeostore.hash).query({ format: 'esri' });
+
+        response.status.should.equal(200);
+        response.body.should.instanceOf(Object).and.have.property('data');
+
+        const { data } = response.body;
+        data.id.should.equal(createdGeostore.hash);
+        data.type.should.equal('geoStore');
+        data.should.have.property('attributes').and.instanceOf(Object);
+
+        const { geojson, bbox, hash, esrijson } = data.attributes;
+
+        const expectedGeojson = {
+            ...DEFAULT_GEOJSON,
+            crs: {},
+        };
+        delete expectedGeojson.features[0].properties;
+
+        geojson.should.deep.equal(expectedGeojson);
+        bbox.should.instanceOf(Array);
+        hash.should.equal(createdGeostore.hash);
+        esrijson.should.deep.equal({ spatialReference: { wkid: 4326 } });
     });
 
     afterEach(() => {

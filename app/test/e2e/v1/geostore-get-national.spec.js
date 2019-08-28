@@ -4,7 +4,7 @@ const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
 
-const { getTestServer } = require('../test-server');
+const { getTestServer } = require('../src/test-server');
 
 const should = chai.should();
 
