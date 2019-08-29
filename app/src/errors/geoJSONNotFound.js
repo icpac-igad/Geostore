@@ -6,6 +6,7 @@ class GeoJSONNotFound extends Error{
         super(message);
         this.name = 'GeoJSONNotFound';
         this.message = message;
+        this.status = 404;
     }
 }
 module.exports = GeoJSONNotFound;

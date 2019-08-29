@@ -1,5 +1,5 @@
-FROM mhart/alpine-node:11.6
-MAINTAINER tiago.garcia@vizzuality.com
+FROM mhart/alpine-node:12.9
+MAINTAINER info@vizzuality.com
 
 ENV NAME gfw-geostore-api
 ENV USER microservice

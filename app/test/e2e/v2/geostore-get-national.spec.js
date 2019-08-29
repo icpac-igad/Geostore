@@ -8,8 +8,9 @@ const path = require('path');
 
 const {
     getTestServer
-} = require('../test-server');
+} = require('../utils/test-server');
 
+const should = chai.should();
 
 let requester;
 nock.disableNetConnect();
@@ -36,23 +37,23 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
             .query({
-                q: "SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('AAA')"
+                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER(\'AAA\')'
             })
             .reply(200, {
-                "rows": [],
-                "time": 0.349,
-                "fields": {
-                    "geojson": {
-                        "type": "string"
+                rows: [],
+                time: 0.349,
+                fields: {
+                    geojson: {
+                        type: 'string'
                     },
-                    "area_ha": {
-                        "type": "number"
+                    area_ha: {
+                        type: 'number'
                     },
-                    "name": {
-                        "type": "string"
+                    name: {
+                        type: 'string'
                     }
                 },
-                "total_rows": 0
+                total_rows: 0
             });
 
 
@@ -68,27 +69,27 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
             .query({
-                q: "SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('MCO')"
+                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER(\'MCO\')'
             })
             .reply(200, {
-                "rows": [{
-                    "geojson": "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[7.4134,43.7346],[7.4396,43.7492],[7.4179,43.7226],[7.4095,43.7299],[7.4134,43.7346]]]]}",
-                    "area_ha": 235.490994944,
-                    "name": "Monaco"
+                rows: [{
+                    geojson: '{"type":"MultiPolygon","coordinates":[[[[7.4134,43.7346],[7.4396,43.7492],[7.4179,43.7226],[7.4095,43.7299],[7.4134,43.7346]]]]}',
+                    area_ha: 235.490994944,
+                    name: 'Monaco'
                 }],
-                "time": 0.002,
-                "fields": {
-                    "geojson": {
-                        "type": "string"
+                time: 0.002,
+                fields: {
+                    geojson: {
+                        type: 'string'
                     },
-                    "area_ha": {
-                        "type": "number"
+                    area_ha: {
+                        type: 'number'
                     },
-                    "name": {
-                        "type": "string"
+                    name: {
+                        type: 'string'
                     }
                 },
-                "total_rows": 1
+                total_rows: 1
             });
 
 
@@ -101,13 +102,13 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
         response.body.data.should.have.property('attributes').and.be.an('object');
 
         response.body.data.attributes.should.have.property('areaHa').and.equal(200.60179285554386);
-        response.body.data.attributes.should.have.property('bbox').and.be.an("array");
-        response.body.data.attributes.should.have.property('geojson').and.be.an("object");
-        response.body.data.attributes.should.have.property('hash').and.be.a("string");
-        response.body.data.attributes.should.have.property('info').and.be.an("object");
+        response.body.data.attributes.should.have.property('bbox').and.be.an('array');
+        response.body.data.attributes.should.have.property('geojson').and.be.an('object');
+        response.body.data.attributes.should.have.property('hash').and.be.a('string');
+        response.body.data.attributes.should.have.property('info').and.be.an('object');
 
-        response.body.data.attributes.info.should.have.property('gadm').and.equal("3.6");
-        response.body.data.attributes.info.should.have.property('iso').and.equal("MCO");
+        response.body.data.attributes.info.should.have.property('gadm').and.equal('3.6');
+        response.body.data.attributes.info.should.have.property('iso').and.equal('MCO');
         response.body.data.attributes.info.should.have.property('simplifyThresh').and.equal(0.005);
         response.body.data.attributes.info.should.have.property('name');
     });
@@ -122,13 +123,13 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
         response.body.data.should.have.property('attributes').and.be.an('object');
 
         response.body.data.attributes.should.have.property('areaHa').and.equal(200.60179285554386);
-        response.body.data.attributes.should.have.property('bbox').and.be.an("array");
-        response.body.data.attributes.should.have.property('geojson').and.be.an("object");
-        response.body.data.attributes.should.have.property('hash').and.be.a("string");
-        response.body.data.attributes.should.have.property('info').and.be.an("object");
+        response.body.data.attributes.should.have.property('bbox').and.be.an('array');
+        response.body.data.attributes.should.have.property('geojson').and.be.an('object');
+        response.body.data.attributes.should.have.property('hash').and.be.a('string');
+        response.body.data.attributes.should.have.property('info').and.be.an('object');
 
-        response.body.data.attributes.info.should.have.property('gadm').and.equal("3.6");
-        response.body.data.attributes.info.should.have.property('iso').and.equal("MCO");
+        response.body.data.attributes.info.should.have.property('gadm').and.equal('3.6');
+        response.body.data.attributes.info.should.have.property('iso').and.equal('MCO');
         response.body.data.attributes.info.should.have.property('simplifyThresh').and.equal(0.005);
         response.body.data.attributes.info.should.have.property('name');
     });
@@ -136,11 +137,11 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
     it('Get complex country that exists should return a 200', async () => {
 
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`, {
-                "encodedQueryParams": true
-            })
+            encodedQueryParams: true
+        })
             .get('/api/v2/sql')
             .query({
-                "q": "SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER('USA')"
+                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER(\'USA\')'
             })
             .reply(200, JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'USA-request-one-reply.json'))), ['Server',
                 'openresty',
