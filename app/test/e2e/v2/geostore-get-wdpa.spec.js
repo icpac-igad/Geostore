@@ -1,17 +1,19 @@
-const { createGeostore, ensureCorrectError } = require('../src/utils');
-const { createRequest } = require('../src/test-server');
 const nock = require('nock');
+const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
-const { createQueryWDPA } = require('../src/queries-v2');
-const { createQueryGeometry } = require('../src/queries-v1');
-const { createMockQueryCartoDB } = require('../src/mock');
-const { MOCK_RESULT_CARTODB } = require('../src/test.constants');
+const { createRequest } = require('../utils/test-server');
+const { createGeostore, ensureCorrectError } = require('../utils/utils');
+const { createQueryWDPA } = require('../utils/queries-v2');
+const { createMockQueryCartoDB } = require('../utils/mock');
+const { MOCK_RESULT_CARTODB } = require('../utils/test.constants');
+
+const should = chai.should();
 
 const prefix = '/api/v2/geostore/wdpa/';
 let geostoreWDPA;
 
-describe("Geostore v2 tests - Getting geodata by wdpa", () => {
+describe('Geostore v2 tests - Getting geodata by wdpa', () => {
     before(async () => {
         if (process.env.NODE_ENV !== 'test') {
             throw Error(`Running the test suite with NODE_ENV ${process.env.NODE_ENV} may result in permanent data loss. Please use NODE_ENV=test.`);
@@ -21,7 +23,7 @@ describe("Geostore v2 tests - Getting geodata by wdpa", () => {
         }
 
         nock.cleanAll();
-        geostoreWDPA = await createRequest(prefix, "get");
+        geostoreWDPA = await createRequest(prefix, 'get');
     });
 
     it('Getting geodata by wdpa when data from query wdpa return empty array, and data doens\'t exist into geostore should return not found', async () => {
@@ -41,7 +43,7 @@ describe("Geostore v2 tests - Getting geodata by wdpa", () => {
         const { data } = response.body;
 
         data.id.should.equal(geostore.hash);
-        data.should.have.property("attributes");
+        data.should.have.property('attributes');
         data.attributes.should.instanceOf(Object);
 
         const { attributes } = data;
@@ -70,7 +72,7 @@ describe("Geostore v2 tests - Getting geodata by wdpa", () => {
         const { data } = response.body;
 
         data.id.should.equal(geostore.hash);
-        data.should.have.property("attributes");
+        data.should.have.property('attributes');
         data.attributes.should.instanceOf(Object);
 
         const { attributes } = data;

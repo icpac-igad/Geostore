@@ -4,11 +4,11 @@ const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
 
-const { createRequest } = require('../src/test-server');
-const { ensureCorrectError, createGeostore } = require('../src/utils');
-const { createMockQueryCartoDB } = require('../src/mock');
-const { createQueryID1, createQueryGeometry } = require('../src/queries-v1');
-const { DEFAULT_GEOJSON, MOCK_RESULT_CARTODB } = require('../src/test.constants');
+const { createRequest } = require('../utils/test-server');
+const { ensureCorrectError, createGeostore } = require('../utils/utils');
+const { createMockQueryCartoDB } = require('../utils/mock');
+const { createQueryID1, createQueryGeometry } = require('../utils/queries-v1');
+const { DEFAULT_GEOJSON, MOCK_RESULT_CARTODB } = require('../utils/test.constants');
 
 const should = chai.should();
 const prefix = '/api/v1/geostore/admin';
@@ -45,7 +45,7 @@ describe('Geostore v1 tests - Get geostore subnational by id', () => {
         const testID = 123;
         const testISO = 'TEST123';
         createMockQueryCartoDB({ query: createQueryID1(testID, testISO), rows: MOCK_RESULT_CARTODB });
-        createMockQueryCartoDB({ query: createQueryGeometry(MOCK_RESULT_CARTODB[0]["geojson"]) });
+        createMockQueryCartoDB({ query: createQueryGeometry(MOCK_RESULT_CARTODB[0].geojson) });
 
         const response = await subnational.get(`/${testISO}/${testID}`);
         ensureCorrectError(response, 'No Geojson returned', 404);
@@ -80,7 +80,10 @@ describe('Geostore v1 tests - Get geostore subnational by id', () => {
         const testID = 123;
         const testISO = 'TEST123';
         createMockQueryCartoDB({ query: createQueryID1(testID, testISO), rows: MOCK_RESULT_CARTODB });
-        createMockQueryCartoDB({ query: createQueryGeometry(MOCK_RESULT_CARTODB[0].geojson), rows: MOCK_RESULT_CARTODB });
+        createMockQueryCartoDB({
+            query: createQueryGeometry(MOCK_RESULT_CARTODB[0].geojson),
+            rows: MOCK_RESULT_CARTODB
+        });
 
         const response = await subnational.get(`/${testISO}/${testID}`);
         response.status.should.equal(200);

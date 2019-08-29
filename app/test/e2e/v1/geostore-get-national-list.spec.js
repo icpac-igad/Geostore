@@ -4,10 +4,10 @@ const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
 
-const { createRequest } = require('../src/test-server');
-const { createGeostore } = require('../src/utils');
-const { createMockQueryCartoDB } = require('../src/mock');
-const { createQueryISOName } = require('../src/queries-v1');
+const { createRequest } = require('../utils/test-server');
+const { createGeostore } = require('../utils/utils');
+const { createMockQueryCartoDB } = require('../utils/mock');
+const { createQueryISOName } = require('../utils/queries-v1');
 
 const should = chai.should();
 const prefix = '/api/v1/geostore/admin/list';
@@ -33,8 +33,8 @@ describe('Geostore v1 tests - Get list geostore national', () => {
 
     it('Getting list national geostore should return empty list error (happy case)', async () => {
         const isoDATA = [{ info: { iso: 'foo' } }, { info: { iso: 'bar' } }];
-        const geostores = await Promise.all([ createGeostore(isoDATA[0]), createGeostore(isoDATA[1]) ]);
-        createMockQueryCartoDB({ query: createQueryISOName("('BAR', 'FOO')") });
+        const geostores = await Promise.all([createGeostore(isoDATA[0]), createGeostore(isoDATA[1])]);
+        createMockQueryCartoDB({ query: createQueryISOName('(\'BAR\', \'FOO\')') });
 
         const response = await listNational.get();
         response.status.should.equal(200);
@@ -43,7 +43,7 @@ describe('Geostore v1 tests - Get list geostore national', () => {
 
         const { data } = response.body;
         data.should.lengthOf(geostores.length);
-        geostores.reverse().map((geo, key) => {
+        geostores.reverse().forEach((geo, key) => {
             data[key].iso.should.equal(geo.info.iso);
             data[key].geostoreId.should.equal(geo.hash);
         });

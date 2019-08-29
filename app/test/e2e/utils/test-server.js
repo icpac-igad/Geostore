@@ -1,9 +1,10 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const nock = require('nock');
 
 let requester;
-let createdServer
+let createdServer;
 
 chai.use(chaiHttp);
 

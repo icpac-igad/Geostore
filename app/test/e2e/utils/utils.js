@@ -1,6 +1,6 @@
-const GeoStore = require('models/geoStore')
-const { DEFAULT_GEOJSON } = require('./test.constants');
+const GeoStore = require('models/geoStore');
 const md5 = require('md5');
+const { DEFAULT_GEOJSON } = require('./test.constants');
 
 const getUUID = () => Math.random().toString(36).substring(7);
 
@@ -13,7 +13,7 @@ const ensureCorrectError = ({ body, status }, errMessage, expectedStatus) => {
 
 const createGeostore = (additionalData = {}, data = DEFAULT_GEOJSON) => new GeoStore({
     geojson: data,
-    hash:  md5(JSON.stringify(data) + getUUID()),
+    hash: md5(JSON.stringify(data) + getUUID()),
     ...additionalData
 }).save();
 

@@ -1,14 +1,17 @@
-const { createGeostore, ensureCorrectError } = require('../src/utils');
-const { createRequest } = require('../src/test-server');
 const nock = require('nock');
+const chai = require('chai');
 const config = require('config');
 const GeoStore = require('models/geoStore');
-const { DEFAULT_GEOJSON } = require('../src/test.constants');
+const { createRequest } = require('../utils/test-server');
+const { createGeostore, ensureCorrectError } = require('../utils/utils');
+const { DEFAULT_GEOJSON } = require('../utils/test.constants');
+
+const should = chai.should();
 
 const prefix = '/api/v2/geostore';
 let geostoreWDPA;
 
-describe("Geostore v2 tests - Getting geodata by wdpa", () => {
+describe('Geostore v2 tests - Getting geodata by wdpa', () => {
     before(async () => {
         if (process.env.NODE_ENV !== 'test') {
             throw Error(`Running the test suite with NODE_ENV ${process.env.NODE_ENV} may result in permanent data loss. Please use NODE_ENV=test.`);
@@ -18,7 +21,7 @@ describe("Geostore v2 tests - Getting geodata by wdpa", () => {
         }
 
         nock.cleanAll();
-        geostoreWDPA = await createRequest(prefix, "get");
+        geostoreWDPA = await createRequest(prefix, 'get');
     });
 
     it('Getting geodata by wdpa when data doens\'t exist into geostore should return not found', async () => {
@@ -31,6 +34,7 @@ describe("Geostore v2 tests - Getting geodata by wdpa", () => {
         const response = await geostoreWDPA.get(`/${createdGeostore.hash}/view`);
         response.status.should.equal(200);
         response.body.should.instanceOf(Object).and.have.property('view_link');
+        // eslint-disable-next-line camelcase
         const { view_link } = response.body;
         const expectedGEOJSON = {
             features: [{
@@ -42,8 +46,9 @@ describe("Geostore v2 tests - Getting geodata by wdpa", () => {
             type: DEFAULT_GEOJSON.type
         };
 
-        view_link.should.equal('http://geojson.io/' + ('#data=data:application/json,' + encodeURIComponent(
-            JSON.stringify(expectedGEOJSON))))
+        view_link.should.equal(`http://geojson.io/#data=data:application/json,${encodeURIComponent(
+            JSON.stringify(expectedGEOJSON)
+        )}`);
     });
 
     afterEach(async () => {

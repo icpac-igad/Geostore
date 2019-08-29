@@ -1,5 +1,4 @@
-const createQueryWDPA = (wdpa_id) =>
-    `SELECT ST_AsGeoJSON(ST_MAKEVALID(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
+const createQueryWDPA = wdpaId => `SELECT ST_AsGeoJSON(ST_MAKEVALID(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha
         FROM (
           SELECT CASE
           WHEN marine::numeric = 2 THEN NULL
@@ -8,7 +7,7 @@ const createQueryWDPA = (wdpa_id) =>
             ELSE ST_RemoveRepeatedPoints(the_geom, 0.005)
             END AS the_geom
           FROM wdpa_protected_areas
-          WHERE wdpaid=${wdpa_id}
+          WHERE wdpaid=${wdpaId}
         ) p`;
 
 module.exports = { createQueryWDPA };

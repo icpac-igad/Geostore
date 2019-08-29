@@ -3,9 +3,9 @@ const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
 
-const { createRequest } = require('../src/test-server');
-const { getUUID, createGeostore, ensureCorrectError } = require('../src/utils');
-const { DEFAULT_GEOJSON } = require('../src/test.constants');
+const { createRequest } = require('../utils/test-server');
+const { getUUID, createGeostore, ensureCorrectError } = require('../utils/utils');
+const { DEFAULT_GEOJSON } = require('../utils/test.constants');
 
 const should = chai.should();
 
@@ -73,7 +73,9 @@ describe('Geostore v2 tests - Get geostores', () => {
         data.type.should.equal('geoStore');
         data.should.have.property('attributes').and.instanceOf(Object);
 
-        const { geojson, bbox, hash, esrijson } = data.attributes;
+        const {
+            geojson, bbox, hash, esrijson
+        } = data.attributes;
 
         const expectedGeojson = {
             ...DEFAULT_GEOJSON,
@@ -91,8 +93,5 @@ describe('Geostore v2 tests - Get geostores', () => {
         if (!nock.isDone()) {
             throw new Error(`Not all nock interceptors were used: ${nock.pendingMocks()}`);
         }
-    });
-
-    after(() => {
     });
 });
