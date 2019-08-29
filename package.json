@@ -23,7 +23,11 @@
     "javascript",
     "koa"
   ],
-  "author": "rrequero",
+  "author": {
+    "name": "Vizzuality",
+    "email": "hello@vizzuality.com",
+    "url": "http://vizzuality.com/"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/gfw-api/gfw-geostore-api/issues"
@@ -50,7 +54,7 @@
     "koa-validate": "0.2.11",
     "md5": "2.1.0",
     "mongoose": "4.13.2",
-    "sleep": "^5.2.3",
+    "sleep": "^6.1.0",
     "turf": "^3.0.11"
   },
   "devDependencies": {
