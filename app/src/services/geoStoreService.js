@@ -15,9 +15,9 @@ const CARTO_PROVIDER = 'carto';
 
 const executeThunk = function (client, sql, params) {
     return function (callback) {
-        client.execute(sql, params).done(function (data) {
+        client.execute(sql, params).done((data) => {
             callback(null, data);
-        }).error(function (err) {
+        }).error((err) => {
             callback(err[0], null);
         });
     };
@@ -29,11 +29,11 @@ class GeoStoreService {
         logger.debug('Get geometry type');
         logger.debug('Geometry type: %s', geojson.type);
 
-        if (geojson.type === "Point" || geojson.type === "MultiPoint") {
+        if (geojson.type === 'Point' || geojson.type === 'MultiPoint') {
             return 1;
-        } else if (geojson.type === "LineString" || geojson.type === "MultiLineString") {
+        } if (geojson.type === 'LineString' || geojson.type === 'MultiLineString') {
             return 2;
-        } else if (geojson.type === "Polygon" || geojson.type === "MultiPolygon") {
+        } if (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon') {
             return 3;
         }
         throw new UnknownGeometry(`Unknown geometry type: ${geojson.type}`);
@@ -44,21 +44,21 @@ class GeoStoreService {
 
             logger.debug('GeoJSON: %s', JSON.stringify(geojson));
 
-            let geometry_type = GeoStoreService.getGeometryType(geojson);
+            const geometry_type = GeoStoreService.getGeometryType(geojson);
             logger.debug('Geometry type: %s', JSON.stringify(geometry_type));
 
             logger.debug('Repair geoJSON geometry');
             logger.debug('Generating query');
-            let sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometry_type})) as geojson`;
+            const sql = `SELECT ST_AsGeoJson(ST_CollectionExtract(st_MakeValid(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}')),${geometry_type})) as geojson`;
 
             if (process.env.NODE_ENV !== 'test' || sql.length < 2000) {
                 logger.debug('SQL to repair geojson: %s', sql);
             }
 
-            let client = new CartoDB.SQL({
+            const client = new CartoDB.SQL({
                 user: config.get('cartoDB.user')
             });
-            let data = yield executeThunk(client, sql, {});
+            const data = yield executeThunk(client, sql, {});
             if (data.rows && data.rows.length === 1) {
                 data.rows[0].geojson = JSON.parse(data.rows[0].geojson);
                 logger.debug(data.rows[0].geojson);
@@ -74,12 +74,12 @@ class GeoStoreService {
     static* obtainGeoJSONOfCarto(table, user, filter) {
         logger.debug('Obtaining geojson with params: table %s, user %s, filter %s', table, user, filter);
         logger.debug('Generating query');
-        let sql = `SELECT ST_AsGeoJson(the_geom) as geojson, (ST_Area(geography(the_geom))/10000) as area_ha FROM ${table} WHERE ${filter}`;
+        const sql = `SELECT ST_AsGeoJson(the_geom) as geojson, (ST_Area(geography(the_geom))/10000) as area_ha FROM ${table} WHERE ${filter}`;
         logger.debug('SQL to obtain geojson: %s', sql);
-        let client = new CartoDB.SQL({
-            user: user
+        const client = new CartoDB.SQL({
+            user
         });
-        let data = yield executeThunk(client, sql, {});
+        const data = yield executeThunk(client, sql, {});
         if (data.rows && data.rows.length === 1) {
             data.rows[0].geojson = JSON.parse(data.rows[0].geojson);
             logger.debug(data.rows[0].geojson);
@@ -89,7 +89,7 @@ class GeoStoreService {
     }
 
     static* getNewHash(hash) {
-        let idCon = yield IdConnection.findOne({ oldId: hash }).exec();
+        const idCon = yield IdConnection.findOne({ oldId: hash }).exec();
         if (!idCon) {
             return hash;
         }
@@ -98,9 +98,9 @@ class GeoStoreService {
 
     static* getGeostoreById(id) {
         logger.debug(`Getting geostore by id ${id}`);
-        let hash = yield GeoStoreService.getNewHash(id);
+        const hash = yield GeoStoreService.getNewHash(id);
         logger.debug('hash', hash);
-        let geoStore = yield GeoStore.findOne({ hash: hash }, { 'geojson._id': 0, 'geojson.features._id': 0 });
+        const geoStore = yield GeoStore.findOne({ hash }, { 'geojson._id': 0, 'geojson.features._id': 0 });
         if (geoStore) {
             logger.debug('geostore', JSON.stringify(geoStore.geojson));
             return geoStore;
@@ -131,11 +131,13 @@ class GeoStoreService {
     static* obtainGeoJSON(provider) {
         logger.debug('Obtaining geojson of provider', provider);
         switch (provider.type) {
+
             case CARTO_PROVIDER:
                 return yield GeoStoreService.obtainGeoJSONOfCarto(provider.table, provider.user, provider.filter);
             default:
                 logger.error('Provider not found');
                 throw new ProviderNotFound(`Provider ${provider.type} not found`);
+
         }
     }
 
@@ -148,12 +150,12 @@ class GeoStoreService {
 
     static* saveGeostore(geojson, data) {
 
-        let geoStore = {
-            geojson: geojson
+        const geoStore = {
+            geojson
         };
 
         if (data && data.provider) {
-            let geoJsonObtained = yield GeoStoreService.obtainGeoJSON(data.provider);
+            const geoJsonObtained = yield GeoStoreService.obtainGeoJSON(data.provider);
             geoStore.geojson = geoJsonObtained.geojson;
             geoStore.areaHa = geoJsonObtained.area_ha;
             geoStore.provider = {
@@ -171,7 +173,7 @@ class GeoStoreService {
         logger.debug('Fix and convert geojson');
         logger.debug('Converting', JSON.stringify(geoStore.geojson));
 
-        let geoJsonObtained = yield GeoStoreService.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
+        const geoJsonObtained = yield GeoStoreService.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
         geoStore.geojson = geoJsonObtained.geojson;
 
         logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
@@ -183,7 +185,7 @@ class GeoStoreService {
         if (geoStore.areaHa === undefined) {
             geoStore.areaHa = turf.area(geoStore.geojson) / 10000; // convert to ha2
         }
-        let exist = yield GeoStore.findOne({
+        const exist = yield GeoStore.findOne({
             hash: geoStore.hash
         });
         if (!geoStore.bbox) {
@@ -206,12 +208,12 @@ class GeoStoreService {
 
     static* calculateArea(geojson, data) {
 
-        let geoStore = {
-            geojson: geojson
+        const geoStore = {
+            geojson
         };
 
         if (data && data.provider) {
-            let geoJsonObtained = yield GeoStoreService.obtainGeoJSON(data.provider);
+            const geoJsonObtained = yield GeoStoreService.obtainGeoJSON(data.provider);
             geoStore.geojson = geoJsonObtained.geojson;
             geoStore.areaHa = geoJsonObtained.area_ha;
         }

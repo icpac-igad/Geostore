@@ -1,37 +1,38 @@
-'use strict';
-var config = require('config');
-var sleep = require('co-sleep');
-var request = require('co-request');
-var logger = require('logger');
-var co = require('co');
-var md5 = require('md5');
-var turf = require('turf');
-var mongoose = require('mongoose');
-var GeoJSONConverter = require('converters/geoJSONConverter');
-var geojsonhint = require('geojsonhint');
-var uriMigrate = process.env.MIGRATE_URI || config.get('migrate.uri');
-var mongoUri = process.env.MONGO_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
 
-let GeoStore = require('models/geoStore');
-let IdConnection = require('models/idConnection');
+const config = require('config');
+const sleep = require('co-sleep');
+const request = require('co-request');
+const logger = require('logger');
+const co = require('co');
+const md5 = require('md5');
+const turf = require('turf');
+const mongoose = require('mongoose');
+const GeoJSONConverter = require('converters/geoJSONConverter');
+const geojsonhint = require('geojsonhint');
 
-var obtainData = function*(cursor) {
+const uriMigrate = process.env.MIGRATE_URI || config.get('migrate.uri');
+const mongoUri = process.env.MONGO_URI || `mongodb://${config.get('mongodb.host')}:${config.get('mongodb.port')}/${config.get('mongodb.database')}`;
+
+const GeoStore = require('models/geoStore');
+const IdConnection = require('models/idConnection');
+
+const obtainData = function* (cursor) {
     let url = uriMigrate;
     if (cursor) {
-        url += '?cursor=' + cursor;
+        url += `?cursor=${cursor}`;
     }
     logger.debug('Doing request to ', url);
-    var response = yield request({
-        url: url,
+    let response = yield request({
+        url,
         method: 'GET',
         json: true
     });
-    if(response.statusCode !== 200){
+    if (response.statusCode !== 200) {
         logger.error(response);
         logger.info('Waiting 5 seconds and trying');
         yield sleep(5000);
         response = yield request({
-            url: url,
+            url,
             method: 'GET',
             json: true
         });
@@ -69,8 +70,8 @@ var obtainData = function*(cursor) {
 //     }
 //     return el;
 // }
-var checkIfExist = function*(id) {
-    var result = yield IdConnection.find({
+const checkIfExist = function* (id) {
+    const result = yield IdConnection.find({
         oldId: id
     }).exec();
     if (result && result.length > 0) {
@@ -79,13 +80,13 @@ var checkIfExist = function*(id) {
     return false;
 };
 
-var saveData = function*(element) {
+const saveData = function* (element) {
     logger.debug('Saving element');
     try {
         logger.debug('Checking if exist id', element.id);
-        let exist = yield checkIfExist(element.id);
+        const exist = yield checkIfExist(element.id);
         if (!exist) {
-            var model = yield new GeoStore({
+            const model = yield new GeoStore({
                 areaHa: turf.area(element.geojson) / 10000,
                 geojson: element.geojson,
                 hash: md5(JSON.stringify(element.geojson))
@@ -104,16 +105,17 @@ var saveData = function*(element) {
     logger.debug('Saved');
 };
 
-var transformAndSaveData = function*(data) {
+const transformAndSaveData = function* (data) {
     logger.debug('Transforming data with data', data);
-    let newData = [];
-    let geojson, result, geoData = null;
-    let length = data.length;
+    const newData = [];
+    let geojson; let result; let
+        geoData = null;
+    const { length } = data;
     for (let i = 0; i < length; i++) {
         logger.debug('Transforming element');
         result = null;
         geoData = data[i];
-        if(geoData){
+        if (geoData) {
             try {
                 if (data[i].next_id) {
                     logger.debug('Contain next_id');
@@ -123,7 +125,7 @@ var transformAndSaveData = function*(data) {
                     logger.debug('checking');
                     geojson = geoData.geojson;
                     logger.debug('Correct JSON');
-                    let result = geojsonhint.hint(geojson);
+                    const result = geojsonhint.hint(geojson);
                     if (!result || result.length === 0) {
                         yield saveData({
                             id: geoData.id,
@@ -143,27 +145,28 @@ var transformAndSaveData = function*(data) {
 };
 
 
-var migrate = function*() {
+const migrate = function* () {
     logger.debug('Connecting to database');
-    var data = yield obtainData();
+    let data = yield obtainData();
 
     while (data) {
         logger.debug('Obtained data');
 
-        let element = null;
-        let model, idConn = null;
+        const element = null;
+        let model; const
+            idConn = null;
         yield transformAndSaveData(data.geostore);
-        if(data.cursor){
+        if (data.cursor) {
             data = yield obtainData(data.cursor);
-        } else {
+        } else {
             data = null;
         }
     }
 
     logger.debug('Finished migration');
 };
-var onDbReady = function() {
-    co(function*() {
+const onDbReady = function () {
+    co(function* () {
         logger.info('Starting migration');
 
         yield migrate();

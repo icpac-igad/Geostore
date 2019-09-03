@@ -1,11 +1,12 @@
-'use strict';
 
-class CoverageDuplicated extends Error{
+class CoverageDuplicated extends Error {
 
-    constructor(message){
+    constructor(message) {
         super(message);
         this.name = 'CoverageDuplicated';
         this.message = message;
     }
+
 }
+
 module.exports = CoverageDuplicated;

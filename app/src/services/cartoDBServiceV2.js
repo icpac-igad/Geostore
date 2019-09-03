@@ -37,8 +37,7 @@ const USE = `SELECT ST_AsGeoJSON(ST_MAKEVALID(the_geom)) AS geojson, (ST_Area(ge
         FROM {{use}}
         WHERE cartodb_id = {{id}}`;
 
-const SIMPLIFIED_USE =
-    `SELECT ST_Area(geography(the_geom))/10000 as area_ha, the_geom,
+const SIMPLIFIED_USE = `SELECT ST_Area(geography(the_geom))/10000 as area_ha, the_geom,
         CASE
             WHEN (ST_Area(geography(the_geom))/10000)::numeric > 1e8 
             THEN st_asgeojson(ST_MAKEVALID(st_simplify(the_geom, 0.1)))
@@ -54,9 +53,9 @@ const executeThunk = function (client, sql, params, thresh) {
         sql = sql.replace('{geom}', thresh ? `ST_Simplify(the_geom, ${thresh})` : 'the_geom')
             .replace('{geom}', thresh ? `ST_Simplify(the_geom, ${thresh})` : 'the_geom');
         logger.debug(Mustache.render(sql, params, thresh));
-        client.execute(sql, params).done(function (data) {
+        client.execute(sql, params).done((data) => {
             callback(null, data);
-        }).error(function (err) {
+        }).error((err) => {
             callback(err, null);
         });
     };
@@ -70,12 +69,12 @@ const deserializer = function (obj) {
 
 const parseSimplifyGeom = function (iso, id1, id2) {
     const bigCountries = ['USA', 'RUS', 'CAN', 'CHN', 'BRA', 'IDN'];
-    let baseThresh = bigCountries.includes(iso) ? 0.1 : 0.005;
+    const baseThresh = bigCountries.includes(iso) ? 0.1 : 0.005;
     if (iso && !id1 && !id2) {
         return baseThresh;
-    } else {
-        return id1 && !id2 ? baseThresh / 10 : baseThresh / 100;
     }
+    return id1 && !id2 ? baseThresh / 10 : baseThresh / 100;
+
 };
 
 
@@ -89,8 +88,8 @@ class CartoDBServiceV2 {
 
     * getNational(iso, thresh) {
         logger.debug('Request %s to carto', iso);
-        let params = {
-            'iso': iso.toUpperCase()
+        const params = {
+            iso: iso.toUpperCase()
         };
 
         if (!thresh) {
@@ -109,9 +108,9 @@ class CartoDBServiceV2 {
             return existingGeo;
         }
 
-        let data = yield executeThunk(this.client, ISO, params, thresh);
+        const data = yield executeThunk(this.client, ISO, params, thresh);
         if (data.rows && data.rows.length > 0) {
-            let result = data.rows[0];
+            const result = data.rows[0];
             logger.debug('Saving national geostore');
             const geoData = {
                 info: {
@@ -131,21 +130,17 @@ class CartoDBServiceV2 {
     * getNationalList() {
         logger.debug('Request national list names from carto');
         const countryList = yield GeoStoreServiceV2.getNationalList();
-        const iso_values_map = countryList.map(el => {
-            return el.info.iso;
-        });
+        const iso_values_map = countryList.map((el) => el.info.iso);
         let iso_values = '';
-        iso_values_map.forEach(el => {
+        iso_values_map.forEach((el) => {
             iso_values += `'${el.toUpperCase()}', `;
         });
         iso_values = `(${iso_values.substr(0, iso_values.length - 2)})`;
-        let data = yield executeThunk(this.client, ISO_NAME + iso_values);
+        const data = yield executeThunk(this.client, ISO_NAME + iso_values);
         if (data.rows && data.rows.length > 0) {
             logger.debug('Adding Country names');
-            countryList.forEach(countryListElement => {
-                let idx = data.rows.findIndex(el => {
-                    return el.iso.toUpperCase() === countryListElement.info.iso.toUpperCase();
-                });
+            countryList.forEach((countryListElement) => {
+                const idx = data.rows.findIndex((el) => el.iso.toUpperCase() === countryListElement.info.iso.toUpperCase());
                 if (idx > -1) {
                     countryListElement.name = data.rows[idx].name;
                     data.rows.splice(idx, 1);
@@ -158,7 +153,7 @@ class CartoDBServiceV2 {
 
     * getSubnational(iso, id1, thresh) {
         logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
-        let params = {
+        const params = {
             id1: `${iso.toUpperCase()}.${parseInt(id1, 10)}_1`
         };
 
@@ -166,9 +161,9 @@ class CartoDBServiceV2 {
             thresh = parseSimplifyGeom(iso, id1);
         }
         const query = {
-          'info.iso': iso.toUpperCase(),
-          'info.id1': id1,
-          'info.simplifyThresh': thresh
+            'info.iso': iso.toUpperCase(),
+            'info.id1': id1,
+            'info.simplifyThresh': thresh
         };
 
         logger.debug('Checking existing subnational geo');
@@ -179,11 +174,11 @@ class CartoDBServiceV2 {
             return existingGeo;
         }
 
-        let data = yield executeThunk(this.client, ID1, params, thresh);
+        const data = yield executeThunk(this.client, ID1, params, thresh);
         logger.debug('Request subnational to carto');
         if (data.rows && data.rows.length > 0) {
             logger.debug('Return subnational geojson from carto');
-            let result = data.rows[0];
+            const result = data.rows[0];
             logger.debug('Saving national geostore');
             const geoData = {
                 info: {
@@ -202,7 +197,7 @@ class CartoDBServiceV2 {
 
     * getRegional(iso, id1, id2, thresh) {
         logger.debug('Obtaining admin2 of iso %s, id1 and id2', iso, id1, id2);
-        let params = {
+        const params = {
             id2: `${iso.toUpperCase()}.${parseInt(id1, 10)}.${parseInt(id2, 10)}_1`
         };
 
@@ -210,10 +205,10 @@ class CartoDBServiceV2 {
             thresh = parseSimplifyGeom(iso, id1, id2);
         }
         const query = {
-          'info.iso': iso.toUpperCase(),
-          'info.id1': id1,
-          'info.id2': id2,
-          'info.simplifyThresh': thresh
+            'info.iso': iso.toUpperCase(),
+            'info.id1': id1,
+            'info.id2': id2,
+            'info.simplifyThresh': thresh
         };
 
         logger.debug('Checking existing admin2 geostore');
@@ -225,10 +220,10 @@ class CartoDBServiceV2 {
         }
 
         logger.debug('Request admin2 shape from Carto');
-        let data = yield executeThunk(this.client, ID2, params, thresh);
+        const data = yield executeThunk(this.client, ID2, params, thresh);
         if (data.rows && data.rows.length > 0) {
             logger.debug('Return admin2 geojson from Carto');
-            let result = data.rows[0];
+            const result = data.rows[0];
             logger.debug('Saving admin2 geostore');
             const geoData = {
                 info: {
@@ -248,13 +243,13 @@ class CartoDBServiceV2 {
 
     * getUse(use, id, thresh) {
         logger.debug('Obtaining use with id %s', id);
-        let params = {
-            use: use,
+        const params = {
+            use,
             id: parseInt(id, 10)
         };
-        let info = {
+        const info = {
             use: params,
-            simplify: thresh ? true : false
+            simplify: !!thresh
         };
 
         logger.debug('Checking existing use geo', info);
@@ -268,13 +263,13 @@ class CartoDBServiceV2 {
         const USE_SQL = thresh ? SIMPLIFIED_USE : USE;
 
         logger.debug('Request use to carto');
-        let data = yield executeThunk(this.client, USE_SQL, params);
+        const data = yield executeThunk(this.client, USE_SQL, params);
 
         if (data.rows && data.rows.length > 0) {
-            let result = data.rows[0];
+            const result = data.rows[0];
             logger.debug('Saving use geostore');
             const geoData = {
-                info: info
+                info
             };
             existingGeo = yield GeoStoreServiceV2.saveGeostore(JSON.parse(result.geojson), geoData);
             logger.debug('Return use geojson from carto');
@@ -286,7 +281,7 @@ class CartoDBServiceV2 {
     * getWdpa(wdpaid) {
         logger.debug('Obtaining wpda of id %s', wdpaid);
 
-        let params = {
+        const params = {
             wdpaid: parseInt(wdpaid, 10)
         };
 
@@ -299,9 +294,9 @@ class CartoDBServiceV2 {
         }
 
         logger.debug('Request wdpa to carto');
-        let data = yield executeThunk(this.client, WDPA, params);
+        const data = yield executeThunk(this.client, WDPA, params);
         if (data.rows && data.rows.length > 0) {
-            let result = data.rows[0];
+            const result = data.rows[0];
             logger.debug('Saving national geostore');
             const geoData = {
                 info: params
@@ -315,8 +310,8 @@ class CartoDBServiceV2 {
 
     * getGeostore(hashGeoStore) {
         logger.debug('Obtaining geostore with hash %s', hashGeoStore);
-        let result = yield require('vizz.microservice-client').requestToMicroservice({
-            uri: '/geostore/' + hashGeoStore,
+        const result = yield require('vizz.microservice-client').requestToMicroservice({
+            uri: `/geostore/${hashGeoStore}`,
             method: 'GET',
             json: true
         });
@@ -325,12 +320,13 @@ class CartoDBServiceV2 {
             console.error(result);
             return null;
         }
-        let geostore = yield deserializer(result.body);
+        const geostore = yield deserializer(result.body);
         if (geostore) {
             return geostore;
         }
         return null;
     }
+
 }
 
 module.exports = new CartoDBServiceV2();

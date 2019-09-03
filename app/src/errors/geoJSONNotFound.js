@@ -1,12 +1,13 @@
-'use strict';
 
-class GeoJSONNotFound extends Error{
+class GeoJSONNotFound extends Error {
 
-    constructor(message){
+    constructor(message) {
         super(message);
         this.name = 'GeoJSONNotFound';
         this.message = message;
         this.status = 404;
     }
+
 }
+
 module.exports = GeoJSONNotFound;

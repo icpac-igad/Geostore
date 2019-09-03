@@ -1,21 +1,21 @@
-'use strict';
 
-var logger = require('logger');
-var JSONAPISerializer = require('jsonapi-serializer').Serializer;
-var geoStoreSerializer = new JSONAPISerializer('geoStore', {
+const logger = require('logger');
+const JSONAPISerializer = require('jsonapi-serializer').Serializer;
+
+const geoStoreSerializer = new JSONAPISerializer('geoStore', {
     attributes: ['geojson', 'hash', 'provider', 'areaHa', 'bbox', 'lock', 'esrijson', 'info'],
     id: 'hash',
 
-    geojson:{
-        attributes:['type', 'features', 'crs']
+    geojson: {
+        attributes: ['type', 'features', 'crs']
     },
-    esrijson:{
-        attributes:['rings', 'spatialReference']
+    esrijson: {
+        attributes: ['rings', 'spatialReference']
     },
-    provider:{
+    provider: {
         attributes: ['type', 'table', 'user', 'filter']
     },
-    typeForAttribute: function (attribute, record) {
+    typeForAttribute(attribute, record) {
         return attribute;
     },
     keyForAttribute: 'camelCase'
@@ -23,9 +23,10 @@ var geoStoreSerializer = new JSONAPISerializer('geoStore', {
 
 class GeoStoreSerializer {
 
-  static serialize(data) {
-    return geoStoreSerializer.serialize(data);
-  }
+    static serialize(data) {
+        return geoStoreSerializer.serialize(data);
+    }
+
 }
 
 module.exports = GeoStoreSerializer;

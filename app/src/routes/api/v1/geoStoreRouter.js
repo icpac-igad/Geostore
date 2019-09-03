@@ -9,8 +9,8 @@ const GeoStoreService = require('services/geoStoreService');
 const GeoJsonIOService = require('services/geoJsonIOService');
 const ProviderNotFound = require('errors/providerNotFound');
 const GeoJSONNotFound = require('errors/geoJSONNotFound');
-const geojsonToArcGIS = require('arcgis-to-geojson-utils').geojsonToArcGIS;
-const arcgisToGeoJSON = require('arcgis-to-geojson-utils').arcgisToGeoJSON;
+const { geojsonToArcGIS } = require('arcgis-to-geojson-utils');
+const { arcgisToGeoJSON } = require('arcgis-to-geojson-utils');
 
 const router = new Router({
     prefix: '/geostore'
@@ -56,7 +56,7 @@ class GeoStoreRouter {
                 this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
             }
 
-            let geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
+            const geostore = yield GeoStoreService.saveGeostore(this.request.body.geojson, data);
             if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
                 logger.debug(JSON.stringify(geostore.geojson));
             }
@@ -86,7 +86,7 @@ class GeoStoreRouter {
             if (this.request.body.esrijson) {
                 this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
             }
-            let geostore = yield GeoStoreService.calculateArea(this.request.body.geojson, data);
+            const geostore = yield GeoStoreService.calculateArea(this.request.body.geojson, data);
             if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
                 logger.debug(JSON.stringify(geostore.geojson));
             }
@@ -140,6 +140,7 @@ class GeoStoreRouter {
         logger.info('Obtaining use data with name %s and id %s', this.params.name, this.params.id);
         let useTable = null;
         switch (this.params.name) {
+
             case 'mining':
                 useTable = 'gfw_mining';
                 break;
@@ -160,6 +161,7 @@ class GeoStoreRouter {
                 break;
             default:
                 useTable = this.params.name;
+
         }
         if (!useTable) {
             this.throw(404, 'Name not found');
@@ -185,7 +187,7 @@ class GeoStoreRouter {
         this.assert(this.params.hash, 400, 'Hash param not found');
         logger.debug('Getting geostore by hash %s', this.params.hash);
 
-        let geoStore = yield GeoStoreService.getGeostoreById(this.params.hash);
+        const geoStore = yield GeoStoreService.getGeostoreById(this.params.hash);
 
         if (!geoStore) {
             this.throw(404, 'GeoStore not found');
@@ -193,10 +195,11 @@ class GeoStoreRouter {
         }
         logger.debug('GeoStore found. Returning...');
 
-        let geojsonIoPath = yield GeoJsonIOService.view(geoStore.geojson);
-        this.body = { 'view_link': geojsonIoPath };
+        const geojsonIoPath = yield GeoJsonIOService.view(geoStore.geojson);
+        this.body = { view_link: geojsonIoPath };
 
     }
+
 }
 
 router.get('/:hash', GeoStoreRouter.getGeoStoreById);
