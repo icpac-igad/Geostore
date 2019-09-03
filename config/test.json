@@ -1,13 +1,13 @@
 {
-    "logger": {
-        "name": "gfw-geostore-api-TEST",
-        "level": "debug",
-        "toFile": false,
-        "dirLogFile": null
-    },
-    "mongodb":{
-        "database": "gfw_geostore_db_test",
-        "host": "mymachine",
-        "port": 27017
-    }
+  "logger": {
+    "name": "gfw-geostore-api-TEST",
+    "level": "debug",
+    "toFile": false,
+    "dirLogFile": null
+  },
+  "mongodb": {
+    "database": "gfw_geostore_db_test",
+    "host": "mymachine",
+    "port": 27017
+  }
 }

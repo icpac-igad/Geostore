@@ -7,7 +7,8 @@ const loader = require('loader');
 const validate = require('koa-validate');
 const mongoose = require('mongoose');
 const ErrorSerializer = require('serializers/errorSerializer');
-const mongoUri = process.env.MONGO_URI || 'mongodb://' + config.get('mongodb.host') + ':' + config.get('mongodb.port') + '/' + config.get('mongodb.database');
+
+const mongoUri = process.env.MONGO_URI || `mongodb://${config.get('mongodb.host')}:${config.get('mongodb.port')}/${config.get('mongodb.database')}`;
 const ctRegisterMicroservice = require('ct-register-microservice-node');
 const sleep = require('sleep');
 
@@ -37,7 +38,7 @@ async function init() {
             // instance of koa
             const app = koa();
 
-            //if environment is dev then load koa-logger
+            // if environment is dev then load koa-logger
             if (process.env.NODE_ENV === 'dev') {
                 app.use(koaLogger());
             }
@@ -46,7 +47,7 @@ async function init() {
                 jsonLimit: '50mb'
             }));
 
-            //catch errors and send in jsonapi standard. Always return vnd.api+json
+            // catch errors and send in jsonapi standard. Always return vnd.api+json
             app.use(function* (next) {
                 try {
                     yield next;
@@ -67,14 +68,14 @@ async function init() {
                 this.response.type = 'application/vnd.api+json';
             });
 
-            //load custom validator
+            // load custom validator
             require('validators/geoJSONValidator');
             app.use(validate());
 
-            //load routes
+            // load routes
             loader.loadRoutes(app);
 
-            //Instance of http module
+            // Instance of http module
             // const app = require('http').Server(app.callback());
 
 
@@ -82,7 +83,7 @@ async function init() {
             // In production environment, the port must be declared in environment variable
             const port = process.env.PORT || config.get('service.port');
 
-            const server = app.listen(port, function () {
+            const server = app.listen(port, () => {
                 ctRegisterMicroservice.register({
                     info: require('../microservice/register.json'),
                     swagger: require('../microservice/public-swagger.json'),
@@ -103,9 +104,9 @@ async function init() {
                 });
             });
 
-            logger.info('Server started in port:' + port);
+            logger.info(`Server started in port:${port}`);
 
-        };
+        }
 
 
         logger.info(`Connecting to MongoDB URL ${mongoUri}`);

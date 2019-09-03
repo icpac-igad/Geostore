@@ -1,9 +1,11 @@
-class UnknownGeometry extends Error{
+class UnknownGeometry extends Error {
 
-    constructor(message){
+    constructor(message) {
         super(message);
         this.name = 'UnknownGeometry';
         this.message = message;
     }
+
 }
+
 module.exports = UnknownGeometry;

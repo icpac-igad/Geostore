@@ -1,10 +1,10 @@
-'use strict';
 
-var logger = require('logger');
-var JSONAPISerializer = require('jsonapi-serializer').Serializer;
-var coverageSerializer = new JSONAPISerializer('coverages', {
+const logger = require('logger');
+const JSONAPISerializer = require('jsonapi-serializer').Serializer;
+
+const coverageSerializer = new JSONAPISerializer('coverages', {
     attributes: ['layers'],
-    typeForAttribute: function (attribute, record) {
+    typeForAttribute(attribute, record) {
         return attribute;
     },
     keyForAttribute: 'camelCase'
@@ -12,9 +12,10 @@ var coverageSerializer = new JSONAPISerializer('coverages', {
 
 class CoverageSerializer {
 
-  static serialize(data) {
-    return coverageSerializer.serialize(data);
-  }
+    static serialize(data) {
+        return coverageSerializer.serialize(data);
+    }
+
 }
 
 module.exports = CoverageSerializer;

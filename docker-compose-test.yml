@@ -16,9 +16,9 @@ services:
     command: test
     depends_on:
       - mongo
+
   mongo:
-    image: mongo
+    image: mongo:3.4
     command: --smallfiles
     ports:
       - "27017"
-    restart: always

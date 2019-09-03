@@ -16,6 +16,7 @@ class GeoStoreValidator {
         logger.debug('Validate correct!');
         yield next;
     }
+
 }
 
 module.exports = GeoStoreValidator;

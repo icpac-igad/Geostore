@@ -1,11 +1,12 @@
-'use strict';
 
-class ErrorCreatingGist extends Error{
+class ErrorCreatingGist extends Error {
 
-    constructor(message){
+    constructor(message) {
         super(message);
         this.name = 'ErrorCreatingGist';
         this.message = message;
     }
+
 }
+
 module.exports = ErrorCreatingGist;

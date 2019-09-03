@@ -1,12 +1,13 @@
-'use strict';
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
 
-var IdConnection = new Schema({
-    hash: {type: String, required:true, trim: true},
-    oldId: {type: String, required: true, trim: true}
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
+
+const IdConnection = new Schema({
+    hash: { type: String, required: true, trim: true },
+    oldId: { type: String, required: true, trim: true }
 
 });
-IdConnection.index({ oldId: 1});
+IdConnection.index({ oldId: 1 });
 
 module.exports = mongoose.model('IdConnection', IdConnection);

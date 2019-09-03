@@ -1,9 +1,9 @@
 const GeoStoreService2 = require('services/geoStoreService');
 
-describe('GeoStore Service test', function () {
+describe('GeoStore Service test', () => {
 
     const pointGeometry = {
-        type: "Point",
+        type: 'Point',
         coordinates: [-1.6596221923828125, 50.91255835156951]
     };
 
@@ -21,24 +21,23 @@ describe('GeoStore Service test', function () {
     };
 
     const invalidGeometry = {
-        type: "Unknown",
+        type: 'Unknown',
         coordinates: [-1.6596221923828125, 50.91255835156951]
     };
 
-    it('Get Point Geometry Type', function () {
-        let geometry_type = GeoStoreService2.getGeometryType(pointGeometry);
-        geometry_type.should.be.exactly(1).and.be.a.Number();
+    it('Get Point Geometry Type', () => {
+        const geometryType = GeoStoreService2.getGeometryType(pointGeometry);
+        geometryType.should.equal(1).and.be.a('number');
     });
 
-
-    it('Get Polygon Geometry Type', function () {
-        let geometry_type = GeoStoreService2.getGeometryType(polygonGeometry);
-        geometry_type.should.be.exactly(3).and.be.a.Number();
+    it('Get Polygon Geometry Type', () => {
+        const geometryType = GeoStoreService2.getGeometryType(polygonGeometry);
+        geometryType.should.equal(3).and.be.a('number');
     });
 
-    it('Test unknown geometry', function () {
+    it('Test unknown geometry', () => {
         try {
-            GeoStoreService2.getGeometryType(invalidGeometry)
+            GeoStoreService2.getGeometryType(invalidGeometry);
         } catch (err) {
             const expected = 'Unknown geometry type: Unknown';
             err.message.should.equal(expected);

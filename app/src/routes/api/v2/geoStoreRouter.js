@@ -9,8 +9,8 @@ const GeoStoreServiceV2 = require('services/geoStoreServiceV2');
 const GeoJsonIOService = require('services/geoJsonIOService');
 const ProviderNotFound = require('errors/providerNotFound');
 const GeoJSONNotFound = require('errors/geoJSONNotFound');
-const geojsonToArcGIS = require('arcgis-to-geojson-utils').geojsonToArcGIS;
-const arcgisToGeoJSON = require('arcgis-to-geojson-utils').arcgisToGeoJSON;
+const { geojsonToArcGIS } = require('arcgis-to-geojson-utils');
+const { arcgisToGeoJSON } = require('arcgis-to-geojson-utils');
 
 const router = new Router({
     prefix: '/geostore'
@@ -55,7 +55,7 @@ class GeoStoreRouterV2 {
                 this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
             }
 
-            let geostore = yield GeoStoreServiceV2.saveGeostore(this.request.body.geojson, data);
+            const geostore = yield GeoStoreServiceV2.saveGeostore(this.request.body.geojson, data);
             if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
                 logger.debug(JSON.stringify(geostore.geojson));
             }
@@ -84,7 +84,7 @@ class GeoStoreRouterV2 {
             if (this.request.body.esrijson) {
                 this.request.body.geojson = arcgisToGeoJSON(this.request.body.esrijson);
             }
-            let geostore = yield GeoStoreServiceV2.calculateArea(this.request.body.geojson, data);
+            const geostore = yield GeoStoreServiceV2.calculateArea(this.request.body.geojson, data);
             if (process.env.NODE_ENV !== 'test' || geostore.geojson.length < 2000) {
                 logger.debug(JSON.stringify(geostore.geojson));
             }
@@ -100,7 +100,7 @@ class GeoStoreRouterV2 {
 
     static* getNational() {
         logger.info('Obtaining national data geojson (GADM v3.6)');
-        let thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
+        const thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
 
         if (thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)) {
             this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
@@ -125,7 +125,7 @@ class GeoStoreRouterV2 {
 
     static* getSubnational() {
         logger.info('Obtaining subnational data geojson (GADM v3.6)');
-        let thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
+        const thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
 
         if (thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)) {
             this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
@@ -141,7 +141,7 @@ class GeoStoreRouterV2 {
 
     static* getRegional() {
         logger.info('Obtaining Admin2 data geojson (GADM v3.6)');
-        let thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
+        const thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
 
         if (thresh && typeof thresh === Number && (thresh > 1 || thresh <= 0)) {
             this.throw(404, 'Bad threshold for simplify. Must be in range 0-1.');
@@ -157,13 +157,14 @@ class GeoStoreRouterV2 {
 
     static* use() {
         logger.info('Obtaining use data with name %s and id %s', this.params.name, this.params.id);
-        let thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
+        const thresh = this.query.simplify ? JSON.parse(this.query.simplify.toLowerCase()) : null;
         if (thresh && typeof thresh === Boolean && thresh !== true) {
             this.throw(404, 'Bad syntax for simplify. Must be "true".');
         }
 
         let useTable = null;
         switch (this.params.name) {
+
             case 'mining':
                 useTable = 'gfw_mining';
                 break;
@@ -181,6 +182,7 @@ class GeoStoreRouterV2 {
                 break;
             default:
                 useTable = this.params.name;
+
         }
         if (!useTable) {
             this.throw(404, 'Name not found');
@@ -205,7 +207,7 @@ class GeoStoreRouterV2 {
         this.assert(this.params.hash, 400, 'Hash param not found');
         logger.debug('Getting geostore by hash %s', this.params.hash);
 
-        let geoStore = yield GeoStoreServiceV2.getGeostoreById(this.params.hash);
+        const geoStore = yield GeoStoreServiceV2.getGeostoreById(this.params.hash);
 
         if (!geoStore) {
             this.throw(404, 'GeoStore not found');
@@ -213,9 +215,10 @@ class GeoStoreRouterV2 {
         }
         logger.debug('GeoStore found. Returning...');
 
-        let geojsonIoPath = yield GeoJsonIOService.view(geoStore.geojson);
-        this.body = { 'view_link': geojsonIoPath };
+        const geojsonIoPath = yield GeoJsonIOService.view(geoStore.geojson);
+        this.body = { view_link: geojsonIoPath };
     }
+
 }
 
 router.get('/:hash', GeoStoreRouterV2.getGeoStoreById);

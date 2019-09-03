@@ -1,10 +1,10 @@
-'use strict';
-var logger = require('logger');
-var CoverageDuplicated = require('errors/coverageDuplicated');
-var CoverageNotFound = require('errors/coverageNotFound');
-var CartoDB = require('cartodb');
-var Mustache = require('mustache');
-var config = require('config');
+
+const logger = require('logger');
+const CoverageDuplicated = require('errors/coverageDuplicated');
+const CoverageNotFound = require('errors/coverageNotFound');
+const CartoDB = require('cartodb');
+const Mustache = require('mustache');
+const config = require('config');
 
 const ISO = `with c as (select the_geom_webmercator, st_area(the_geom_webmercator)/10000 as area_ha from gadm36_adm0 where iso = UPPER('{{iso}}')),
             cl as (select (st_buffer(st_simplify(the_geom_webmercator,10000),1)) the_geom_webmercator, slug, coverage_slug from coverage_layers)
@@ -38,109 +38,104 @@ const WORLD = `SELECT slug FROM coverage_layers where ST_INTERSECTS(the_geom, ST
 const REDUCED_WORLD = `with p as (SELECT slug, the_geom FROM coverage_layers {{{filter}}}) SELECT slug FROM p  where ST_INTERSECTS(the_geom, ST_SetSRID(ST_GeomFromGeoJSON('{{{geojson}}}'), 4326))`;
 
 
-var executeThunk = function(client, sql, params) {
-  return function(callback) {
-    client.execute(sql, params).done(function(data) {
-      callback(null, data);
-    }).error(function(err) {
-      callback(err[0], null);
-    });
-  };
+const executeThunk = function (client, sql, params) {
+    return function (callback) {
+        client.execute(sql, params).done((data) => {
+            callback(null, data);
+        }).error((err) => {
+            callback(err[0], null);
+        });
+    };
 };
 
 
 class CoverageServiceV2 {
 
-  constructor() {
-    this.client = new CartoDB.SQL({
-      user: config.get('cartoDB.user')
-    });
-  }
-
-  *
-  getNational(iso) {
-    logger.debug('Obtaining national of iso %s', iso);
-    let params = {
-      iso: iso
-    };
-
-    let data = yield executeThunk(this.client, ISO, params);
-    if (data.rows && data.rows.length > 0) {
-      return data.rows.map(item => item.slug);
+    constructor() {
+        this.client = new CartoDB.SQL({
+            user: config.get('cartoDB.user')
+        });
     }
-    return [];
-  }
 
-  *
-  getSubnational(iso, id1) {
-    logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
-    let params = {
-      iso: iso,
-      id1: id1
-    };
+    * getNational(iso) {
+        logger.debug('Obtaining national of iso %s', iso);
+        const params = {
+            iso
+        };
 
-    let data = yield executeThunk(this.client, ID1, params);
-    if (data.rows && data.rows.length > 0) {
-      return data.rows.map(item => item.slug);
+        const data = yield executeThunk(this.client, ISO, params);
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map((item) => item.slug);
+        }
+        return [];
     }
-    return [];
-  }
 
-  *
-  getUse(useTable, id) {
-    logger.debug('Obtaining use with id %s', id);
+    * getSubnational(iso, id1) {
+        logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
+        const params = {
+            iso,
+            id1
+        };
 
-    let params = {
-      useTable: useTable,
-      pid: id
-    };
-
-    let data = yield executeThunk(this.client, USE, params);
-
-    if (data.rows && data.rows.length > 0) {
-      return data.rows.map(item => item.slug);
+        const data = yield executeThunk(this.client, ID1, params);
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map((item) => item.slug);
+        }
+        return [];
     }
-    return [];
-  }
 
-  *
-  getWdpa(wdpaid) {
-    logger.debug('Obtaining wpda of id %s', wdpaid);
+    * getUse(useTable, id) {
+        logger.debug('Obtaining use with id %s', id);
 
-    let params = {
-      wdpaid: wdpaid
-    };
+        const params = {
+            useTable,
+            pid: id
+        };
 
-    let data = yield executeThunk(this.client, WDPA, params);
-    if (data.rows && data.rows.length > 0) {
-      return data.rows.map(item => item.slug);
+        const data = yield executeThunk(this.client, USE, params);
+
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map((item) => item.slug);
+        }
+        return [];
     }
-    return [];
-  }
 
-  *
-  getCoverages() {
-    logger.info('Getting coverages');
+    * getWdpa(wdpaid) {
+        logger.debug('Obtaining wpda of id %s', wdpaid);
 
-    let data = yield executeThunk(this.client, COVERAGES);
-    return data;
-  }
+        const params = {
+            wdpaid
+        };
 
-  *
-  getWorld(geojson, { slugs }) {
-    logger.info('Getting layers that intersect');
-
-    let params = {
-      geojson: JSON.stringify(geojson),
-      filter: slugs && slugs.length && `WHERE slug IN (${slugs.map(slug => `'${slug.trim()}'`).join(',')})`
-    };
-    const query = slugs ? REDUCED_WORLD : WORLD;
-    let data = yield executeThunk(this.client, query, params);
-    if (data.rows && data.rows.length > 0) {
-      return data.rows.map(item => item.slug);
+        const data = yield executeThunk(this.client, WDPA, params);
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map((item) => item.slug);
+        }
+        return [];
     }
-    return [];
-  }
+
+    * getCoverages() {
+        logger.info('Getting coverages');
+
+        const data = yield executeThunk(this.client, COVERAGES);
+        return data;
+    }
+
+    * getWorld(geojson, { slugs }) {
+        logger.info('Getting layers that intersect');
+
+        const params = {
+            geojson: JSON.stringify(geojson),
+            filter: slugs && slugs.length && `WHERE slug IN (${slugs.map((slug) => `'${slug.trim()}'`).join(',')})`
+        };
+        const query = slugs ? REDUCED_WORLD : WORLD;
+        const data = yield executeThunk(this.client, query, params);
+        if (data.rows && data.rows.length > 0) {
+            return data.rows.map((item) => item.slug);
+        }
+        return [];
+    }
+
 }
 
 module.exports = new CoverageServiceV2();
