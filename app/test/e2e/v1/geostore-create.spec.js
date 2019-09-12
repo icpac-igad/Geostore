@@ -2,6 +2,7 @@
 const nock = require('nock');
 const chai = require('chai');
 const config = require('config');
+const logger = require('logger');
 
 const { getTestServer } = require('../utils/test-server');
 
@@ -58,9 +59,14 @@ describe('Geostore v1 tests - Create geostores', () => {
             .send({
                 geojson: {
                     type: 'FeatureCollection',
+                    "properties": {
+                        "some": "property"
+                      },
                     features: [{
                         type: 'Feature',
-                        properties: {},
+                        "properties": {
+                        "some": "property"
+                      },
                         geometry: {
                             type: 'MultiPoint',
                             coordinates: [
