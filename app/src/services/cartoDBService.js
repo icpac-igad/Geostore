@@ -89,6 +89,7 @@ class CartoDBService {
             const geoData = {
                 info: {
                     iso: iso.toUpperCase(),
+                    id1: null,
                     gadm: '2.8'
                 }
             };
