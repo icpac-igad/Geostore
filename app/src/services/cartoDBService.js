@@ -90,6 +90,7 @@ class CartoDBService {
                 info: {
                     iso: iso.toUpperCase(),
                     id1: null,
+                    id2: null,
                     gadm: '2.8'
                 }
             };
@@ -129,7 +130,8 @@ class CartoDBService {
         logger.debug('Obtaining subnational of iso %s and id1', iso, id1);
         const params = {
             iso: iso.toUpperCase(),
-            id1: parseInt(id1, 10)
+            id1: parseInt(id1, 10),
+            id2: null
         };
 
         logger.debug('Checking existing subnational geo');
