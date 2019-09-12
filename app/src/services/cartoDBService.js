@@ -71,7 +71,9 @@ class CartoDBService {
     * getNational(iso) {
         logger.debug('Obtaining national of iso %s', iso);
         const query = {
-            'info.iso': iso.toUpperCase()
+            'info.iso': iso.toUpperCase(),
+            'info.id1': null,
+            'info.id2': null
         };
         logger.debug('Checking existing national geo');
         let existingGeo = yield GeoStoreService.getGeostoreByInfoProps(query);
