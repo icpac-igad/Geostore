@@ -72,7 +72,7 @@ class GeoStoreRouter {
     }
 
     static* getArea() {
-        logger.info('Retreiving Polygon Area');
+        logger.info('Retrieving Polygon Area');
         try {
             const data = {
                 provider: this.request.body.provider,
