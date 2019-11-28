@@ -207,13 +207,10 @@ class GeoStoreService {
             geoStore.info = data.info;
         }
         geoStore.lock = data.lock || false;
-
         logger.debug('Fix and convert geojson');
         logger.debug('Converting', JSON.stringify(geoStore.geojson));
-
         const geoJsonObtained = yield GeoStoreService.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
         geoStore.geojson = geoJsonObtained.geojson;
-
         logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
         logger.debug('Make Feature Collection');
         geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson, props);

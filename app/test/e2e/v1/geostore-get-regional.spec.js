@@ -62,9 +62,7 @@ describe('Geostore v1 tests - Get geostore sub sub national', () => {
                 iso: testISO, id1: testID, id2: testID2, gadm: '2.8'
             }
         });
-
         const response = await subnational.get(`/${testISO}/${testID}/${testID2}`);
-
         const { data } = response.body;
         data.id.should.equal(createdSubnational.hash);
         data.type.should.equal('geoStore');
@@ -72,7 +70,6 @@ describe('Geostore v1 tests - Get geostore sub sub national', () => {
         data.attributes.should.instanceOf(Object);
 
         const { geojson, hash } = data.attributes;
-
         const expectedGeojson = {
             ...DEFAULT_GEOJSON,
             crs: {},

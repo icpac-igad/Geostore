@@ -113,22 +113,18 @@ describe('Geostore v1 tests - Get geostore - National level', () => {
             }
         });
         const response = await requester.get(`/api/v1/geostore/admin/MCO`).send();
-
         response.status.should.equal(200);
         response.body.should.have.property('data').and.be.an('object');
         response.body.data.should.have.property('type').and.equal('geoStore');
         response.body.data.should.have.property('id').and.a('string');
         response.body.data.should.have.property('attributes').and.be.an('object');
-
         response.body.data.attributes.should.have.property('areaHa').and.equal(205.64210228373287);
         response.body.data.attributes.should.have.property('bbox').and.be.an('array');
         response.body.data.attributes.should.have.property('geojson').and.be.an('object');
         response.body.data.attributes.should.have.property('hash').and.be.a('string');
         response.body.data.attributes.should.have.property('info').and.be.an('object');
-
         response.body.data.attributes.info.should.have.property('gadm').and.equal('2.8');
         response.body.data.attributes.info.should.have.property('iso').and.equal('MCO');
-
     });
 
     afterEach(() => {
