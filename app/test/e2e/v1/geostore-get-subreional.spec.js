@@ -54,10 +54,12 @@ describe('Geostore v1 tests - Get geostore subnational by id', () => {
     it('Getting subnational by id should return directly from db when it was created (happy case)', async () => {
         const testID = 123;
         const testISO = 'TEST123';
-        const createdSubnational = await createGeostore({ info: { iso: testISO, id1: testID , id2: null, gadm: '2.8'} });
-
+        const createdSubnational = await createGeostore({
+            info: {
+                iso: testISO, id1: testID, id2: null, gadm: '2.8'
+            }
+        });
         const response = await subnational.get(`/${testISO}/${testID}`);
-
         const { data } = response.body;
         data.id.should.equal(createdSubnational.hash);
         data.type.should.equal('geoStore');

@@ -100,6 +100,14 @@ class GeoStoreServiceV2 {
         return idCon.hash;
     }
 
+    static async getNewHashPromise(hash) {
+        const idCon = await IdConnection.findOne({ oldId: hash }).exec();
+        if (!idCon) {
+            return hash;
+        }
+        return idCon.hash;
+    }
+
     static* getGeostoreById(id) {
         logger.debug(`Getting geostore by id ${id}`);
         const hash = yield GeoStoreServiceV2.getNewHash(id);
@@ -108,6 +116,18 @@ class GeoStoreServiceV2 {
         if (geoStore) {
             logger.debug('geostore', JSON.stringify(geoStore.geojson));
             return geoStore;
+        }
+        return null;
+    }
+
+    static async getMultipleGeostores(ids) {
+        logger.debug(`Getting geostores with ids: ${ids}`);
+        const hashes = await Promise.all(ids.map(GeoStoreServiceV2.getNewHashPromise));
+        const query = { hash: { $in: hashes } };
+        const geoStores = await GeoStore.find(query);
+
+        if (geoStores && geoStores.length > 0) {
+            return geoStores;
         }
         return null;
     }
@@ -171,14 +191,14 @@ class GeoStoreServiceV2 {
         }
         let props = null;
         const geom_type = geoStore.geojson.type || null;
-        if (geom_type && geom_type === "FeatureCollection") {
-            logger.info('Preserving FeatureCollection properties.')
+        if (geom_type && geom_type === 'FeatureCollection') {
+            logger.info('Preserving FeatureCollection properties.');
             props = geoStore.geojson.features[0].properties || null;
-        } else if(geom_type && geom_type === "Feature"){
-            logger.info('Preserving Feature properties.')
+        } else if (geom_type && geom_type === 'Feature') {
+            logger.info('Preserving Feature properties.');
             props = geoStore.geojson.properties || null;
-        } else{
-            logger.info('Preserving Geometry properties.')
+        } else {
+            logger.info('Preserving Geometry properties.');
             props = geoStore.geojson.properties || null;
         }
         logger.debug('Props', JSON.stringify(props));
@@ -186,7 +206,6 @@ class GeoStoreServiceV2 {
             geoStore.info = data.info;
         }
         geoStore.lock = data.lock || false;
-
         logger.debug('Fix and convert geojson');
         if (process.env.NODE_ENV !== 'test' || geoStore.geojson.length < 2000) {
             logger.debug('Converting', JSON.stringify(geoStore.geojson));

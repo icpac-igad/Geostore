@@ -9,6 +9,7 @@ const ProviderNotFound = require('errors/providerNotFound');
 const GeoJSONNotFound = require('errors/geoJSONNotFound');
 const UnknownGeometry = require('errors/unknownGeometry');
 const config = require('config');
+const { promisify } = require('util');
 
 const CARTO_PROVIDER = 'carto';
 
@@ -31,9 +32,11 @@ class GeoStoreService {
 
         if (geojson.type === 'Point' || geojson.type === 'MultiPoint') {
             return 1;
-        } if (geojson.type === 'LineString' || geojson.type === 'MultiLineString') {
+        }
+        if (geojson.type === 'LineString' || geojson.type === 'MultiLineString') {
             return 2;
-        } if (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon') {
+        }
+        if (geojson.type === 'Polygon' || geojson.type === 'MultiPolygon') {
             return 3;
         }
         throw new UnknownGeometry(`Unknown geometry type: ${geojson.type}`);
@@ -96,6 +99,14 @@ class GeoStoreService {
         return idCon.hash;
     }
 
+    static async getNewHashPromise(hash) {
+        const idCon = await IdConnection.findOne({ oldId: hash }).exec();
+        if (!idCon) {
+            return hash;
+        }
+        return idCon.hash;
+    }
+
     static* getGeostoreById(id) {
         logger.debug(`Getting geostore by id ${id}`);
         const hash = yield GeoStoreService.getNewHash(id);
@@ -104,6 +115,18 @@ class GeoStoreService {
         if (geoStore) {
             logger.debug('geostore', JSON.stringify(geoStore.geojson));
             return geoStore;
+        }
+        return null;
+    }
+
+    static async getMultipleGeostores(ids) {
+        logger.debug(`Getting geostores with ids: ${ids}`);
+        const hashes = await Promise.all(ids.map(GeoStoreService.getNewHashPromise));
+        const query = { hash: { $in: hashes } };
+        const geoStores = await GeoStore.find(query);
+
+        if (geoStores && geoStores.length > 0) {
+            return geoStores;
         }
         return null;
     }
@@ -168,29 +191,26 @@ class GeoStoreService {
 
         let props = null;
         const geom_type = geoStore.geojson.type || null;
-        if (geom_type && geom_type === "FeatureCollection") {
-            logger.info('Preserving FeatureCollection properties.')
+        if (geom_type && geom_type === 'FeatureCollection') {
+            logger.info('Preserving FeatureCollection properties.');
             props = geoStore.geojson.features[0].properties || null;
-        } else if(geom_type && geom_type === "Feature"){
-            logger.info('Preserving Feature properties.')
+        } else if (geom_type && geom_type === 'Feature') {
+            logger.info('Preserving Feature properties.');
             props = geoStore.geojson.properties || null;
-        } else{
-            logger.info('Preserving Geometry properties.')
+        } else {
+            logger.info('Preserving Geometry properties.');
             props = geoStore.geojson.properties || null;
         }
         logger.debug('Props', JSON.stringify(props));
-        
+
         if (data && data.info) {
             geoStore.info = data.info;
         }
         geoStore.lock = data.lock || false;
-
         logger.debug('Fix and convert geojson');
         logger.debug('Converting', JSON.stringify(geoStore.geojson));
-
         const geoJsonObtained = yield GeoStoreService.repairGeometry(GeoJSONConverter.getGeometry(geoStore.geojson));
         geoStore.geojson = geoJsonObtained.geojson;
-
         logger.debug('Repaired geometry', JSON.stringify(geoStore.geojson));
         logger.debug('Make Feature Collection');
         geoStore.geojson = GeoJSONConverter.makeFeatureCollection(geoStore.geojson, props);
