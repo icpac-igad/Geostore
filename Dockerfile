@@ -1,7 +1,7 @@
 FROM mhart/alpine-node:12.9
 MAINTAINER info@vizzuality.com
 
-ENV NAME gfw-geostore-api
+ENV NAME geostore-api
 ENV USER microservice
 
 RUN apk update && apk upgrade && \

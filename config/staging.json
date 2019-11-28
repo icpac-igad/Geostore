@@ -1,16 +1,16 @@
 {
   "logger": {
-    "name": "gfw-geostore-api-STAGING",
+    "name": "geostore-api-STAGING",
     "level": "debug",
     "toFile": false,
     "dirLogFile": null
   },
   "service": {
-    "uri": "http://gfw-geostore-api-staging.herokuapp.com",
+    "uri": "http://geostore-api-staging.herokuapp.com",
     "port": null
   },
   "mongodb": {
-    "database": "gfw_geostore_db",
+    "database": "geostore_db",
     "host": "mymachine",
     "port": 32780
   }

@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
-  title: GFW GeoStore API
-  description: Global Forest Watch - GeoStore API
+  title: GeoStore API
+  description: GeoStore API
   version: "1.0.0"
 host: example.vizzuality.com
 
@@ -186,8 +186,8 @@ paths:
                   "hash": "f3ec85259a83c61ac1b7ff8a51d0a461",
                   "provider": {
                       "filter": "cartodb_id=729417",
-                      "user": "wri-01",
-                      "table": "gfw_mining",
+                      "user": "x",
+                      "table": "x",
                       "type": "carto"
                   },
                   "areaHa": 9764.29591966568

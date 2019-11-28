@@ -1,18 +1,18 @@
 {
   "logger": {
-    "name": "gfw-geostore-api-DEV",
+    "name": "geostore-api-DEV",
     "level": "debug",
     "toFile": false,
     "dirLogFile": null
   },
   "service": {
-    "id": "gfw-geostore-api_1.0.0",
-    "name": "GFW GeoStore API",
+    "id": "geostore-api_1.0.0",
+    "name": "GeoStore API",
     "uri": "http://mymachine:3100",
     "port": 3100
   },
   "mongodb": {
-    "database": "gfw_geostore_db",
+    "database": "geostore_db",
     "host": "127.0.0.1",
     "port": 27017
   },
