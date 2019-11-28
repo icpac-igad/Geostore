@@ -1,7 +1,7 @@
 {
-  "name": "gfw-geostore-api",
+  "name": "geostore-api",
   "version": "1.4.0",
-  "description": "Global forest watch - GeoStore API",
+  "description": "GeoStore API",
   "main": "index.js",
   "scripts": {
     "test-e2e": "NODE_PATH=app/src grunt --gruntfile app/Gruntfile.js e2eTest",
@@ -13,15 +13,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gfw-api/gfw-geostore-api.git"
+    "url": "git+https://github.com/Skydipper/Geostore.git"
   },
   "keywords": [
-    "gfw",
-    "api",
-    "microservice",
-    "node",
-    "javascript",
-    "koa"
+    "Geostore"
   ],
   "author": {
     "name": "Vizzuality",
@@ -30,9 +25,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gfw-api/gfw-geostore-api/issues"
+    "url": "https://github.com/Skydipper/Geostore/issues"
   },
-  "homepage": "https://github.com/gfw-api/gfw-geostore-api#readme",
+  "homepage": "https://github.com/Skydipper/Geostore#readme",
   "dependencies": {
     "arcgis-to-geojson-utils": "^1.0.1",
     "bunyan": "1.7.1",

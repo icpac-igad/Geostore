@@ -4,7 +4,7 @@ services:
     build: .
     ports:
       - "3100:3100"
-    container_name: gfw-geostore-api-develop
+    container_name: geostore-api-develop
     env_file:
       - dev.env
     environment:
@@ -18,13 +18,13 @@ services:
     depends_on:
       - mongo
     volumes:
-      - ./app:/opt/gfw-geostore-api/app
+      - ./app:/opt/geostore-api/app
   mongo:
     image: mongo:3.4
-    container_name: gfw-geostore-mon
+    container_name: geostore-mon
     command: --smallfiles
     ports:
       - "27017"
     volumes:
-      - $HOME/docker/data/gfw-geostore-api:/data/db
+      - $HOME/docker/data/geostore-api:/data/db
     restart: always

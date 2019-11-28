@@ -37,29 +37,6 @@ info:
 
     We will be able to store a geojson and retrive a geohash for that geojson. The service will also provide information related the geometry stored, like the area in Ha or the bounding box.
 
-    We will also be able to provide a geometry provider at CARTO:
-      ```{
-      "provider": {
-          "filter": "cartodb_id=729417",
-          "user": "wri-01",
-          "table": "gfw_mining",
-          "type": "carto"
-      }
-    }```
-
-
-  termsOfService: http://www.globalforestwatch.org/terms
-  contact:
-    name: API Support
-    url: http://www.globalforestwatch.org
-    email: support@wri.com
-  license:
-    name: MIT License (MIT)
-    url: https://opensource.org/licenses/MIT
-  version: "1.0.0"
-
-host: staging-api.globalforestwatch.org
-
 schemes:
   - https
   - http
@@ -420,8 +397,8 @@ paths:
                   "hash": "f3ec85259a83c61ac1b7ff8a51d0a461",
                   "provider": {
                       "filter": "cartodb_id=729417",
-                      "user": "wri-01",
-                      "table": "gfw_mining",
+                      "user": "x",
+                      "table": "x",
                       "type": "carto"
                   },
                   "areaHa": 9764.29591966568
@@ -470,8 +447,8 @@ paths:
                 {
                   "provider": {
                       "filter": "cartodb_id=729417",
-                      "user": "wri-01",
-                      "table": "gfw_mining",
+                      "user": "x",
+                      "table": "x",
                       "type": "carto"
                   }
                 }
@@ -577,8 +554,8 @@ definitions:
         example:
           provider:
             filter: cartodb_id=729417
-            user: wri-01
-            table: gfw_mining
+            user: x
+            table: x
             type: carto
       geojson:
         properties:

@@ -1,18 +1,14 @@
-# Global Forest Watch Geostore API
+# Geostore API
 
-[![Build Status](https://travis-ci.org/gfw-api/gfw-geostore-api.svg?branch=develop)](https://travis-ci.org/gfw-api/gfw-geostore-api)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/896da4f09a0ebb049753/test_coverage)](https://codeclimate.com/github/gfw-api/gfw-geostore-api/test_coverage)
+[![Build Status](https://travis-ci.org/Skydipper/Geostore.svg?branch=develop)](https://travis-ci.org/Skydipper/Geostore)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/896da4f09a0ebb049753/test_coverage)](https://codeclimate.com/github/Skydipper/Geostore/test_coverage)
 
 This repository is the microservice that implements the Geostore
 functionality, which is exposed on the /geostore endpoint.
 
 The Geostore is a simple GeoJSON storage service that receives GeoJSON
 and returns an ID that can be used later to retrieve the given object.
-It is used primarily by the GFW map to handle large GeoJSON objects that
-could not normally be stored in the URL.
 
-[View the documentation for this
-API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/gfw-api/gfw-geostore-api/master/app/microservice/swagger.yml#/GeoStore)
 
 ## Dependencies
 
@@ -33,7 +29,7 @@ Execution using Docker requires:
 Start by cloning the repository from github to your execution environment
 
 ```
-git clone https://github.com/gfw-api/gfw-geostore-api.git && cd gfw-geostore-api
+git clone https://github.com/Skydipper/Geostore.git && cd Geostore
 ```
 
 After that, follow one of the instructions below:
@@ -91,7 +87,7 @@ Follow the instruction above for setting up the runtime environment for Docker e
 - PORT => TCP port in which the service will run
 - NODE_PATH => relative path to the source code. Should be `app/src`
 - CT_REGISTER_MODE => if `auto` the microservice automatically registers on Control Tower on start
-- CT_TOKEN => 
+- CT_TOKEN =>
 - API_VERSION => API version identifier that prefixes the URL. Should be `v1`
 - MONGO_PORT_27017_TCP_ADDR => IP/Address of the MongoDB server
 - CARTODB_USER => [Carto](http://carto.com) username.

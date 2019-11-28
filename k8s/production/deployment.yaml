@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     name: {name}
-    app: gfw
+    app: geostore
   name: {name}
 spec:
   revisionHistoryLimit: 2

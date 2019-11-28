@@ -1,6 +1,6 @@
 {
   "logger": {
-    "name": "gfw-geostore-api",
+    "name": "geostore-api",
     "level": "debug",
     "toFile": false,
     "dirLogFile": null
@@ -9,7 +9,7 @@
     "uri": "http://172.31.40.31:3100"
   },
   "mongodb": {
-    "database": "gfw_geostore_db",
+    "database": "geostore_db",
     "host": "mymachine",
     "port": 32780
   }
