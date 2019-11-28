@@ -206,7 +206,6 @@ class GeoStoreServiceV2 {
             geoStore.info = data.info;
         }
         geoStore.lock = data.lock || false;
-
         logger.debug('Fix and convert geojson');
         if (process.env.NODE_ENV !== 'test' || geoStore.geojson.length < 2000) {
             logger.debug('Converting', JSON.stringify(geoStore.geojson));

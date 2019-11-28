@@ -59,9 +59,7 @@ describe('Geostore v1 tests - Get geostore subnational by id', () => {
                 iso: testISO, id1: testID, id2: null, gadm: '2.8'
             }
         });
-
         const response = await subnational.get(`/${testISO}/${testID}`);
-
         const { data } = response.body;
         data.id.should.equal(createdSubnational.hash);
         data.type.should.equal('geoStore');
