@@ -37,7 +37,7 @@ describe('Geostore v2 tests - Get geostore - Regional (admin-1) level', () => {
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
             .query({
-                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_1 as name\n        FROM gadm36_adm1\n        WHERE gid_1 = \'AAA.1_1\''
+                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_1 as name\n        FROM ea_gadm36_adm1\n        WHERE gid_1 = \'AAA.1_1\''
             })
             .reply(200, {
                 rows: [],
@@ -69,7 +69,7 @@ describe('Geostore v2 tests - Get geostore - Regional (admin-1) level', () => {
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
             .query({
-                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_1 as name\n        FROM gadm36_adm1\n        WHERE gid_1 = \'CYP.1_1\''
+                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_1 as name\n        FROM ea_gadm36_adm1\n        WHERE gid_1 = \'CYP.1_1\''
             })
             .reply(200, {
                 rows: [{

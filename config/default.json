@@ -20,7 +20,7 @@
         "uri": ""
     },
     "cartoDB": {
-        "user": null
+        "user": "erick-otenyo"
     },
     "constants": {
         "maxGeostoresFoundById": 100

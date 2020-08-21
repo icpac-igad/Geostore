@@ -6,19 +6,19 @@ const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const GeoStoreServiceV2 = require('services/geoStoreServiceV2');
 
 const ISO = `SELECT ST_AsGeoJSON(ST_MAKEVALID({geom})) AS geojson, area_ha, name_0 as name
-        FROM gadm36_countries
+        FROM ea_gadm36_countries
         WHERE gid_0 = UPPER('{{iso}}')`;
 
 const ISO_NAME = `SELECT gid_0, name_0 as name
-        FROM gadm36_adm0
+        FROM ea_gadm36_adm0
         WHERE gid_0 in `;
 
 const ID1 = `SELECT ST_AsGeoJSON(ST_MAKEVALID({geom})) AS geojson, area_ha, name_1 as name
-        FROM gadm36_adm1
+        FROM ea_gadm36_adm1
         WHERE gid_1 = '{{id1}}'`;
 
 const ID2 = `SELECT ST_AsGeoJSON(ST_MAKEVALID({geom})) AS geojson, area_ha, name_2 as name
-        FROM gadm36_adm2
+        FROM ea_gadm36_adm2
         WHERE gid_2 = '{{id2}}'`;
 
 const WDPA = `SELECT ST_AsGeoJSON(ST_MAKEVALID(p.the_geom)) AS geojson, (ST_Area(geography(the_geom))/10000) as area_ha

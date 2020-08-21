@@ -37,7 +37,7 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
             .query({
-                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER(\'AAA\')'
+                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM ea_gadm36_countries\n        WHERE gid_0 = UPPER(\'AAA\')'
             })
             .reply(200, {
                 rows: [],
@@ -69,7 +69,7 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
         nock(`https://${process.env.CARTODB_USER}.cartodb.com`)
             .get('/api/v2/sql')
             .query({
-                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER(\'MCO\')'
+                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM ea_gadm36_countries\n        WHERE gid_0 = UPPER(\'MCO\')'
             })
             .reply(200, {
                 rows: [{
@@ -141,7 +141,7 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
         })
             .get('/api/v2/sql')
             .query({
-                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM gadm36_countries\n        WHERE gid_0 = UPPER(\'USA\')'
+                q: 'SELECT ST_AsGeoJSON(ST_MAKEVALID(ST_Simplify(the_geom, 0.005))) AS geojson, area_ha, name_0 as name\n        FROM ea_gadm36_countries\n        WHERE gid_0 = UPPER(\'USA\')'
             })
             .reply(200, JSON.parse(fs.readFileSync(path.join(__dirname, 'resources', 'USA-request-one-reply.json'))), ['Server',
                 'openresty',
@@ -164,7 +164,7 @@ describe('Geostore v2 tests - Get geostore - National level', () => {
                 'vary',
                 'Authorization',
                 'X-SQLAPI-Log',
-                '{"request":{"sql":{"type":"query","sql":"SELECT ST AsGeoJSON ST Simplify the geom  0 005   AS geojson  area ha  name 0 as name         FROM gadm36 countries         WHERE gid 0   UPPER  USA  "}}}',
+                '{"request":{"sql":{"type":"query","sql":"SELECT ST AsGeoJSON ST Simplify the geom  0 005   AS geojson  area ha  name 0 as name         FROM ea_gadm36 countries         WHERE gid 0   UPPER  USA  "}}}',
                 'Content-Disposition',
                 'inline; filename=cartodb-query.json; modification-date="Thu, 14 Mar 2019 07:07:41 GMT";',
                 'Cache-Control',

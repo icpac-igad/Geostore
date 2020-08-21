@@ -1,12 +1,13 @@
 const config = require('config');
 const logger = require('logger');
-const koa = require('koa');
+const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const koaLogger = require('koa-logger');
 const loader = require('loader');
 const validate = require('koa-validate');
 const mongoose = require('mongoose');
 const ErrorSerializer = require('serializers/errorSerializer');
+const cors = require('@koa/cors')
 
 const mongoUri = process.env.MONGO_URI || `mongodb://${config.get('mongodb.host')}:${config.get('mongodb.port')}/${config.get('mongodb.database')}`;
 // const ctRegisterMicroservice = require('ct-register-microservice-node');
@@ -36,7 +37,12 @@ async function init() {
             }
 
             // instance of koa
-            const app = koa();
+            const app = new Koa();
+
+            // enable cors
+            app.use(cors({
+                credentials: true
+            }))
 
             // if environment is dev then load koa-logger
             if (process.env.NODE_ENV === 'dev') {
