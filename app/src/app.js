@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const ErrorSerializer = require('serializers/errorSerializer');
 
 const mongoUri = process.env.MONGO_URI || `mongodb://${config.get('mongodb.host')}:${config.get('mongodb.port')}/${config.get('mongodb.database')}`;
-const ctRegisterMicroservice = require('ct-register-microservice-node');
+// const ctRegisterMicroservice = require('ct-register-microservice-node');
 const sleep = require('sleep');
 
 // const nock = require('nock');
@@ -84,24 +84,27 @@ async function init() {
             const port = process.env.PORT || config.get('service.port');
 
             const server = app.listen(port, () => {
-                ctRegisterMicroservice.register({
-                    info: require('../microservice/register.json'),
-                    swagger: require('../microservice/public-swagger.json'),
-                    mode: (process.env.CT_REGISTER_MODE && process.env.CT_REGISTER_MODE === 'auto') ? ctRegisterMicroservice.MODE_AUTOREGISTER : ctRegisterMicroservice.MODE_NORMAL,
-                    framework: ctRegisterMicroservice.KOA1,
-                    app,
-                    logger,
-                    name: config.get('service.name'),
-                    ctUrl: process.env.CT_URL,
-                    url: process.env.LOCAL_URL,
-                    active: true,
-                }).then(() => {
-                    logger.info('Server started in ', process.env.PORT);
-                    resolve({ app, server });
-                }, (err) => {
-                    logger.error(err);
-                    process.exit(1);
-                });
+
+                // TODO: We are not using Control Tower for now. Use the api direactly
+
+                // ctRegisterMicroservice.register({
+                //     info: require('../microservice/register.json'),
+                //     swagger: require('../microservice/public-swagger.json'),
+                //     mode: (process.env.CT_REGISTER_MODE && process.env.CT_REGISTER_MODE === 'auto') ? ctRegisterMicroservice.MODE_AUTOREGISTER : ctRegisterMicroservice.MODE_NORMAL,
+                //     framework: ctRegisterMicroservice.KOA1,
+                //     app,
+                //     logger,
+                //     name: config.get('service.name'),
+                //     ctUrl: process.env.CT_URL,
+                //     url: process.env.LOCAL_URL,
+                //     active: true,
+                // }).then(() => {
+                //     logger.info('Server started in ', process.env.PORT);
+                //     resolve({ app, server });
+                // }, (err) => {
+                //     logger.error(err);
+                //     process.exit(1);
+                // });
             });
 
             logger.info(`Server started in port:${port}`);
