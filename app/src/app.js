@@ -95,7 +95,7 @@ async function init() {
                     info: require('../microservice/register.json'),
                     swagger: require('../microservice/public-swagger.json'),
                     mode: (process.env.CT_REGISTER_MODE && process.env.CT_REGISTER_MODE === 'auto') ? ctRegisterMicroservice.MODE_AUTOREGISTER : ctRegisterMicroservice.MODE_NORMAL,
-                    framework: ctRegisterMicroservice.KOA1,
+                    framework: ctRegisterMicroservice.KOA2,
                     app,
                     logger,
                     name: config.get('service.name'),
