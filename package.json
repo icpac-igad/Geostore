@@ -40,6 +40,7 @@
         "config": "1.19.0",
         "country-data": "0.0.24",
         "ct-register-microservice-node": "^2.1.7",
+        "dotenv": "^8.2.0",
         "geojsonhint": "1.2.0",
         "jsonapi-serializer": "^3.6.5",
         "koa": "^2.0.0",
