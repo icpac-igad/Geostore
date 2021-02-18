@@ -28,3 +28,8 @@ services:
     volumes:
       - $HOME/docker/data/geostore-api:/data/db
     restart: always
+
+networks:
+  default:
+    external:
+      name: control-tower_controltower
