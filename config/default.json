@@ -1,7 +1,7 @@
 {
     "logger": {
         "name": "geostore-api-DEV",
-        "level": "debug",
+        "level": "info",
         "toFile": false,
         "dirLogFile": null
     },
@@ -21,6 +21,9 @@
     },
     "cartoDB": {
         "user": "erick-otenyo"
+    },
+    "pgFeatureServ": {
+        "url": ""
     },
     "constants": {
         "maxGeostoresFoundById": 100

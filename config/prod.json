@@ -1,16 +1,16 @@
 {
-  "logger": {
-    "name": "geostore-api",
-    "level": "debug",
-    "toFile": false,
-    "dirLogFile": null
-  },
-  "service": {
-    "uri": "http://172.31.40.31:3100"
-  },
-  "mongodb": {
-    "database": "geostore_db",
-    "host": "mymachine",
-    "port": 32780
-  }
+    "logger": {
+        "name": "geostore-api",
+        "level": "info",
+        "toFile": false,
+        "dirLogFile": null
+    },
+    "service": {
+        "uri": "http://172.31.40.31:3100"
+    },
+    "mongodb": {
+        "database": "geostore_db",
+        "host": "mymachine",
+        "port": 32780
+    }
 }

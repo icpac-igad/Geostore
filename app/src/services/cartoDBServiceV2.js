@@ -178,6 +178,7 @@ class CartoDBServiceV2 {
         }
 
         const data = yield executeThunk(this.client, ID1, params, thresh);
+        
         logger.debug('Request subnational to carto');
         if (data.rows && data.rows.length > 0) {
             logger.debug('Return subnational geojson from carto');

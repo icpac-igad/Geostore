@@ -47,7 +47,6 @@ const GeoStore = new Schema({
         },
         simplify: { type: Boolean, required: false },
         simplifyThresh: { type: Number, required: false }
-
     }
 });
 
