@@ -1,6 +1,7 @@
 const logger = require("logger");
+const dotenv = require("dotenv")
 
-require("dotenv").config({ silent: true });
+dotenv.config();
 
 require("app")().then(
     () => {

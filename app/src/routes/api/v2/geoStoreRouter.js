@@ -268,14 +268,14 @@ class GeoStoreRouterV2 {
 
         let useTable = this.params.name;
 
-        let pgFeatureServUrl = config.get("pgFeatureServ.url");
+        const pgFeatureServUrl = config.get("pgFeatureServ.url");
 
         if (!useTable) {
             this.throw(404, "Name not found");
         }
 
         if (!pgFeatureServUrl) {
-            this.throw(404, "PgFeatureServ not set");
+            this.throw(400, "PgFeatureServ not set");
         }
 
         const data = yield PgFeatureService.getUse(
